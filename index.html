@@ -68,7 +68,7 @@
     <div class="seg" id="statusseg">
       <button data-s="beide" class="on">Beide</button>
       <button data-s="besucht">Besucht</button>
-      <button data-s="wunschliste">Wunschliste</button>
+      <button data-s="wunschliste">Watchlist</button>
     </div>
     <span id="ratingdots"></span>
     <span id="count"></span>
@@ -79,7 +79,7 @@
   <h3>Farbe = Bewertung</h3><div id="legcolors"></div>
   <h3 style="margin-top:14px">Form = Status</h3>
   <div class="lrow"><span class="sw" style="background:#888"></span> Kreis = besucht</div>
-  <div class="lrow"><span class="sw sq" style="background:#888"></span> Quadrat = Wunschliste</div>
+  <div class="lrow"><span class="sw sq" style="background:#888"></span> Quadrat = Watchlist (noch nicht besucht)</div>
   <p style="font-size:12px;color:var(--muted)">Icon auf dem Pin = Typ (Pizza, Bar, Café …). Beim Rauszoomen bleiben alle Orte sichtbar; bessere Bewertungen liegen oben. restomap · Session 1 MVP</p>
 </div></div>
 <div id="err"></div>
@@ -258,7 +258,7 @@ map.on('load', async () => {
         new maplibregl.Popup({offset:14}).setLngLat([lon,lat]).setHTML(
           `<div class="p-name">${esc(pr.name)}</div>
            <div class="p-meta">${esc(pr.typ)} · ${RLABEL[pr.rk]}</div>
-           <div class="p-meta">${pr.status==="besucht"?"Besucht":"Wunschliste"}</div>
+           <div class="p-meta">${pr.status==="besucht"?"Besucht":"Watchlist"}</div>
            ${pr.notiz?`<div class="p-note">${esc(pr.notiz)}</div>`:''}
            <a class="p-link" href="${gm}" target="_blank" rel="noopener">In Google Maps öffnen ↗</a>`).addTo(map);
       });
