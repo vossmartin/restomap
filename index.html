@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>restomap · Berlin</title>
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css">
+<script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+<style>
+  :root { --bg:#ffffff; --ink:#1c1c1e; --muted:#6e6e73; --line:#e4e4e7; }
+  * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html,body { margin:0; height:100%; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif; }
+  #map { position:absolute; inset:0; }
+
+  /* Suche oben */
+  #searchwrap { position:absolute; top:calc(10px + env(safe-area-inset-top)); left:10px; right:56px; z-index:5; }
+  #search { width:100%; max-width:340px; padding:10px 14px; border:1px solid var(--line); border-radius:12px;
+            font-size:16px; background:var(--bg); color:var(--ink); box-shadow:0 2px 10px rgba(0,0,0,.12); outline:none; }
+
+  /* Filter-Panel unten */
+  #panel { position:absolute; left:0; right:0; bottom:0; z-index:5; background:rgba(255,255,255,.96);
+           backdrop-filter:blur(8px); border-top:1px solid var(--line);
+           padding:8px 10px calc(8px + env(safe-area-inset-bottom)); }
+  .row { display:flex; align-items:center; gap:8px; overflow-x:auto; scrollbar-width:none; padding:3px 0; }
+  .row::-webkit-scrollbar { display:none; }
+
+  .seg { display:flex; border:1px solid var(--line); border-radius:10px; overflow:hidden; flex:0 0 auto; }
+  .seg button { border:0; background:transparent; padding:7px 11px; font-size:13px; color:var(--muted); }
+  .seg button.on { background:var(--ink); color:#fff; }
+
+  .dot { width:26px; height:26px; border-radius:50%; border:2px solid #fff; box-shadow:0 0 0 1px var(--line);
+         flex:0 0 auto; opacity:.25; transform:scale(.92); transition:all .15s; }
+  .dot.on { opacity:1; transform:scale(1); box-shadow:0 0 0 1px rgba(0,0,0,.25); }
+
+  .chip { flex:0 0 auto; border:1px solid var(--line); background:#fff; color:var(--ink); border-radius:999px;
+          padding:7px 12px; font-size:13px; }
+  .chip.on { background:var(--ink); color:#fff; border-color:var(--ink); }
+  #count { margin-left:auto; flex:0 0 auto; font-size:12px; color:var(--muted); padding-right:2px; }
+
+  /* Legende */
+  #legendbtn { position:absolute; top:calc(10px + env(safe-area-inset-top)); right:10px; z-index:5; width:38px; height:38px;
+               border-radius:50%; border:1px solid var(--line); background:var(--bg); font-size:16px; box-shadow:0 2px 10px rgba(0,0,0,.12); }
+  #legend { position:absolute; inset:0; z-index:20; background:rgba(0,0,0,.35); display:none; align-items:flex-end; }
+  #legend.open { display:flex; }
+  #legend .sheet { background:#fff; width:100%; border-radius:16px 16px 0 0; padding:18px 20px calc(22px + env(safe-area-inset-bottom));
+                   max-height:70%; overflow-y:auto; }
+  #legend h3 { margin:0 0 10px; font-size:15px; }
+  .lrow { display:flex; align-items:center; gap:10px; margin:7px 0; font-size:14px; }
+  .lrow .sw { width:20px; height:20px; border-radius:50%; flex:0 0 auto; border:2px solid #fff; box-shadow:0 0 0 1px var(--line); }
+  .lrow .sq { border-radius:5px; }
+
+  .maplibregl-popup-content { border-radius:12px; padding:12px 14px; box-shadow:0 4px 18px rgba(0,0,0,.18); min-width:200px; }
+  .p-name { font-weight:600; font-size:15px; margin-bottom:3px; padding-right:14px; }
+  .p-meta { font-size:13px; color:var(--muted); margin-bottom:2px; }
+  .p-note { font-size:12px; color:var(--muted); font-style:italic; margin-top:5px; }
+  .p-link { display:inline-block; margin-top:8px; font-size:13px; color:#1a6fd4; text-decoration:none; }
+  #err { position:absolute; top:40%; left:10%; right:10%; z-index:30; background:#fff; border:1px solid var(--line);
+         border-radius:12px; padding:16px; font-size:14px; display:none; }
+</style>
+</head>
+<body>
+<div id="map"></div>
+<div id="searchwrap"><input id="search" type="search" placeholder="Ort suchen …" autocomplete="off"></div>
+<button id="legendbtn" title="Legende">?</button>
+<div id="panel">
+  <div class="row" id="row1">
+    <div class="seg" id="statusseg">
+      <button data-s="beide" class="on">Beide</button>
+      <button data-s="besucht">Besucht</button>
+      <button data-s="wunschliste">Wunschliste</button>
+    </div>
+    <span id="ratingdots"></span>
+    <span id="count"></span>
+  </div>
+  <div class="row" id="chips"></div>
+</div>
+<div id="legend"><div class="sheet">
+  <h3>Farbe = Bewertung</h3><div id="legcolors"></div>
+  <h3 style="margin-top:14px">Form = Status</h3>
+  <div class="lrow"><span class="sw" style="background:#888"></span> Kreis = besucht</div>
+  <div class="lrow"><span class="sw sq" style="background:#888"></span> Abgerundetes Quadrat = Wunschliste</div>
+  <p style="font-size:12px;color:var(--muted)">Icon auf dem Pin = Typ (Pizza, Bar, Café …). Bei Überlappung gewinnen bessere Bewertungen den Platz. restomap · Session 1 MVP</p>
+</div></div>
+<div id="err"></div>
+
+<script>
+'use strict';
+/* ====== Konfiguration ====== */
+const SHEET_CSV_URL = "";      // Session 2: veröffentlichte Sheet-CSV-URL eintragen → Sheet wird Datenquelle
+const DATA_URL = "data/orte.geojson";
+const BASEMAP = "https://tiles.openfreemap.org/styles/positron";
+
+const COLORS = { gold:"#F0A800", lila:"#9C27B0", gruen:"#0F9D58", orange:"#E65100", grau:"#8A8A8E", rot:"#7B1420" };
+const PRIO   = { gold:0, lila:1, rot:2, orange:3, gruen:4, grau:5 };
+const RLABEL = { gold:"Sehr gut", lila:"Sehr gut · Anlass (teuer)", gruen:"Gut & günstig",
+                 orange:"Zu teuer (P/L)", grau:"Ohne Urteil", rot:"Nie wieder" };
+const TYPES = ["Restaurant","Asia","Bar","Café","Frühstück","Kneipe","Imbiss","Pizza","Club/Livemusik",
+               "Biergarten","Sushi","Eis","Weinbar","Burger","Steak/Grill","Fisch","Sport-/Kickerbar","Karaoke"];
+
+function ratingKey(q, p) {
+  if (p === "ueberteuert") return "orange";
+  if (q === "nie_wieder")  return "rot";
+  if (q === "top")         return p === "teuer" ? "lila" : "gold";
+  if (q === "gut")         return "gruen";
+  return "grau";
+}
+
+/* ====== Icon-Glyphen (weiß, schlicht) — gezeichnet in 24×24-Box ====== */
+const GLYPH = {
+  "Restaurant": c => { bar(c,8.5,5,1.6,9); c.fillRect(7,5,1.2,4); c.fillRect(9.6,5,1.2,4); // Gabel
+                       c.beginPath(); c.moveTo(15,5); c.quadraticCurveTo(17.5,8,15.9,12); c.lineTo(15.9,19); c.lineTo(14.4,19); c.lineTo(14.4,5); c.closePath(); c.fill(); },
+  "Asia":       c => { c.beginPath(); c.arc(12,13,6,0,Math.PI); c.closePath(); c.fill(); bar(c,12,13.5,10,1.6,true);
+                       line(c,8,4,14,9,1.6); line(c,11,3.4,16,8.4,1.6); },
+  "Bar":        c => { c.beginPath(); c.moveTo(5.5,5); c.lineTo(18.5,5); c.lineTo(12,12.5); c.closePath(); c.fill();
+                       bar(c,12,13,1.7,6); bar(c,12,19,7,1.7,true); },
+  "Café":       c => { c.fillRect(6,7,9,8); c.beginPath(); c.arc(10.5,15,4.5,0,Math.PI); c.fill();
+                       ring(c,16.5,10,2.6,1.5); bar(c,11,19.5,10,1.5,true); },
+  "Frühstück":  c => { ring(c,11,12,6.5,1.7); c.beginPath(); c.arc(11,12,2.6,0,7); c.fill(); bar(c,20.3,12,4,1.7,true); },
+  "Kneipe":     c => { c.fillRect(6,6,8.5,12); ring(c,16.8,11.5,2.8,1.6); c.clearRect(7.4,8,5.7,1.4); },
+  "Imbiss":     c => { c.save(); c.translate(12,12); c.rotate(-0.6); rr(c,-7,-3,14,6,3); c.restore();
+                       line(c,7,6.2,9,4.6,1.4); line(c,11,5.2,13,3.6,1.4); },
+  "Pizza":      c => { c.beginPath(); c.moveTo(12,20); c.lineTo(5.5,5.5); c.quadraticCurveTo(12,3,18.5,5.5); c.closePath(); c.fill();
+                       c.save(); c.globalCompositeOperation='destination-out';
+                       dot(c,10.5,8.6,1.3); dot(c,13.8,11.4,1.3); dot(c,11.6,14.6,1.1); c.restore(); },
+  "Club/Livemusik": c => { bar(c,14.9,4.5,1.7,11); c.beginPath(); c.arc(13.2,15.5,2.7,0,7); c.fill();
+                       c.beginPath(); c.moveTo(14,4); c.lineTo(19.5,5.6); c.lineTo(19.5,8.4); c.lineTo(15.7,7.2); c.lineTo(15.7,4.4); c.closePath(); c.fill(); },
+  "Biergarten": c => { c.beginPath(); c.arc(12,9.5,5.8,0,7); c.fill(); bar(c,12,17,2,6); bar(c,12,19.6,7,1.6,true); },
+  "Sushi":      c => { ring(c,12,13.5,5.5,2.6); line(c,5.5,5.8,18.5,5.8,1.6); line(c,5.5,8.6,18.5,8.6,1.6); },
+  "Eis":        c => { c.beginPath(); c.arc(12,8.6,4.6,Math.PI,0); c.fill();
+                       c.beginPath(); c.moveTo(7.4,9.4); c.lineTo(16.6,9.4); c.lineTo(12,20); c.closePath(); c.fill();
+                       c.clearRect(9.2,12.4,5.6,1.1); },
+  "Weinbar":    c => { c.beginPath(); c.moveTo(7,4.5); c.lineTo(17,4.5); c.quadraticCurveTo(17,12,12,12.6);
+                       c.quadraticCurveTo(7,12,7,4.5); c.closePath(); c.fill(); bar(c,12,14.5,1.7,5); bar(c,12,19.3,7,1.6,true); },
+  "Burger":     c => { c.beginPath(); c.arc(12,9,6.5,Math.PI,0); c.fill(); rr(c,5.5,10.4,13,2.4,1.2); rr(c,5.5,14.2,13,3.6,1.8); },
+  "Steak/Grill":c => { c.beginPath(); c.moveTo(12,4); c.quadraticCurveTo(17.5,8,16.8,13.5); c.quadraticCurveTo(16.2,18.5,12,20);
+                       c.quadraticCurveTo(7.8,18.5,7.2,13.5); c.quadraticCurveTo(6.5,8,12,4); c.closePath(); c.fill();
+                       c.save(); c.globalCompositeOperation='destination-out';
+                       c.beginPath(); c.arc(12,15.5,2.4,0,7); c.fill(); c.restore(); },
+  "Fisch":      c => { c.beginPath(); c.ellipse(10.5,12,6,3.8,0,0,7); c.fill();
+                       c.beginPath(); c.moveTo(16,12); c.lineTo(20,8.5); c.lineTo(20,15.5); c.closePath(); c.fill();
+                       c.save(); c.globalCompositeOperation='destination-out'; dot(c,7.6,10.8,0.9); c.restore(); },
+  "Sport-/Kickerbar": c => { ring(c,12,12,7,1.7); dot(c,12,12,2.2); dot(c,12,6.6,1.2); dot(c,6.9,10.3,1.2);
+                       dot(c,8.8,16.4,1.2); dot(c,15.2,16.4,1.2); dot(c,17.1,10.3,1.2); },
+  "Karaoke":    c => { rr(c,9.8,4,4.4,9,2.2); c.beginPath(); c.arc(12,10.5,4.4,0.15,Math.PI-0.15); c.lineWidth=1.6;
+                       c.stroke(); bar(c,12,16.5,1.6,3); bar(c,12,19.4,6,1.5,true); },
+};
+function bar(c,x,y,w,h,centerX){ if(centerX){ c.fillRect(x-w/2,y-h/2,w,h);} else { c.fillRect(x-w/2,y,w,h);} }
+function line(c,x1,y1,x2,y2,w){ c.lineWidth=w; c.beginPath(); c.moveTo(x1,y1); c.lineTo(x2,y2); c.stroke(); }
+function dot(c,x,y,r){ c.beginPath(); c.arc(x,y,r,0,7); c.fill(); }
+function ring(c,x,y,r,w){ c.lineWidth=w; c.beginPath(); c.arc(x,y,r,0,7); c.stroke(); }
+function rr(c,x,y,w,h,r){ c.beginPath(); c.roundRect(x,y,w,h,r); c.fill(); }
+
+function makeIcon(typ, colorKey, square) {
+  const S = 56, cv = document.createElement('canvas'); cv.width = cv.height = S;
+  const c = cv.getContext('2d');
+  c.save();
+  if (square) { c.beginPath(); c.roundRect(3,3,S-6,S-6,14); }
+  else { c.beginPath(); c.arc(S/2,S/2,S/2-3,0,7); }
+  c.fillStyle = COLORS[colorKey]; c.shadowColor='rgba(0,0,0,.35)'; c.shadowBlur=3; c.shadowOffsetY=1; c.fill();
+  c.shadowColor='transparent'; c.lineWidth=3; c.strokeStyle='#fff'; c.stroke();
+  c.restore();
+  c.save(); c.translate(4,4); c.scale(2,2); c.fillStyle='#fff'; c.strokeStyle='#fff';
+  (GLYPH[typ] || GLYPH["Restaurant"])(c); c.restore();
+  return c.getImageData(0,0,S,S);
+}
+
+/* ====== CSV-Parser (für Sheet-Quelle) ====== */
+function parseCSV(text) {
+  const rows=[]; let row=[], cell='', q=false;
+  for (let i=0;i<text.length;i++){ const ch=text[i];
+    if(q){ if(ch==='"'){ if(text[i+1]==='"'){cell+='"';i++;} else q=false; } else cell+=ch; }
+    else if(ch==='"') q=true;
+    else if(ch===','){ row.push(cell); cell=''; }
+    else if(ch==='\n'||ch==='\r'){ if(cell!==''||row.length){ row.push(cell); rows.push(row); row=[]; cell=''; } }
+    else cell+=ch; }
+  if(cell!==''||row.length){ row.push(cell); rows.push(row); }
+  const head=rows.shift();
+  return rows.map(r=>Object.fromEntries(head.map((h,i)=>[h,r[i]??''])));
+}
+function toFeatures(recs){
+  return recs.filter(r=>r.lat&&r.lon).map(r=>({ type:"Feature",
+    geometry:{ type:"Point", coordinates:[+r.lon, +r.lat] },
+    properties:{ id:r.id, name:r.name, typ:r.typ, status:r.status, q:r.qualitaet, p:r.preis, notiz:r.notiz||'' } }));
+}
+
+/* ====== State & Filter ====== */
+const state = { status:"beide", ratings:new Set(Object.keys(COLORS)), types:new Set(), query:"" };
+let allFeatures = [];
+
+function matches(pr){
+  if (state.status!=="beide" && pr.status!==state.status) return false;
+  if (!state.ratings.has(pr.rk)) return false;
+  if (state.types.size && !state.types.has(pr.typ)) return false;
+  if (state.query && !pr.name.toLowerCase().includes(state.query)) return false;
+  return true;
+}
+function applyFilter(){
+  const visible = allFeatures.filter(f=>matches(f.properties));
+  map.getSource('orte').setData({type:"FeatureCollection", features:visible});
+  document.getElementById('count').textContent = visible.length + " Orte";
+}
+
+/* ====== Karte ====== */
+const params = new URLSearchParams(location.search);
+const style = params.get('basemap')==='blank'
+  ? { version:8, glyphs:"https://tiles.openfreemap.org/fonts/{fontstack}/{range}.pbf",
+      sources:{}, layers:[{id:'bg',type:'background',paint:{'background-color':'#eceae4'}}] }
+  : BASEMAP;
+
+const map = new maplibregl.Map({ container:'map', style, center:[13.401,52.523], zoom:12.3,
+                                 attributionControl:{compact:true} });
+map.addControl(new maplibregl.NavigationControl({showCompass:false}), 'top-right');
+map.addControl(new maplibregl.GeolocateControl({positionOptions:{enableHighAccuracy:true},trackUserLocation:true}), 'top-right');
+
+map.on('error', e => { const m=(e&&e.error&&e.error.message)||''; if(m) console.warn('[restomap] map error:', m); });
+
+async function loadData(){
+  if (SHEET_CSV_URL){
+    try { const t=await (await fetch(SHEET_CSV_URL)).text(); return toFeatures(parseCSV(t)); }
+    catch(e){ console.warn('[restomap] Sheet nicht erreichbar, nutze GeoJSON-Fallback', e); }
+  }
+  const gj = await (await fetch(DATA_URL)).json();
+  return gj.features;
+}
+
+map.on('load', async () => {
+  try {
+    allFeatures = await loadData();
+    allFeatures.forEach(f=>{ const pr=f.properties; pr.rk=ratingKey(pr.q,pr.p); pr.prio=PRIO[pr.rk];
+                             pr.icon=pr.typ+"|"+pr.rk+"|"+(pr.status==="wunschliste"?"w":"b"); });
+    for (const typ of TYPES) for (const ck of Object.keys(COLORS)) {
+      map.addImage(typ+"|"+ck+"|b", makeIcon(typ,ck,false), {pixelRatio:2});
+      map.addImage(typ+"|"+ck+"|w", makeIcon(typ,ck,true ), {pixelRatio:2});
+    }
+    map.addSource('orte', { type:'geojson', data:{type:"FeatureCollection",features:allFeatures}, promoteId:'id' });
+    const common = { type:'symbol', source:'orte',
+      layout:{ 'icon-image':['get','icon'], 'symbol-sort-key':['get','prio'],
+               'icon-size':['interpolate',['linear'],['zoom'], 10,0.62, 13,0.8, 16,1] } };
+    map.addLayer({ id:'pins-low', ...common, maxzoom:14.5 });
+    map.addLayer({ id:'pins-high', ...common, minzoom:14.5,
+      layout:{ ...common.layout, 'icon-allow-overlap':true,
+               'text-field':['step',['zoom'],'',15.5,['get','name']], 'text-font':['Noto Sans Regular'],
+               'text-size':11, 'text-offset':[0,1.7],
+               'text-anchor':'top', 'text-optional':true },
+      paint:{ 'text-color':'#333', 'text-halo-color':'#fff', 'text-halo-width':1.2 } });
+
+    for (const layer of ['pins-low','pins-high']) {
+      map.on('click', layer, e => {
+        const pr = e.features[0].properties;
+        const [lon,lat] = e.features[0].geometry.coordinates;
+        const gm = `https://www.google.com/maps/search/?api=1&query=${lat},${lon}`;
+        new maplibregl.Popup({offset:14}).setLngLat([lon,lat]).setHTML(
+          `<div class="p-name">${esc(pr.name)}</div>
+           <div class="p-meta">${esc(pr.typ)} · ${RLABEL[pr.rk]}</div>
+           <div class="p-meta">${pr.status==="besucht"?"Besucht":"Wunschliste"}</div>
+           ${pr.notiz?`<div class="p-note">${esc(pr.notiz)}</div>`:''}
+           <a class="p-link" href="${gm}" target="_blank" rel="noopener">In Google Maps öffnen ↗</a>`).addTo(map);
+      });
+      map.on('mouseenter', layer, ()=>map.getCanvas().style.cursor='pointer');
+      map.on('mouseleave', layer, ()=>map.getCanvas().style.cursor='');
+    }
+    buildUI(); applyFilter();
+  } catch (err) {
+    const el=document.getElementById('err'); el.style.display='block';
+    el.textContent='Daten konnten nicht geladen werden: '+err.message; console.error(err);
+  }
+});
+
+function esc(s){ return String(s).replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+
+/* ====== UI ====== */
+function buildUI(){
+  // Status
+  document.querySelectorAll('#statusseg button').forEach(b=>b.onclick=()=>{
+    document.querySelectorAll('#statusseg button').forEach(x=>x.classList.remove('on'));
+    b.classList.add('on'); state.status=b.dataset.s; applyFilter(); });
+  // Bewertungs-Dots
+  const dots=document.getElementById('ratingdots');
+  for (const ck of ['gold','lila','gruen','grau','orange','rot']){
+    const d=document.createElement('button'); d.className='dot on'; d.style.background=COLORS[ck];
+    d.title=RLABEL[ck];
+    d.onclick=()=>{ if(state.ratings.has(ck)){state.ratings.delete(ck); d.classList.remove('on');}
+                    else {state.ratings.add(ck); d.classList.add('on');} applyFilter(); };
+    dots.appendChild(d);
+  }
+  // Typ-Chips
+  const chips=document.getElementById('chips');
+  const counts={}; allFeatures.forEach(f=>counts[f.properties.typ]=(counts[f.properties.typ]||0)+1);
+  const alle=document.createElement('button'); alle.className='chip on'; alle.textContent='Alle';
+  alle.onclick=()=>{ state.types.clear(); chips.querySelectorAll('.chip').forEach(x=>x.classList.remove('on'));
+                     alle.classList.add('on'); applyFilter(); };
+  chips.appendChild(alle);
+  for (const t of [...TYPES].sort((a,b)=>(counts[b]||0)-(counts[a]||0))){
+    const ch=document.createElement('button'); ch.className='chip'; ch.textContent=`${t} ${counts[t]||0}`;
+    ch.onclick=()=>{ if(state.types.has(t)){state.types.delete(t); ch.classList.remove('on');}
+                     else {state.types.add(t); ch.classList.add('on');}
+                     alle.classList.toggle('on', state.types.size===0); applyFilter(); };
+    chips.appendChild(ch);
+  }
+  // Suche
+  document.getElementById('search').oninput=e=>{ state.query=e.target.value.trim().toLowerCase(); applyFilter(); };
+  // Legende
+  const leg=document.getElementById('legend');
+  document.getElementById('legendbtn').onclick=()=>leg.classList.add('open');
+  leg.onclick=e=>{ if(e.target===leg) leg.classList.remove('open'); };
+  const lc=document.getElementById('legcolors');
+  for (const ck of ['gold','lila','gruen','grau','orange','rot']){
+    const r=document.createElement('div'); r.className='lrow';
+    r.innerHTML=`<span class="sw" style="background:${COLORS[ck]}"></span> ${RLABEL[ck]}`; lc.appendChild(r);
+  }
+}
+</script>
+</body>
+</html>
