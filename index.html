@@ -80,7 +80,7 @@
   <h3 style="margin-top:14px">Form = Status</h3>
   <div class="lrow"><span class="sw" style="background:#888"></span> Kreis = besucht</div>
   <div class="lrow"><span class="sw sq" style="background:#888"></span> Quadrat = Wunschliste</div>
-  <p style="font-size:12px;color:var(--muted)">Icon auf dem Pin = Typ (Pizza, Bar, Café …). Bei Überlappung gewinnen bessere Bewertungen den Platz. restomap · Session 1 MVP</p>
+  <p style="font-size:12px;color:var(--muted)">Icon auf dem Pin = Typ (Pizza, Bar, Café …). Beim Rauszoomen bleiben alle Orte sichtbar; bessere Bewertungen liegen oben. restomap · Session 1 MVP</p>
 </div></div>
 <div id="err"></div>
 
@@ -108,69 +108,43 @@ function ratingKey(q, p) {
 
 /* ====== Icon-Glyphen (weiß, schlicht) — gezeichnet in 24×24-Box ====== */
 const GLYPH = {
-  "Restaurant": c => { // Gabel: 3 Zinken + Laffe + Stiel
-                       c.fillRect(6.9,4.5,1.1,5); c.fillRect(8.6,4.5,1.1,5); c.fillRect(10.3,4.5,1.1,5);
-                       rr(c,6.9,8.2,4.5,2.6,1.2); bar(c,9.15,10.8,1.5,8.7);
-                       // Messer: Klinge + Griff
-                       c.beginPath(); c.moveTo(14.2,4.5); c.quadraticCurveTo(17.4,7.5,16.6,11.6);
-                       c.lineTo(15.7,11.6); c.lineTo(14.2,11.6); c.closePath(); c.fill();
-                       bar(c,15.1,11.6,1.5,7.9); },
-  "Asia":       c => { c.beginPath(); c.arc(12,13,6,0,Math.PI); c.closePath(); c.fill(); bar(c,12,13.5,10,1.6,true);
-                       line(c,8,4,14,9,1.6); line(c,11,3.4,16,8.4,1.6); },
-  "Bar":        c => { c.beginPath(); c.moveTo(5.5,5); c.lineTo(18.5,5); c.lineTo(12,12.5); c.closePath(); c.fill();
-                       bar(c,12,13,1.7,6); bar(c,12,19,7,1.7,true); },
-  "Café":       c => { c.beginPath(); c.roundRect(5.8,9.5,9.4,7.5,[0,0,3.5,3.5]); c.fill();
-                       ring(c,16.9,12.4,2.2,1.5); bar(c,11,19.3,12,1.5,true);
-                       line(c,8.6,5,8.6,7.8,1.3); line(c,12.2,4.2,12.2,7.8,1.3); },
-  "Frühstück":  c => { // Croissant: Mittel-Lobe + Flügel + Spitzen, mit Nähten
-                       const lobe=(x,y,rx,ry,rot)=>{ c.beginPath(); c.ellipse(x,y,rx,ry,rot,0,7); c.fill(); };
-                       lobe(12,10.8,3.1,5.2,0); lobe(8.4,12.4,2.5,4.4,-0.6); lobe(15.6,12.4,2.5,4.4,0.6);
-                       lobe(5.9,15,1.9,3.1,-1.0); lobe(18.1,15,1.9,3.1,1.0);
-                       c.save(); c.globalCompositeOperation='destination-out';
-                       c.translate(12,12); c.rotate(-0.35); c.fillRect(-1.9,-6.5,1.1,13); c.rotate(0.7); c.fillRect(0.8,-6.5,1.1,13);
-                       c.restore(); },
-  "Kneipe":     c => { // Krug mit Henkel + Schaumkrone
-                       rr(c,6.2,8.2,9,11,1.5); ring(c,17.4,13.2,2.5,1.7);
-                       dot(c,7.8,7.2,1.9); dot(c,10.7,6.3,2.2); dot(c,13.6,7.2,1.9);
-                       c.save(); c.globalCompositeOperation='destination-out';
-                       c.fillRect(5.5,9.4,10.4,1.2); c.restore(); },
-  "Imbiss":     c => { // Pommes-Tüte
-                       c.beginPath(); c.moveTo(7,11); c.lineTo(17,11); c.lineTo(15.7,20); c.lineTo(8.3,20); c.closePath(); c.fill();
-                       c.save(); c.translate(9.6,10.5); c.rotate(-0.14); c.fillRect(-0.85,-6,1.7,6); c.restore();
-                       c.fillRect(11.15,3.6,1.7,6.9);
-                       c.save(); c.translate(14.4,10.5); c.rotate(0.14); c.fillRect(-0.85,-6,1.7,6); c.restore(); },
-  "Pizza":      c => { c.beginPath(); c.moveTo(12,20); c.lineTo(5.5,5.5); c.quadraticCurveTo(12,3,18.5,5.5); c.closePath(); c.fill();
-                       c.save(); c.globalCompositeOperation='destination-out';
-                       dot(c,10.5,8.6,1.3); dot(c,13.8,11.4,1.3); dot(c,11.6,14.6,1.1); c.restore(); },
-  "Club/Livemusik": c => { bar(c,14.9,4.5,1.7,11); c.beginPath(); c.arc(13.2,15.5,2.7,0,7); c.fill();
-                       c.beginPath(); c.moveTo(14,4); c.lineTo(19.5,5.6); c.lineTo(19.5,8.4); c.lineTo(15.7,7.2); c.lineTo(15.7,4.4); c.closePath(); c.fill(); },
-  "Biergarten": c => { c.beginPath(); c.arc(12,9.5,5.8,0,7); c.fill(); bar(c,12,17,2,6); bar(c,12,19.6,7,1.6,true); },
-  "Sushi":      c => { // Nigiri: Fisch oben, Reis unten, klare Trennfuge
-                       rr(c,5.8,13.2,12.4,5.8,2.9);
-                       c.save(); c.translate(12,9.6); c.rotate(-0.1); rr(c,-7.4,-2.6,14.8,5.2,2.6);
-                       c.globalCompositeOperation='destination-out';
-                       c.fillRect(-4.8,-1.9,1.2,3.8); c.fillRect(-0.6,-1.9,1.2,3.8); c.fillRect(3.6,-1.9,1.2,3.8);
-                       c.restore();
-                       c.save(); c.globalCompositeOperation='destination-out';
-                       c.translate(12,12.6); c.rotate(-0.1); c.fillRect(-8,-0.65,16,1.3); c.restore(); },
-  "Eis":        c => { c.beginPath(); c.arc(12,8.6,4.6,Math.PI,0); c.fill();
-                       c.beginPath(); c.moveTo(7.4,9.4); c.lineTo(16.6,9.4); c.lineTo(12,20); c.closePath(); c.fill();
-                       c.clearRect(9.2,12.4,5.6,1.1); },
-  "Weinbar":    c => { c.beginPath(); c.moveTo(7,4.5); c.lineTo(17,4.5); c.quadraticCurveTo(17,12,12,12.6);
-                       c.quadraticCurveTo(7,12,7,4.5); c.closePath(); c.fill(); bar(c,12,14.5,1.7,5); bar(c,12,19.3,7,1.6,true); },
-  "Burger":     c => { c.beginPath(); c.arc(12,9,6.5,Math.PI,0); c.fill(); rr(c,5.5,10.4,13,2.4,1.2); rr(c,5.5,14.2,13,3.6,1.8); },
-  "Steak/Grill":c => { // Steak mit Grillstreifen
-                       c.save(); c.translate(12,12); c.rotate(-0.35);
-                       c.beginPath(); c.ellipse(0,0,7.8,5.4,0,0,7); c.fill();
-                       c.globalCompositeOperation='destination-out';
-                       c.fillRect(-3.6,-6,1.3,12); c.fillRect(1.2,-6,1.3,12); c.restore(); },
-  "Fisch":      c => { c.beginPath(); c.ellipse(10.5,12,6,3.8,0,0,7); c.fill();
-                       c.beginPath(); c.moveTo(16,12); c.lineTo(20,8.5); c.lineTo(20,15.5); c.closePath(); c.fill();
-                       c.save(); c.globalCompositeOperation='destination-out'; dot(c,7.6,10.8,0.9); c.restore(); },
+  "Restaurant": {v:15, d:["M3.5,0l-1,5.5c-0.1464,0.805,1.7815,1.181,1.75,2L4,14c-0.0384,0.9993,1,1,1,1s1.0384-0.0007,1-1L5.75,7.5  c-0.0314-0.8176,1.7334-1.1808,1.75-2L6.5,0H6l0.25,4L5.5,4.5L5.25,0h-0.5L4.5,4.5L3.75,4L4,0H3.5z M12,0  c-0.7364,0-1.9642,0.6549-2.4551,1.6367C9.1358,2.3731,9,4.0182,9,5v2.5c0,0.8182,1.0909,1,1.5,1L10,14c-0.0905,0.9959,1,1,1,1  s1,0,1-1V0z"]},
+  "Bar": {v:15, d:["M7.5,1c-2,0-7,0.25-6.5,0.75L7,8v4  c0,1-3,0.5-3,2h7c0-1.5-3-1-3-2V8l6-6.25C14.5,1.25,9.5,1,7.5,1z M7.5,2c2.5,0,4.75,0.25,4.75,0.25L11.5,3h-8L2.75,2.25  C2.75,2.25,5,2,7.5,2z"]},
+  "Café": {v:15, d:["M12,5h-2V3H2v4c0.0133,2.2091,1.8149,3.9891,4.024,3.9758C7.4345,10.9673,8.7362,10.2166,9.45,9H12c1.1046,0,2-0.8954,2-2  S13.1046,5,12,5z M12,8H9.86C9.9487,7.6739,9.9958,7.3379,10,7V6h2c0.5523,0,1,0.4477,1,1S12.5523,8,12,8z M10,12.5  c0,0.2761-0.2239,0.5-0.5,0.5h-7C2.2239,13,2,12.7761,2,12.5S2.2239,12,2.5,12h7C9.7761,12,10,12.2239,10,12.5z"]},
+  "Frühstück": {v:15, d:["M5.294,4.382,6,9.5a.979.979,0,0,0,1,1H8a.979.979,0,0,0,1-1l.706-5.118C9.706,3,7.5,3,7.5,3S5.291,3,5.294,4.382ZM3.5,5C2,5,2,6,2,6l1,4H4.5a.793.793,0,0,0,.794-.765L4.5,5Zm-2,2.5a1.533,1.533,0,0,0-1.059.412A1.366,1.366,0,0,0,0,8.794V11H.882A1.02,1.02,0,0,0,2,10ZM11.5,5C13,5,13,6,13,6l-1,4H10.5a.793.793,0,0,1-.794-.765L10.5,5Zm2,2.5a1.533,1.533,0,0,1,1.059.412A1.366,1.366,0,0,1,15,8.794V11h-.882A1.02,1.02,0,0,1,13,10Z"]},
+  "Pizza": {v:15, d:["M1.393 7.931.025 7.315A14.05 14.05 0 0 1 7.764-.001l.027.07.511 1.331-.003.001a12.613 12.613 0 0 0-6.906 6.53Zm10.963 4.96L2.42 8.414a11.604 11.604 0 0 1 6.354-6.009l.003-.001.817 2.122c-.028-.002-.052-.016-.081-.016a1.062 1.062 0 1 0 .764 1.793l2.413 6.273a.249.249 0 0 1-.334.316ZM7.426 7.52a.925.925 0 1 0-1.849 0 .925.925 0 0 0 1.849 0Zm3.017 2.03a.925.925 0 1 0-.07.353.924.924 0 0 0 .07-.354Z"]},
+  "Asia": c => { c.beginPath(); c.arc(12,12.5,6.5,0,Math.PI); c.closePath(); c.fill(); bar(c,12,13,9,1.6,true); bar(c,12,19,5,1.5,true);
+                       line(c,7.5,4.5,13.5,9.5,1.5); line(c,10.5,3.8,15.5,8.8,1.5); },
+  "Kneipe": c => { rr(c,5.6,5.6,10.2,3.6,1.8); rr(c,6.2,9,9,10,1.5); ring(c,17.6,13.5,2.5,1.8);
+                       c.save(); c.globalCompositeOperation='destination-out'; c.fillRect(5,8.6,11.4,1.1); c.restore(); },
+  "Imbiss": c => { c.beginPath(); c.moveTo(5.6,11.5); c.lineTo(18.4,11.5); c.lineTo(16.9,20); c.lineTo(7.1,20); c.closePath(); c.fill();
+                       c.save(); c.translate(8.9,11); c.rotate(-0.12); c.fillRect(-0.95,-4.6,1.9,4.6); c.restore();
+                       c.fillRect(11.05,5.6,1.9,5.4);
+                       c.save(); c.translate(15.1,11); c.rotate(0.12); c.fillRect(-0.95,-4.6,1.9,4.6); c.restore(); },
+  "Club/Livemusik": c => { c.save(); c.translate(0,0.4); bar(c,9.7,6.2,1.5,9.5); bar(c,14.3,5.4,1.5,9.5);
+                       c.beginPath(); c.moveTo(8.9,4.6); c.lineTo(15.1,3.8); c.lineTo(15.1,6.4); c.lineTo(8.9,7.2); c.closePath(); c.fill();
+                       c.beginPath(); c.ellipse(8.9,15.9,2.1,1.6,-0.25,0,7); c.fill();
+                       c.beginPath(); c.ellipse(13.5,15.1,2.1,1.6,-0.25,0,7); c.fill(); c.restore(); },
+  "Biergarten": c => { dot(c,12,8,4.8); dot(c,8.6,10,3.2); dot(c,15.4,10,3.2); bar(c,12,12.4,1.8,3.6);
+                       bar(c,12,17,11,1.6,true); bar(c,8,18.4,1.6,2.2); bar(c,16,18.4,1.6,2.2); },
+  "Sushi": c => { c.beginPath(); c.ellipse(12,15,6.3,4.3,0,0,7); c.fill(); rr(c,4.7,8.4,14.6,4.4,2.2);
+                       c.save(); c.globalCompositeOperation='destination-out'; c.fillRect(4,12.4,16,1.2); c.restore(); },
+  "Eis": c => { dot(c,12,8.2,4.5); c.beginPath(); c.moveTo(7.5,11.6); c.lineTo(16.5,11.6); c.lineTo(12,20.4); c.closePath(); c.fill();
+                       c.save(); c.globalCompositeOperation='destination-out'; line(c,8.6,13.6,13.8,18.8,0.9); line(c,15.4,13.6,10.2,18.8,0.9); c.restore(); },
+  "Weinbar": c => { c.beginPath(); c.moveTo(7.6,4.2); c.lineTo(16.4,4.2); c.quadraticCurveTo(16.4,11.6,12,12.2);
+                       c.quadraticCurveTo(7.6,11.6,7.6,4.2); c.closePath(); c.fill(); bar(c,12,12.2,1.6,5.2); bar(c,12,18.6,7.5,1.5,true); },
+  "Burger": c => { c.beginPath(); c.arc(12,9.6,6.6,Math.PI,0); c.closePath(); c.fill(); rr(c,5.4,10.8,13.2,2.3,1.15); rr(c,5.4,14.4,13.2,3.4,1.7); },
+  "Steak/Grill": c => { c.save(); c.translate(12,12.4); c.rotate(-0.3);
+                       c.beginPath(); c.ellipse(0,0,7.7,5.1,0,0,7); c.fill();
+                       c.globalCompositeOperation='destination-out'; c.lineWidth=1.2;
+                       c.beginPath(); c.ellipse(0,0,5.4,3.1,0,0,7); c.stroke(); dot(c,1.2,0.2,1.1); c.restore(); },
+  "Fisch": c => { c.beginPath(); c.ellipse(10.6,12,5.9,3.7,0,0,7); c.fill();
+                       c.beginPath(); c.moveTo(15.4,12); c.lineTo(19.6,8.8); c.lineTo(19.6,15.2); c.closePath(); c.fill();
+                       c.save(); c.globalCompositeOperation='destination-out'; dot(c,7.7,10.9,0.95); c.restore(); },
   "Sport-/Kickerbar": c => { ring(c,12,12,7,1.7); dot(c,12,12,2.2); dot(c,12,6.6,1.2); dot(c,6.9,10.3,1.2);
                        dot(c,8.8,16.4,1.2); dot(c,15.2,16.4,1.2); dot(c,17.1,10.3,1.2); },
-  "Karaoke":    c => { rr(c,9.8,4,4.4,9,2.2); c.beginPath(); c.arc(12,10.5,4.4,0.15,Math.PI-0.15); c.lineWidth=1.6;
-                       c.stroke(); bar(c,12,16.5,1.6,3); bar(c,12,19.4,6,1.5,true); },
+  "Karaoke": c => { rr(c,9.8,4.2,4.4,8.6,2.2); bar(c,12,12.8,1.6,4.4); bar(c,12,18.6,6.5,1.5,true);
+                       c.save(); c.globalCompositeOperation='destination-out'; line(c,9.8,7.2,14.2,7.2,0.9); line(c,9.8,9.4,14.2,9.4,0.9); c.restore(); },
 };
 function bar(c,x,y,w,h,centerX){ if(centerX){ c.fillRect(x-w/2,y-h/2,w,h);} else { c.fillRect(x-w/2,y,w,h);} }
 function line(c,x1,y1,x2,y2,w){ c.lineWidth=w; c.beginPath(); c.moveTo(x1,y1); c.lineTo(x2,y2); c.stroke(); }
@@ -187,8 +161,12 @@ function makeIcon(typ, colorKey, square) {
   c.fillStyle = COLORS[colorKey]; c.shadowColor='rgba(0,0,0,.35)'; c.shadowBlur=3; c.shadowOffsetY=1; c.fill();
   c.shadowColor='transparent'; c.lineWidth=3; c.strokeStyle='#fff'; c.stroke();
   c.restore();
-  c.save(); c.translate(4,4); c.scale(2,2); c.fillStyle='#fff'; c.strokeStyle='#fff';
-  (GLYPH[typ] || GLYPH["Restaurant"])(c); c.restore();
+  const g = GLYPH[typ] || GLYPH["Restaurant"];
+  c.save(); c.fillStyle='#fff'; c.strokeStyle='#fff';
+  if (typeof g === 'function') { c.translate(4,4); c.scale(2,2); g(c); }
+  else { const px = 33, s = px/g.v; c.translate((S-px)/2,(S-px)/2); c.scale(s,s);
+         for (const d of g.d) c.fill(new Path2D(d)); }
+  c.restore();
   return c.getImageData(0,0,S,S);
 }
 
@@ -254,25 +232,25 @@ async function loadData(){
 map.on('load', async () => {
   try {
     allFeatures = await loadData();
-    allFeatures.forEach(f=>{ const pr=f.properties; pr.rk=ratingKey(pr.q,pr.p); pr.prio=PRIO[pr.rk];
+    allFeatures.forEach(f=>{ const pr=f.properties; pr.rk=ratingKey(pr.q,pr.p); pr.prioInv=5-PRIO[pr.rk];
                              pr.icon=pr.typ+"|"+pr.rk+"|"+(pr.status==="wunschliste"?"w":"b"); });
     for (const typ of TYPES) for (const ck of Object.keys(COLORS)) {
       map.addImage(typ+"|"+ck+"|b", makeIcon(typ,ck,false), {pixelRatio:2});
       map.addImage(typ+"|"+ck+"|w", makeIcon(typ,ck,true ), {pixelRatio:2});
     }
     map.addSource('orte', { type:'geojson', data:{type:"FeatureCollection",features:allFeatures}, promoteId:'id' });
-    const common = { type:'symbol', source:'orte',
-      layout:{ 'icon-image':['get','icon'], 'symbol-sort-key':['get','prio'],
-               'icon-size':['interpolate',['linear'],['zoom'], 10,0.62, 13,0.8, 16,1] } };
-    map.addLayer({ id:'pins-low', ...common, maxzoom:14.5 });
-    map.addLayer({ id:'pins-high', ...common, minzoom:14.5,
-      layout:{ ...common.layout, 'icon-allow-overlap':true,
-               'text-field':['step',['zoom'],'',15.5,['get','name']], 'text-font':['Noto Sans Regular'],
-               'text-size':11, 'text-offset':[0,1.7],
+    // Ein Layer: alle Icons immer sichtbar (My-Maps-Gefühl beim Rauszoomen, inkl. Flex-Faktor);
+    // Zeichenreihenfolge über prioInv: Gold/Lila liegen oben. Namen ab Zoom 13,5, wo Platz ist.
+    map.addLayer({ id:'pins', type:'symbol', source:'orte',
+      layout:{ 'icon-image':['get','icon'], 'icon-allow-overlap':true,
+               'symbol-sort-key':['get','prioInv'],
+               'icon-size':['interpolate',['linear'],['zoom'], 8,0.34, 11,0.5, 13,0.7, 16,1],
+               'text-field':['step',['zoom'],'',13.5,['get','name']], 'text-font':['Noto Sans Regular'],
+               'text-size':11, 'text-offset':[0,1.6],
                'text-anchor':'top', 'text-optional':true },
       paint:{ 'text-color':'#333', 'text-halo-color':'#fff', 'text-halo-width':1.2 } });
 
-    for (const layer of ['pins-low','pins-high']) {
+    for (const layer of ['pins']) {
       map.on('click', layer, e => {
         const pr = e.features[0].properties;
         const [lon,lat] = e.features[0].geometry.coordinates;
