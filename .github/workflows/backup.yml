@@ -1,0 +1,38 @@
+name: nightly-backup
+
+on:
+  schedule:
+    - cron: '23 3 * * *'   # täglich 03:23 UTC
+  workflow_dispatch: {}      # manueller Start über den Actions-Tab (für den ersten Test)
+
+permissions:
+  contents: write
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Sheet abrufen und GeoJSON bauen
+        run: |
+          curl -sL "https://docs.google.com/spreadsheets/d/18nYehpbpOmARe9NI6EXdKKFiYG53C3OMgKm4A5CuLFk/gviz/tq?tqx=out:csv" -o data/sheet-backup.csv
+          python3 - << 'EOF'
+          import csv, json
+          rows = list(csv.DictReader(open('data/sheet-backup.csv', encoding='utf-8')))
+          feats = [{"type":"Feature",
+                    "geometry":{"type":"Point","coordinates":[float(r['lon']), float(r['lat'])]},
+                    "properties":{"id":r['id'],"name":r['name'],"typ":r['typ'],"status":r['status'],
+                                  "q":r['qualitaet'],"p":r['preis'],"notiz":r.get('notiz',''),
+                                  "tags":r.get('tags',''),"besucht_am":r.get('besucht_am','')}}
+                   for r in rows if r.get('lat') and r.get('lon') and r.get('id')]
+          json.dump({"type":"FeatureCollection","features":feats},
+                    open('data/orte.geojson','w',encoding='utf-8'), ensure_ascii=False)
+          print(len(feats), 'Orte gesichert')
+          EOF
+      - name: Committen wenn geändert
+        run: |
+          git config user.name "restomap-backup"
+          git config user.email "actions@users.noreply.github.com"
+          git add data/sheet-backup.csv data/orte.geojson
+          git diff --cached --quiet || git commit -m "Nightly-Backup $(date -u +%F)"
+          git push
