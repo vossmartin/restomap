@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>restomap · Review</title>
+<link rel="icon" href="data:,">
+<style>
+  :root { --ink:#1c1c1e; --muted:#6e6e73; --line:#e4e4e7; --gold:#F0A800; --gruen:#0F9D58;
+          --rot:#7B1420; --orange:#E65100; --grau:#8A8A8E; }
+  * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  body { margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+         background:#f4f4f2; color:var(--ink); padding-bottom:40px; }
+  header { padding:calc(14px + env(safe-area-inset-top)) 16px 10px; }
+  h1 { font-size:18px; margin:0 0 2px; } .sub { font-size:13px; color:var(--muted); }
+  #stacks { display:flex; gap:8px; overflow-x:auto; padding:10px 16px; scrollbar-width:none; }
+  #stacks::-webkit-scrollbar { display:none; }
+  .stack { flex:0 0 auto; border:1px solid var(--line); background:#fff; border-radius:12px;
+           padding:8px 13px; font-size:13px; }
+  .stack.on { background:var(--ink); color:#fff; border-color:var(--ink); }
+  .stack b { font-size:15px; }
+  #list { padding:0 16px; }
+  .card { background:#fff; border:1px solid var(--line); border-radius:14px; padding:14px 16px; margin-bottom:12px; }
+  .c-name { font-weight:650; font-size:16px; }
+  .c-meta { font-size:13px; color:var(--muted); margin-top:2px; }
+  .c-google { font-size:13px; margin-top:8px; padding:8px 10px; background:#f7f7f5; border-radius:9px; }
+  .c-google b { font-size:12px; color:var(--muted); font-weight:600; }
+  .warn { color:var(--rot); font-weight:600; }
+  .glink { font-size:13px; color:#1a6fd4; text-decoration:none; display:inline-block; margin-top:8px; }
+  .btns { display:flex; flex-wrap:wrap; gap:8px; margin-top:12px; }
+  .btns button { border:0; border-radius:10px; padding:10px 13px; font-size:13.5px; font-weight:600; color:#fff; }
+  .b-arch { background:var(--rot); } .b-ok { background:var(--gruen); } .b-skip { background:#c9c9cd; color:#333; }
+  .b-top { background:var(--gold); } .b-gut { background:var(--gruen); } .b-nie { background:var(--rot); }
+  .b-teuer { background:var(--orange); } .b-grau { background:#c9c9cd; color:#333; }
+  .b-merge { background:var(--ink); }
+  #more { margin:6px 16px 20px; width:calc(100% - 32px); padding:12px; border:1px dashed var(--line);
+          background:#fff; border-radius:12px; font-size:14px; color:var(--muted); }
+  #toast { position:fixed; bottom:24px; left:50%; transform:translateX(-50%); background:rgba(28,28,30,.92);
+           color:#fff; padding:9px 16px; border-radius:10px; font-size:13px; display:none; z-index:50; }
+  #gate { padding:40px 24px; font-size:15px; }
+  .done { text-align:center; color:var(--muted); padding:30px 0 10px; font-size:14px; }
+</style>
+</head>
+<body>
+<div id="gate" style="display:none">Diese Seite braucht den Edit-Zugang. Öffne einmal die Karte über Deinen Edit-Link (<code>?edit=…</code>) auf diesem Gerät — danach funktioniert auch das Review.</div>
+<header style="display:none" id="hdr">
+  <h1>Review</h1>
+  <div class="sub" id="subtitle">lädt …</div>
+</header>
+<div id="stacks" style="display:none"></div>
+<div id="list"></div>
+<button id="more" style="display:none">Mehr anzeigen</button>
+<div id="toast"></div>
+
+<script>
+'use strict';
+const SHEET_ID = "18nYehpbpOmARe9NI6EXdKKFiYG53C3OMgKm4A5CuLFk";
+const MAIN_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv`;
+const STAGE_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=places_check`;
+const WRITE_URL = "https://script.google.com/macros/s/AKfycbyxI4tO5BqzceSnml-mbChZitp5SzfcUyJfBpYdlWvf4TWTB3aKVigIWKoGbZL_BeDL/exec";
+const PAGE = 20;
+
+function getToken(){ try { return localStorage.getItem('rm_token') || ''; } catch(e){ return ''; } }
+const urlParams = new URLSearchParams(location.search);
+if (urlParams.get('edit')) { try { localStorage.setItem('rm_token', urlParams.get('edit')); } catch(e){}
+  history.replaceState(null,'',location.pathname); }
+
+function toast(m, ms=2200){ const t=document.getElementById('toast'); t.textContent=m; t.style.display='block';
+  clearTimeout(t._h); t._h=setTimeout(()=>t.style.display='none', ms); }
+
+async function post(payload){
+  try {
+    const res = await fetch(WRITE_URL, { method:'POST', body: JSON.stringify({ token:getToken(), ...payload }) });
+    const j = await res.json();
+    if (!j.ok) { toast('Fehler: ' + (j.error||'?')); return false; }
+    return true;
+  } catch(e){ toast('Netzfehler — Aktion nicht gespeichert'); return false; }
+}
+
+function parseCSV(text){
+  const rows=[]; let row=[], cell='', q=false;
+  for (let i=0;i<text.length;i++){ const ch=text[i];
+    if(q){ if(ch==='"'){ if(text[i+1]==='"'){cell+='"';i++;} else q=false; } else cell+=ch; }
+    else if(ch==='"') q=true;
+    else if(ch===','){ row.push(cell); cell=''; }
+    else if(ch==='\n'||ch==='\r'){ if(cell!==''||row.length){ row.push(cell); rows.push(row); row=[]; cell=''; } }
+    else cell+=ch; }
+  if(cell!==''||row.length){ row.push(cell); rows.push(row); }
+  const head=rows.shift();
+  return rows.map(r=>Object.fromEntries(head.map((h,i)=>[h,(r[i]??'').trim()])));
+}
+
+let main = [], stage = [], byId = {}, stById = {};
+const RL = { top:'Top', gut:'Gut', unbewertet:'Ohne Urteil', nie_wieder:'Nie wieder' };
+
+function gmaps(r){ return `https://www.google.com/maps/search/?api=1&query=${r.lat},${r.lon}`; }
+function meta(r){ return `${r.typ} · ${r.status==='besucht'?'Besucht':'Watchlist'} · ${RL[r.qualitaet]||r.qualitaet}${r.preis==='ueberteuert'?' · zu teuer':''}${r.notiz?' · '+r.notiz:''}`; }
+
+/* ====== Stapel-Definitionen ====== */
+const HANDLED = new Set();   // ids, die in dieser Sitzung erledigt/übersprungen wurden
+
+function qClosed(){ return stage.filter(s => byId[s.id] && !HANDLED.has('c'+s.id)
+  && ['CLOSED_PERMANENTLY','NICHT GEFUNDEN',''].includes(s.business_status)
+  && !['ok','archiviert','nein'].includes((s.uebernehmen||'').toLowerCase())); }
+function qTemp(){ return stage.filter(s => byId[s.id] && !HANDLED.has('t'+s.id)
+  && s.business_status==='CLOSED_TEMPORARILY'
+  && !['ok','archiviert','nein'].includes((s.uebernehmen||'').toLowerCase())); }
+function qMatch(){ return stage.filter(s => byId[s.id] && !HANDLED.has('m'+s.id)
+  && s.business_status==='OPERATIONAL' && (s.uebernehmen||'').toLowerCase()==='pruefen'); }
+function qDupes(){
+  const groups = {};
+  main.forEach(r => { const k=r.name.toLowerCase().trim(); (groups[k]=groups[k]||[]).push(r); });
+  return Object.values(groups).filter(g => g.length>1
+    && !g.every(r => (r.dupe_flag||'')==='filiale')
+    && !g.some(r => HANDLED.has('d'+r.id)));
+}
+function qGrau(){ return main.filter(r => r.qualitaet==='unbewertet' && r.preis!=='ueberteuert'
+  && r.status==='besucht' && !HANDLED.has('g'+r.id)); }
+
+const STACKS = [
+  { key:'closed', name:'Geschlossen?', q:qClosed, render:renderStaging },
+  { key:'temp',  name:'Temporär zu', q:qTemp, render:renderStaging },
+  { key:'match', name:'Match prüfen', q:qMatch, render:renderMatch },
+  { key:'dupes', name:'Duplikate', q:qDupes, render:renderDupes },
+  { key:'grau',  name:'Graue', q:qGrau, render:renderGrau },
+];
+let active = 'closed', shown = PAGE;
+
+/* ====== Aktionen ====== */
+async function actArchive(id, mark){
+  const r = byId[id]; HANDLED.add(mark+id);
+  main = main.filter(x=>x.id!==id); delete byId[id];
+  draw(); toast(`${r.name}: archiviert ✓`);
+  if (await post({ action:'archive', id })) post({ action:'stageUpdate', id, value:'archiviert' });
+}
+async function actKeep(id, mark){
+  HANDLED.add(mark+id); draw(); toast('Bleibt — Fehlalarm vermerkt');
+  post({ action:'stageUpdate', id, value:'ok' });
+}
+async function actMatch(id, good){
+  HANDLED.add('m'+id); draw(); toast(good ? 'Match bestätigt' : 'Match verworfen');
+  post({ action:'stageUpdate', id, value: good?'ja':'nein' });
+}
+async function actJudge(id, q){
+  const r = byId[id]; HANDLED.add('g'+id);
+  if (q==='teuer'){ r.preis='ueberteuert'; draw(); toast(`${r.name}: zu teuer (P/L)`);
+    post({ id, updates:{ preis:'ueberteuert' } }); return; }
+  r.qualitaet=q; draw(); toast(`${r.name}: ${RL[q]}`);
+  post({ id, updates:{ qualitaet:q } });
+}
+async function actMergePair(keepId, archId){
+  HANDLED.add('d'+keepId); HANDLED.add('d'+archId);
+  const keep = byId[keepId];
+  main = main.filter(x=>x.id!==archId); delete byId[archId];
+  draw(); toast('Zusammengeführt ✓');
+  if (await post({ action:'archive', id: archId })) post({ id: keepId, updates:{ dupe_flag:'' } });
+}
+async function actFiliale(group){
+  group.forEach(r=>HANDLED.add('d'+r.id)); draw(); toast('Als Filialen markiert');
+  group.forEach(r=>post({ id:r.id, updates:{ dupe_flag:'filiale' } }));
+}
+function actSkip(id, mark){ HANDLED.add(mark+id); draw(); }
+
+/* ====== Renderer ====== */
+function esc(s){ return String(s).replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+
+function renderStaging(s, mark){
+  const r = byId[s.id];
+  const bs = s.business_status || 'kein Status von Google';
+  const far = +s.distanz_m > 30 || (s.name_google && s.name_google.toLowerCase().slice(0,4) !== r.name.toLowerCase().slice(0,4));
+  return card(r, `
+    <div class="c-google"><b>GOOGLE:</b> ${esc(s.name_google||'—')} · ${esc(s.adresse_google||'')}<br>
+    <span class="${bs==='CLOSED_PERMANENTLY'?'warn':''}">${esc(bs)}</span> · Distanz ${esc(s.distanz_m||'?')} m
+    ${far?' · <span class="warn">Match unsicher!</span>':''}</div>`, `
+    <button class="b-arch" onclick="actArchive('${s.id}','${mark}')">🗑 Ist zu → Archiv</button>
+    <button class="b-ok" onclick="actKeep('${s.id}','${mark}')">Bleibt (Fehlalarm)</button>
+    <button class="b-skip" onclick="actSkip('${s.id}','${mark}')">Später</button>`);
+}
+function renderMatch(s){
+  const r = byId[s.id];
+  return card(r, `
+    <div class="c-google"><b>GOOGLE MEINT:</b> ${esc(s.name_google||'—')}<br>${esc(s.adresse_google||'')} · Distanz ${esc(s.distanz_m)} m</div>`, `
+    <button class="b-ok" onclick="actMatch('${s.id}',true)">✓ Match stimmt</button>
+    <button class="b-arch" onclick="actMatch('${s.id}',false)">✗ Falscher Laden</button>
+    <button class="b-skip" onclick="actSkip('${s.id}','m')">Später</button>`);
+}
+function renderDupes(group){
+  const rows = group.map(r=>`<div style="margin-top:6px"><span class="c-name" style="font-size:14px">${esc(r.name)}</span>
+    <div class="c-meta">${meta(r)} · <a class="glink" style="margin:0" href="${gmaps(r)}" target="_blank">Maps ↗</a></div></div>`).join('');
+  const pair = group.length===2 && group[0].status!==group[1].status;
+  let btns = '';
+  if (pair){
+    const b = group.find(r=>r.status==='besucht'), w = group.find(r=>r.status==='wunschliste');
+    btns = `<button class="b-merge" onclick="actMergePair('${b.id}','${w.id}')">Zusammenführen (Besucht behalten)</button>
+            <button class="b-merge" onclick="actMergePair('${w.id}','${b.id}')">Watchlist behalten</button>`;
+  } else {
+    btns = group.map(r=>`<button class="b-arch" onclick="actArchive('${r.id}','d')">🗑 ${esc(r.name.slice(0,14))}… weg</button>`).join('');
+  }
+  return `<div class="card"><div class="c-meta"><b>${group.length}× gleicher Name</b></div>${rows}
+    <div class="btns">${btns}
+    <button class="b-ok" onclick='actFiliale(${JSON.stringify(group.map(r=>({id:r.id})))})'>Beide behalten (Filialen)</button>
+    <button class="b-skip" onclick="actSkip('${group[0].id}','d')">Später</button></div></div>`;
+}
+function renderGrau(r){
+  return card(r, '', `
+    <button class="b-top" onclick="actJudge('${r.id}','top')">Top</button>
+    <button class="b-gut" onclick="actJudge('${r.id}','gut')">Gut</button>
+    <button class="b-teuer" onclick="actJudge('${r.id}','teuer')">Zu teuer</button>
+    <button class="b-nie" onclick="actJudge('${r.id}','nie_wieder')">Nie wieder</button>
+    <button class="b-grau" onclick="actSkip('${r.id}','g')">Bleibt grau</button>
+    <button class="b-arch" onclick="actArchive('${r.id}','g')">🗑 Gibt's nicht mehr</button>`);
+}
+function card(r, extra, btns){
+  return `<div class="card"><div class="c-name">${esc(r.name)}</div>
+    <div class="c-meta">${meta(r)}</div>${extra}
+    <a class="glink" href="${gmaps(r)}" target="_blank" rel="noopener">In Google Maps öffnen ↗</a>
+    <div class="btns">${btns}</div></div>`;
+}
+
+/* ====== Draw ====== */
+function draw(){
+  const bar = document.getElementById('stacks');
+  bar.innerHTML = STACKS.map(s=>`<button class="stack${s.key===active?' on':''}" onclick="setStack('${s.key}')">${s.name} <b>${s.q().length}</b></button>`).join('');
+  const st = STACKS.find(s=>s.key===active);
+  const items = st.q();
+  const list = document.getElementById('list');
+  if (!items.length){ list.innerHTML = '<div class="done">🎉 Stapel leer — nächsten wählen.</div>'; }
+  else {
+    const mark = { closed:'c', temp:'t' }[active] || '';
+    list.innerHTML = items.slice(0, shown).map(it => st.render(it, mark)).join('');
+  }
+  document.getElementById('more').style.display = items.length > shown ? 'block' : 'none';
+  document.getElementById('subtitle').textContent =
+    `${qClosed().length + qTemp().length + qMatch().length} Orts-Checks · ${qDupes().length} Namens-Gruppen · ${qGrau().length} Graue`;
+}
+function setStack(k){ active=k; shown=PAGE; draw(); window.scrollTo(0,0); }
+document.getElementById('more').onclick = ()=>{ shown += PAGE; draw(); };
+
+/* ====== Init ====== */
+(async function init(){
+  if (!getToken()){ document.getElementById('gate').style.display='block'; return; }
+  document.getElementById('hdr').style.display='block';
+  document.getElementById('stacks').style.display='flex';
+  try {
+    const [m, s] = await Promise.all([
+      fetch(MAIN_URL).then(r=>r.text()), fetch(STAGE_URL).then(r=>r.text()) ]);
+    main = parseCSV(m).filter(r=>r.id);
+    stage = parseCSV(s).filter(r=>r.id);
+    main.forEach(r=>byId[r.id]=r);
+    stage.forEach(s=>stById[s.id]=s);
+    draw();
+  } catch(e){
+    document.getElementById('subtitle').textContent = 'Daten konnten nicht geladen werden: ' + e.message;
+  }
+})();
+</script>
+</body>
+</html>
