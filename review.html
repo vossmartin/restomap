@@ -68,13 +68,14 @@ if (urlParams.get('edit')) { try { localStorage.setItem('rm_token', urlParams.ge
 function toast(m, ms=2200){ const t=document.getElementById('toast'); t.textContent=m; t.style.display='block';
   clearTimeout(t._h); t._h=setTimeout(()=>t.style.display='none', ms); }
 
-async function post(payload){
+async function post(payload){ return !!(await postJson(payload)); }
+async function postJson(payload){
   try {
     const res = await fetch(WRITE_URL, { method:'POST', body: JSON.stringify({ token:getToken(), ...payload }) });
     const j = await res.json();
-    if (!j.ok) { toast('Fehler: ' + (j.error||'?')); return false; }
-    return true;
-  } catch(e){ toast('Netzfehler — Aktion nicht gespeichert'); return false; }
+    if (!j.ok) { toast('Fehler: ' + (j.error||'?')); return null; }
+    return j;
+  } catch(e){ toast('Netzfehler — Aktion nicht gespeichert'); return null; }
 }
 
 function parseCSV(text){
@@ -160,6 +161,18 @@ async function actFiliale(group){
   group.forEach(r=>post({ id:r.id, updates:{ dupe_flag:'filiale' } }));
 }
 function actSkip(id, mark){ HANDLED.add(mark+id); draw(); }
+async function actRematch(id){
+  const r = byId[id], s = stById[id];
+  const q = prompt('Wonach soll Google suchen? (z.B. offizieller Name + Straße)', r.name);
+  if (!q) return;
+  toast('Suche läuft …', 8000);
+  const j = await postJson({ action:'rematch', id, query: q });
+  if (!j) return;
+  s.name_google = j.match.name; s.adresse_google = j.match.addr;
+  s.business_status = j.match.status; s.distanz_m = String(j.match.dist);
+  s.place_id = j.match.place_id; s.uebernehmen = j.match.dist <= 150 ? 'ja' : 'pruefen';
+  draw(); toast(`Neuer Treffer: ${j.match.name} (${j.match.dist} m)`);
+}
 
 /* ====== Renderer ====== */
 function esc(s){ return String(s).replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
@@ -174,6 +187,7 @@ function renderStaging(s, mark){
     ${far?' · <span class="warn">Match unsicher!</span>':''}</div>`, `
     <button class="b-arch" onclick="actArchive('${s.id}','${mark}')">🗑 Ist zu → Archiv</button>
     <button class="b-ok" onclick="actKeep('${s.id}','${mark}')">Bleibt (Fehlalarm)</button>
+    <button class="b-merge" onclick="actRematch('${s.id}')">🔍 Neu suchen</button>
     <button class="b-skip" onclick="actSkip('${s.id}','${mark}')">Später</button>`);
 }
 function renderMatch(s){
@@ -182,6 +196,7 @@ function renderMatch(s){
     <div class="c-google"><b>GOOGLE MEINT:</b> ${esc(s.name_google||'—')}<br>${esc(s.adresse_google||'')} · Distanz ${esc(s.distanz_m)} m</div>`, `
     <button class="b-ok" onclick="actMatch('${s.id}',true)">✓ Match stimmt</button>
     <button class="b-arch" onclick="actMatch('${s.id}',false)">✗ Falscher Laden</button>
+    <button class="b-merge" onclick="actRematch('${s.id}')">🔍 Neu suchen</button>
     <button class="b-skip" onclick="actSkip('${s.id}','m')">Später</button>`);
 }
 function renderDupes(group){
