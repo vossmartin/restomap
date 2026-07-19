@@ -168,6 +168,7 @@ async function actRematch(id){
   toast('Suche läuft …', 8000);
   const j = await postJson({ action:'rematch', id, query: q });
   if (!j) return;
+  if (!j.match) { toast('Skript kennt „rematch" nicht — ist Code v3 als NEUE VERSION deployt?', 5000); return; }
   s.name_google = j.match.name; s.adresse_google = j.match.addr;
   s.business_status = j.match.status; s.distanz_m = String(j.match.dist);
   s.place_id = j.match.place_id; s.uebernehmen = j.match.dist <= 150 ? 'ja' : 'pruefen';
@@ -195,8 +196,9 @@ function renderMatch(s){
   return card(r, `
     <div class="c-google"><b>GOOGLE MEINT:</b> ${esc(s.name_google||'—')}<br>${esc(s.adresse_google||'')} · Distanz ${esc(s.distanz_m)} m</div>`, `
     <button class="b-ok" onclick="actMatch('${s.id}',true)">✓ Match stimmt</button>
-    <button class="b-arch" onclick="actMatch('${s.id}',false)">✗ Falscher Laden</button>
+    <button class="b-skip" onclick="actMatch('${s.id}',false)">✗ Falscher Laden</button>
     <button class="b-merge" onclick="actRematch('${s.id}')">🔍 Neu suchen</button>
+    <button class="b-arch" onclick="actArchive('${s.id}','m')">🗑 Gibt's nicht mehr</button>
     <button class="b-skip" onclick="actSkip('${s.id}','m')">Später</button>`);
 }
 function renderDupes(group){

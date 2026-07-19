@@ -13,9 +13,14 @@
 <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css">
 <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
 <style>
-  :root { --bg:#ffffff; --ink:#1c1c1e; --muted:#6e6e73; --line:#e4e4e7; }
+  :root { --bg:#ffffff; --ink:#1c1c1e; --muted:#6e6e73; --line:#e4e4e7; --panel:rgba(255,255,255,.96); }
+  body.dark { --bg:#212125; --ink:#f2f2f4; --muted:#a2a2a8; --line:#3a3a40; --panel:rgba(28,28,32,.94); }
+  body.dark .chip, body.dark .a-chip, body.dark .p-tag { background:var(--bg); color:var(--ink); }
+  body.dark .maplibregl-popup-content { background:#2a2a2f; color:#f2f2f4; }
+  body.dark .maplibregl-popup-tip { border-top-color:#2a2a2f !important; }
   * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
-  html,body { margin:0; height:100%; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif; }
+  html,body { margin:0; height:100%; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+              background:var(--bg); color:var(--ink); }
   #map { position:absolute; inset:0; }
 
   /* Suche oben */
@@ -24,9 +29,25 @@
             font-size:16px; background:var(--bg); color:var(--ink); box-shadow:0 2px 10px rgba(0,0,0,.12); outline:none; }
 
   /* Filter-Panel unten */
-  #panel { position:absolute; left:0; right:0; bottom:0; z-index:5; background:rgba(255,255,255,.96);
+  #panel { position:absolute; left:0; right:0; bottom:0; z-index:5; background:var(--panel);
            backdrop-filter:blur(8px); border-top:1px solid var(--line);
            padding:8px 10px calc(8px + env(safe-area-inset-bottom)); }
+  #rolbtn { flex:0 0 auto; width:34px; height:34px; border-radius:50%; border:1px solid var(--line);
+            background:var(--bg); font-size:16px; }
+  .lbtn { display:block; width:100%; margin-top:12px; padding:10px; border:1px solid var(--line);
+          border-radius:10px; background:var(--bg); color:var(--ink); font-size:14px; }
+  #stats { position:absolute; inset:0; z-index:22; background:rgba(0,0,0,.35); display:none; align-items:flex-end; }
+  #stats.open { display:flex; }
+  #stats .sheet { background:var(--bg); color:var(--ink); width:100%; border-radius:16px 16px 0 0;
+                  padding:18px 20px calc(24px + env(safe-area-inset-bottom)); max-height:80%; overflow-y:auto; }
+  #stats h3 { margin:14px 0 8px; font-size:15px; } #stats h3:first-child { margin-top:0; }
+  .kpis { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
+  .kpi { border:1px solid var(--line); border-radius:10px; padding:8px; text-align:center; }
+  .kpi b { display:block; font-size:19px; } .kpi span { font-size:11.5px; color:var(--muted); }
+  .brow { display:flex; align-items:center; gap:8px; margin:5px 0; font-size:12.5px; }
+  .brow .lbl { width:96px; flex:0 0 auto; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .brow .bar { height:13px; border-radius:4px; min-width:2px; }
+  .brow .val { color:var(--muted); }
   .row { display:flex; align-items:center; gap:8px; overflow-x:auto; scrollbar-width:none; padding:3px 0; }
   .row::-webkit-scrollbar { display:none; }
 
@@ -48,8 +69,8 @@
                border-radius:50%; border:1px solid var(--line); background:var(--bg); font-size:16px; box-shadow:0 2px 10px rgba(0,0,0,.12); }
   #legend { position:absolute; inset:0; z-index:20; background:rgba(0,0,0,.35); display:none; align-items:flex-end; }
   #legend.open { display:flex; }
-  #legend .sheet { background:#fff; width:100%; border-radius:16px 16px 0 0; padding:18px 20px calc(22px + env(safe-area-inset-bottom));
-                   max-height:70%; overflow-y:auto; }
+  #legend .sheet { background:var(--bg); color:var(--ink); width:100%; border-radius:16px 16px 0 0;
+                   padding:18px 20px calc(22px + env(safe-area-inset-bottom)); max-height:70%; overflow-y:auto; }
   #legend h3 { margin:0 0 10px; font-size:15px; }
   .lrow { display:flex; align-items:center; gap:10px; margin:7px 0; font-size:14px; }
   .lrow .sw { width:20px; height:20px; border-radius:50%; flex:0 0 auto; border:2px solid #fff; box-shadow:0 0 0 1px var(--line); }
@@ -66,6 +87,28 @@
               border-radius:50%; border:1px solid var(--line); background:var(--bg); font-size:15px; box-shadow:0 2px 10px rgba(0,0,0,.12); }
   .p-statusbtn { display:block; width:100%; margin-top:9px; padding:8px 10px; border:0; border-radius:9px;
                  background:var(--ink); color:#fff; font-size:13px; }
+  .p-visitbtn { display:block; width:100%; margin-top:6px; padding:8px 10px; border:0; border-radius:9px;
+                background:#0F9D58; color:#fff; font-size:13px; }
+  .p-tagrow { display:flex; gap:6px; margin-top:6px; }
+  .p-tag { flex:1; padding:7px 4px; border:1px solid var(--line); border-radius:9px; background:#fff;
+           color:var(--muted); font-size:12.5px; }
+  .p-tag.on { background:var(--ink); color:#fff; border-color:var(--ink); }
+  #addbtn { position:absolute; top:calc(102px + env(safe-area-inset-top)); right:10px; z-index:5; width:38px; height:38px;
+            border-radius:50%; border:1px solid var(--line); background:var(--ink); color:#fff; font-size:20px;
+            box-shadow:0 2px 10px rgba(0,0,0,.12); display:none; }
+  #addpanel { position:absolute; inset:0; z-index:25; background:rgba(0,0,0,.35); display:none; align-items:flex-end; }
+  #addpanel.open { display:flex; }
+  #addpanel .sheet { background:var(--bg); color:var(--ink); width:100%; border-radius:16px 16px 0 0;
+                     padding:16px 18px calc(22px + env(safe-area-inset-bottom)); max-height:85%; overflow-y:auto; }
+  #addpanel h3 { margin:0 0 8px; font-size:15px; }
+  #addq { width:100%; padding:10px 12px; border:1px solid var(--line); border-radius:10px; font-size:15px; }
+  .a-row { display:flex; flex-wrap:wrap; gap:6px; margin:8px 0 2px; }
+  .a-chip { border:1px solid var(--line); background:#fff; border-radius:999px; padding:6px 10px; font-size:12.5px; }
+  .a-chip.on { background:var(--ink); color:#fff; border-color:var(--ink); }
+  .a-dot { width:26px; height:26px; border-radius:50%; border:2px solid #fff; box-shadow:0 0 0 1px var(--line); opacity:.35; }
+  .a-dot.on { opacity:1; box-shadow:0 0 0 2px var(--ink); }
+  .a-main { width:100%; margin-top:12px; padding:11px; border:0; border-radius:10px; background:var(--ink); color:#fff; font-size:14px; font-weight:600; }
+  #aresult { margin-top:10px; padding:9px 11px; background:#f7f7f5; border-radius:9px; font-size:13px; display:none; }
   .lgrid { display:grid; grid-template-columns:repeat(3,1fr); gap:6px 10px; }
   .lgrid .gi { display:flex; align-items:center; gap:7px; font-size:12.5px; }
   .lgrid canvas { width:26px; height:26px; flex:0 0 auto; }
@@ -76,6 +119,22 @@
 <div id="searchwrap"><input id="search" type="search" placeholder="Ort oder Adresse suchen …" autocomplete="off"></div>
 <button id="legendbtn" title="Legende">?</button>
 <button id="sharebtn" title="Aktuelle Ansicht teilen">↗</button>
+<button id="addbtn" title="Ort hinzufügen">+</button>
+<div id="addpanel"><div class="sheet">
+  <h3>Ort hinzufügen</h3>
+  <input id="addq" type="text" placeholder="Google-Maps-Link einfügen oder Name eintippen …" autocomplete="off">
+  <button class="a-main" id="alookup">Nachschlagen</button>
+  <div id="aresult"></div>
+  <div id="aform" style="display:none">
+    <div class="a-row" id="atyps"></div>
+    <div class="a-row" id="arates"></div>
+    <div class="a-row" id="astatus">
+      <button class="a-chip on" data-s="wunschliste">Watchlist</button>
+      <button class="a-chip" data-s="besucht">Besucht</button>
+    </div>
+    <button class="a-main" id="asave">Speichern</button>
+  </div>
+</div></div>
 <div id="panel">
   <div class="row" id="row1">
     <div class="seg" id="statusseg">
@@ -84,6 +143,7 @@
       <button data-s="wunschliste">Watchlist</button>
     </div>
     <span id="ratingdots"></span>
+    <button id="rolbtn" title="Zufalls-Vorschlag aus dem aktiven Filter">🎲</button>
     <span id="count"></span>
   </div>
   <div class="row" id="chips"></div>
@@ -95,8 +155,11 @@
   <div class="lrow"><span class="sw sq" style="background:#888"></span> Quadrat = Watchlist (noch nicht besucht)</div>
   <h3 style="margin-top:14px">Icon = Typ</h3>
   <div class="lgrid" id="legicons"></div>
-  <p style="font-size:12px;color:var(--muted)">Icon auf dem Pin = Typ (Pizza, Bar, Café …). Beim Rauszoomen bleiben alle Orte sichtbar; bessere Bewertungen liegen oben. restomap · Session 1 MVP</p>
+  <button class="lbtn" id="statsbtn">📊 Statistik anzeigen</button>
+  <button class="lbtn" id="themebtn">🌙 Darstellung: Auto</button>
+  <p style="font-size:12px;color:var(--muted)">Icon auf dem Pin = Typ (Pizza, Bar, Café …). Beim Rauszoomen bleiben alle Orte sichtbar; bessere Bewertungen liegen oben. restomap</p>
 </div></div>
+<div id="stats"><div class="sheet" id="statsbody"></div></div>
 <div id="err"></div>
 
 <script>
@@ -228,25 +291,33 @@ function toast(msg, ms=2500){
   t.textContent = msg; t.style.display='block';
   clearTimeout(t._h); t._h = setTimeout(()=>t.style.display='none', ms);
 }
-async function saveField(id, updates){
+async function postJson(payload){
   let wu = getWriteUrl(); if (!wu) wu = askWriteUrl();
-  if (!wu) { toast('Keine Schreib-URL hinterlegt.'); return false; }
+  if (!wu) { toast('Keine Schreib-URL hinterlegt.'); return null; }
   try {
-    const res = await fetch(wu, { method:'POST', body: JSON.stringify({ token:getToken(), id, updates }) });
+    const res = await fetch(wu, { method:'POST', body: JSON.stringify({ token:getToken(), ...payload }) });
     const j = await res.json();
-    if (!j.ok) { toast('Speichern fehlgeschlagen: ' + (j.error||'?')); return false; }
-    return true;
-  } catch(e) { toast('Speichern fehlgeschlagen (Netz?)'); return false; }
+    if (!j.ok) { toast('Fehler: ' + (j.error||'?')); return null; }
+    return j;
+  } catch(e) { toast('Speichern fehlgeschlagen (Netz?)'); return null; }
 }
+async function saveField(id, updates){ return !!(await postJson({ id, updates })); }
+const RATE2QP = { gold:['top','normal'], lila:['top','teuer'], gruen:['gut','guenstig'],
+                  orange:['unbewertet','ueberteuert'], rot:['nie_wieder','normal'], grau:['unbewertet','normal'] };
 
 /* ====== State & Filter ====== */
-const state = { status:"beide", ratings:new Set(Object.keys(COLORS)), types:new Set(), query:"" };
+const state = { status:"beide", ratings:new Set(Object.keys(COLORS)), types:new Set(), query:"",
+                price:"alle", mtags:new Set() };
 let allFeatures = [];
 
+const PRICEMAP = { "€":["guenstig"], "€€":["normal"], "€€€":["teuer","ueberteuert"] };
 function matches(pr){
   if (state.status!=="beide" && pr.status!==state.status) return false;
   if (!state.ratings.has(pr.rk)) return false;
   if (state.types.size && !state.types.has(pr.typ)) return false;
+  if (state.price!=="alle" && !PRICEMAP[state.price].includes(pr.p)) return false;
+  if (state.mtags.size){ const t=(pr.tags||'').toLowerCase();
+    for (const tg of state.mtags) if (!t.includes(tg)) return false; }
   if (state.query && !pr.name.toLowerCase().includes(state.query)) return false;
   return true;
 }
@@ -265,6 +336,8 @@ function stateToHash(){
   if (state.status !== 'beide') p.set('s', state.status);
   if (state.ratings.size < 6) p.set('r', [...state.ratings].join('.'));
   if (state.types.size) p.set('t', [...state.types].join('.'));
+  if (state.price!=='alle') p.set('p', state.price);
+  if (state.mtags.size) p.set('tg', [...state.mtags].join('.'));
   if (state.query) p.set('q', state.query);
   const c = map.getCenter();
   p.set('m', c.lng.toFixed(5) + ',' + c.lat.toFixed(5) + ',' + map.getZoom().toFixed(2));
@@ -276,6 +349,8 @@ function applyHash(){
   if (p.get('s')) state.status = p.get('s');
   if (p.get('r')) state.ratings = new Set(p.get('r').split('.').filter(k => COLORS[k]));
   if (p.get('t')) state.types = new Set(p.get('t').split('.').filter(t => TYPES.includes(t)));
+  if (p.get('p') && PRICEMAP[p.get('p')]) state.price = p.get('p');
+  if (p.get('tg')) state.mtags = new Set(p.get('tg').split('.').filter(t => ['lunch','dinner'].includes(t)));
   if (p.get('q')) state.query = p.get('q');
   const m = p.get('m');
   if (m) { const [lng, lat, z] = m.split(',').map(Number);
@@ -283,11 +358,16 @@ function applyHash(){
 }
 
 /* ====== Karte ====== */
+const DARKMAP = "https://tiles.openfreemap.org/styles/fiord";
+function themePref(){ try { return localStorage.getItem('rm_theme') || 'auto'; } catch(e){ return 'auto'; } }
+function isDark(){ const p = themePref();
+  return p==='dunkel' || (p==='auto' && window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches); }
+
 const params = new URLSearchParams(location.search);
 const style = params.get('basemap')==='blank'
   ? { version:8, glyphs:"https://tiles.openfreemap.org/fonts/{fontstack}/{range}.pbf",
       sources:{}, layers:[{id:'bg',type:'background',paint:{'background-color':'#eceae4'}}] }
-  : BASEMAP;
+  : (isDark() ? DARKMAP : BASEMAP);
 
 const map = new maplibregl.Map({ container:'map', style, center:[13.401,52.523], zoom:12.3,
                                  attributionControl:{compact:true} });
@@ -305,18 +385,17 @@ async function loadData(){
   return gj.features;
 }
 
-map.on('load', async () => {
-  try {
-    allFeatures = await loadData();
-    allFeatures.forEach(f=>{ const pr=f.properties; pr.rk=ratingKey(pr.q,pr.p); pr.prioInv=5-PRIO[pr.rk];
-                             pr.icon=pr.typ+"|"+pr.rk+"|"+(pr.status==="wunschliste"?"w":"b"); });
-    for (const typ of TYPES) for (const ck of Object.keys(COLORS)) {
-      map.addImage(typ+"|"+ck+"|b", makeIcon(typ,ck,false), {pixelRatio:2});
-      map.addImage(typ+"|"+ck+"|w", makeIcon(typ,ck,true ), {pixelRatio:2});
-    }
+function addMapContent(){
+  for (const typ of TYPES) for (const ck of Object.keys(COLORS)) {
+    if (!map.hasImage(typ+"|"+ck+"|b")) map.addImage(typ+"|"+ck+"|b", makeIcon(typ,ck,false), {pixelRatio:2});
+    if (!map.hasImage(typ+"|"+ck+"|w")) map.addImage(typ+"|"+ck+"|w", makeIcon(typ,ck,true ), {pixelRatio:2});
+  }
+  if (!map.getSource('orte'))
     map.addSource('orte', { type:'geojson', data:{type:"FeatureCollection",features:allFeatures}, promoteId:'id' });
-    // Ein Layer: alle Icons immer sichtbar (My-Maps-Gefühl beim Rauszoomen, inkl. Flex-Faktor);
-    // Zeichenreihenfolge über prioInv: Gold/Lila liegen oben. Namen ab Zoom 13,5, wo Platz ist.
+  // Ein Layer: alle Icons immer sichtbar (My-Maps-Gefühl beim Rauszoomen, inkl. Flex-Faktor);
+  // Zeichenreihenfolge über prioInv: Gold/Lila liegen oben. Namen ab Zoom 13,5, wo Platz ist.
+  const dk = document.body.classList.contains('dark');
+  if (!map.getLayer('pins'))
     map.addLayer({ id:'pins', type:'symbol', source:'orte',
       layout:{ 'icon-image':['get','icon'], 'icon-allow-overlap':true,
                'symbol-sort-key':['get','prioInv'],
@@ -324,12 +403,37 @@ map.on('load', async () => {
                'text-field':['step',['zoom'],'',13.5,['get','name']], 'text-font':['Noto Sans Regular'],
                'text-size':11, 'text-offset':[0,1.6],
                'text-anchor':'top', 'text-optional':true },
-      paint:{ 'text-color':'#333', 'text-halo-color':'#fff', 'text-halo-width':1.2 } });
+      paint:{ 'text-color': dk ? '#e8e8ea' : '#333', 'text-halo-color': dk ? '#1c1c20' : '#fff', 'text-halo-width':1.2 } });
+}
+
+map.on('load', async () => {
+  try {
+    allFeatures = await loadData();
+    allFeatures.forEach(f=>{ const pr=f.properties; pr.rk=ratingKey(pr.q,pr.p); pr.prioInv=5-PRIO[pr.rk];
+                             pr.icon=pr.typ+"|"+pr.rk+"|"+(pr.status==="wunschliste"?"w":"b"); });
+    document.body.classList.toggle('dark', isDark() );
+    addMapContent();
 
     for (const layer of ['pins']) {
       map.on('click', layer, e => {
-        const pr = e.features[0].properties;
-        const [lon,lat] = e.features[0].geometry.coordinates;
+        const f = allFeatures.find(x => x.properties.id === e.features[0].properties.id);
+        if (f) openPopup(f);
+      });
+      map.on('mouseenter', layer, ()=>map.getCanvas().style.cursor='pointer');
+      map.on('mouseleave', layer, ()=>map.getCanvas().style.cursor='');
+    }
+    applyHash(); buildUI(); hashReady = true; applyFilter();
+    map.on('moveend', () => stateToHash());
+    if (window.matchMedia) matchMedia('(prefers-color-scheme: dark)').addEventListener('change', ()=>applyTheme());
+  } catch (err) {
+    const el=document.getElementById('err'); el.style.display='block';
+    el.textContent='Daten konnten nicht geladen werden: '+err.message; console.error(err);
+  }
+});
+
+function openPopup(feat){
+        const pr = feat.properties;
+        const [lon,lat] = feat.geometry.coordinates;
         const gm = `https://www.google.com/maps/search/?api=1&query=${lat},${lon}`;
         const canEdit = !!getToken();
         const nextStatus = pr.status === 'besucht' ? 'wunschliste' : 'besucht';
@@ -339,29 +443,42 @@ map.on('load', async () => {
            <div class="p-meta">${pr.status==="besucht"?"Besucht":"Watchlist"}</div>
            ${pr.notiz?`<div class="p-note">${esc(pr.notiz)}</div>`:''}
            <a class="p-link" href="${gm}" target="_blank" rel="noopener">In Google Maps öffnen ↗</a>
-           ${canEdit?`<button class="p-statusbtn">${nextStatus==='besucht'?'✓ Als besucht markieren':'↩︎ Zurück auf die Watchlist'}</button>`:''}`).addTo(map);
-        if (canEdit) popup.getElement().querySelector('.p-statusbtn').onclick = async () => {
-          const feat = allFeatures.find(x => x.properties.id === pr.id);
-          if (!feat) return;
-          const old = feat.properties.status;
-          const setStatus = s => { feat.properties.status = s;
-            feat.properties.icon = feat.properties.typ+'|'+feat.properties.rk+'|'+(s==='wunschliste'?'w':'b'); };
-          setStatus(nextStatus); applyFilter(); popup.remove();
-          toast(nextStatus==='besucht' ? 'Gespeichert: Besucht ✓' : 'Gespeichert: Watchlist');
-          const ok = await saveField(pr.id, { status: nextStatus });
-          if (!ok) { setStatus(old); applyFilter(); }
-        };
-      });
-      map.on('mouseenter', layer, ()=>map.getCanvas().style.cursor='pointer');
-      map.on('mouseleave', layer, ()=>map.getCanvas().style.cursor='');
-    }
-    applyHash(); buildUI(); hashReady = true; applyFilter();
-    map.on('moveend', () => stateToHash());
-  } catch (err) {
-    const el=document.getElementById('err'); el.style.display='block';
-    el.textContent='Daten konnten nicht geladen werden: '+err.message; console.error(err);
-  }
-});
+           ${canEdit?`<button class="p-statusbtn">${nextStatus==='besucht'?'✓ Als besucht markieren':'↩︎ Zurück auf die Watchlist'}</button>
+           <button class="p-visitbtn">📅 Heute hier gewesen</button>
+           <div class="p-tagrow">
+             <button class="p-tag${(pr.tags||'').includes('lunch')?' on':''}" data-tg="lunch">lunch</button>
+             <button class="p-tag${(pr.tags||'').includes('dinner')?' on':''}" data-tg="dinner">dinner</button>
+           </div>`:''}`).addTo(map);
+        if (canEdit) {
+          const el = popup.getElement();
+          const feat = () => allFeatures.find(x => x.properties.id === pr.id);
+          const setStatus = (f,s) => { f.properties.status = s;
+            f.properties.icon = f.properties.typ+'|'+f.properties.rk+'|'+(s==='wunschliste'?'w':'b'); };
+          el.querySelector('.p-statusbtn').onclick = async () => {
+            const f = feat(); if (!f) return;
+            const old = f.properties.status;
+            setStatus(f, nextStatus); applyFilter(); popup.remove();
+            toast(nextStatus==='besucht' ? 'Gespeichert: Besucht ✓' : 'Gespeichert: Watchlist');
+            if (!await saveField(pr.id, { status: nextStatus })) { setStatus(f, old); applyFilter(); }
+          };
+          el.querySelector('.p-visitbtn').onclick = async () => {
+            const f = feat(); if (!f) return;
+            const heute = new Date().toLocaleDateString('sv-SE');
+            f.properties.besucht_am = heute; setStatus(f, 'besucht'); applyFilter(); popup.remove();
+            toast('Besuch notiert: ' + heute + ' ✓');
+            saveField(pr.id, { besucht_am: heute, status: 'besucht' });
+          };
+          el.querySelectorAll('.p-tag').forEach(b => b.onclick = async () => {
+            const f = feat(); if (!f) return;
+            const tg = b.dataset.tg;
+            let tags = (f.properties.tags||'').split(',').map(s=>s.trim()).filter(Boolean);
+            if (tags.includes(tg)) tags = tags.filter(t=>t!==tg); else tags.push(tg);
+            f.properties.tags = tags.join(', ');
+            b.classList.toggle('on'); applyFilter();
+            saveField(pr.id, { tags: f.properties.tags });
+          });
+        }
+}
 
 function esc(s){ return String(s).replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
 
@@ -382,16 +499,32 @@ function buildUI(){
                     else {state.ratings.add(ck); d.classList.add('on');} applyFilter(); };
     dots.appendChild(d);
   }
-  // Typ-Chips
+  // Preis-Segment
+  const pseg=document.createElement('div'); pseg.className='seg';
+  for (const pv of ['alle','€','€€','€€€']){
+    const b=document.createElement('button'); b.textContent=pv==='alle'?'€?':pv;
+    b.classList.toggle('on', state.price===pv);
+    b.onclick=()=>{ state.price=pv; pseg.querySelectorAll('button').forEach(x=>x.classList.remove('on'));
+                    b.classList.add('on'); applyFilter(); };
+    pseg.appendChild(b);
+  }
+  document.getElementById('row1').insertBefore(pseg, document.getElementById('count'));
+  // Typ-Chips (+ lunch/dinner-Tag-Chips)
   const chips=document.getElementById('chips');
   const counts={}; allFeatures.forEach(f=>counts[f.properties.typ]=(counts[f.properties.typ]||0)+1);
   const alle=document.createElement('button'); alle.className='chip'+(state.types.size?'':' on'); alle.textContent='Alle';
-  alle.onclick=()=>{ state.types.clear(); chips.querySelectorAll('.chip').forEach(x=>x.classList.remove('on'));
+  alle.onclick=()=>{ state.types.clear(); chips.querySelectorAll('.chip[data-typ]').forEach(x=>x.classList.remove('on'));
                      alle.classList.add('on'); applyFilter(); };
   chips.appendChild(alle);
+  for (const tg of ['lunch','dinner']){
+    const ch=document.createElement('button'); ch.className='chip'+(state.mtags.has(tg)?' on':''); ch.textContent='· '+tg;
+    ch.onclick=()=>{ if(state.mtags.has(tg)){state.mtags.delete(tg); ch.classList.remove('on');}
+                     else {state.mtags.add(tg); ch.classList.add('on');} applyFilter(); };
+    chips.appendChild(ch);
+  }
   for (const t of [...TYPES].sort((a,b)=>(counts[b]||0)-(counts[a]||0))){
     const ch=document.createElement('button'); ch.className='chip'+(state.types.has(t)?' on':'');
-    ch.textContent=`${t} ${counts[t]||0}`;
+    ch.dataset.typ=t; ch.textContent=`${t} ${counts[t]||0}`;
     ch.onclick=()=>{ if(state.types.has(t)){state.types.delete(t); ch.classList.remove('on');}
                      else {state.types.add(t); ch.classList.add('on');}
                      alle.classList.toggle('on', state.types.size===0); applyFilter(); };
@@ -442,6 +575,143 @@ function buildUI(){
   }
   let seen=false; try{ seen=!!localStorage.getItem('rm_legend_seen'); }catch(e){}
   if (!seen) leg.classList.add('open');
+  initAdd();
+  // 🎲 Roulette
+  document.getElementById('rolbtn').onclick=()=>{
+    const vis=allFeatures.filter(f=>matches(f.properties));
+    if(!vis.length){ toast('Kein Ort im aktiven Filter'); return; }
+    const f=vis[Math.floor(Math.random()*vis.length)];
+    map.flyTo({ center:f.geometry.coordinates, zoom:16 });
+    setTimeout(()=>openPopup(f), 650);
+    toast('🎲 '+f.properties.name);
+  };
+  // 📊 Statistik
+  const stats=document.getElementById('stats');
+  document.getElementById('statsbtn').onclick=()=>{ renderStats(); leg.classList.remove('open'); stats.classList.add('open'); };
+  stats.onclick=e=>{ if(e.target===stats) stats.classList.remove('open'); };
+  // 🌙 Theme
+  document.getElementById('themebtn').onclick=()=>{
+    const order=['auto','hell','dunkel'];
+    const next=order[(order.indexOf(themePref())+1)%3];
+    try{ localStorage.setItem('rm_theme', next); }catch(e){}
+    applyTheme();
+  };
+  applyTheme(true);
+}
+
+/* ====== Theme (Dark Mode) ====== */
+function applyTheme(initial){
+  const dark=isDark();
+  document.body.classList.toggle('dark', dark);
+  const btn=document.getElementById('themebtn');
+  if (btn) btn.textContent=(dark?'🌙':'☀️')+' Darstellung: '+({auto:'Auto',hell:'Hell',dunkel:'Dunkel'}[themePref()]);
+  if (params.get('basemap')==='blank') return;
+  const want=dark?DARKMAP:BASEMAP;
+  if (map.__styleUrl!==want){
+    map.__styleUrl=want;
+    if (!initial){ map.setStyle(want); map.once('style.load', ()=>{ addMapContent(); applyFilter(); }); }
+  }
+}
+
+/* ====== Statistik ====== */
+function renderStats(){
+  const P=allFeatures.map(f=>f.properties);
+  const bes=P.filter(p=>p.status==='besucht'), wl=P.filter(p=>p.status!=='besucht');
+  const cnt=(arr,fn)=>arr.filter(fn).length;
+  const pct=(a,b)=>b?Math.round(100*a/b)+' %':'–';
+  const goldB=cnt(bes,p=>p.rk==='gold'||p.rk==='lila'), goldW=cnt(wl,p=>p.rk==='gold'||p.rk==='lila');
+  let h=`<h3>Überblick</h3><div class="kpis">
+    <div class="kpi"><b>${P.length}</b><span>Orte gesamt</span></div>
+    <div class="kpi"><b>${bes.length}</b><span>besucht</span></div>
+    <div class="kpi"><b>${wl.length}</b><span>Watchlist</span></div>
+    <div class="kpi"><b>${pct(goldB,bes.length)}</b><span>Gold/Lila besucht</span></div>
+    <div class="kpi"><b>${pct(goldW,wl.length)}</b><span>Gold/Lila Watchlist</span></div>
+    <div class="kpi"><b>${cnt(P,p=>p.rk==='rot')}</b><span>nie wieder</span></div></div>`;
+  h+='<h3>Bewertungen</h3>';
+  const rmax=Math.max(...Object.keys(COLORS).map(ck=>cnt(P,p=>p.rk===ck)),1);
+  for (const ck of ['gold','grau','orange','gruen','lila','rot']){
+    const n=cnt(P,p=>p.rk===ck);
+    h+=`<div class="brow"><span class="lbl">${RLABEL[ck]}</span>
+        <span class="bar" style="width:${Math.round(58*n/rmax)}%;background:${COLORS[ck]}"></span>
+        <span class="val">${n}</span></div>`;
+  }
+  h+='<h3>Typen</h3>';
+  const tc={}; P.forEach(p=>tc[p.typ]=(tc[p.typ]||0)+1);
+  const sorted=Object.entries(tc).sort((a,b)=>b[1]-a[1]);
+  const tmax=sorted.length?sorted[0][1]:1;
+  for (const [t,n] of sorted){
+    h+=`<div class="brow"><span class="lbl">${esc(t)}</span>
+        <span class="bar" style="width:${Math.round(58*n/tmax)}%;background:var(--muted)"></span>
+        <span class="val">${n}</span></div>`;
+  }
+  const tagged=cnt(P,p=>(p.tags||'').includes('lunch')||(p.tags||'').includes('dinner'));
+  const visited=cnt(P,p=>p.besucht_am);
+  h+=`<p style="font-size:12px;color:var(--muted)">Besuchs-Log: ${visited} Einträge · lunch/dinner-Tags: ${tagged} Orte · Stand: beim Öffnen berechnet</p>`;
+  document.getElementById('statsbody').innerHTML=h;
+}
+
+/* ====== Ort hinzufügen (Edit-Modus) ====== */
+const addSel = { typ:'', rate:'grau', status:'wunschliste', place:null };
+function initAdd(){
+  if (!getToken()) return;
+  const btn=document.getElementById('addbtn'); btn.style.display='block';
+  const panel=document.getElementById('addpanel');
+  btn.onclick=()=>panel.classList.add('open');
+  panel.onclick=e=>{ if(e.target===panel) panel.classList.remove('open'); };
+  const at=document.getElementById('atyps');
+  TYPES.forEach(t=>{ const c=document.createElement('button'); c.className='a-chip'; c.textContent=t;
+    c.onclick=()=>{ at.querySelectorAll('.a-chip').forEach(x=>x.classList.remove('on'));
+                    c.classList.add('on'); addSel.typ=t; };
+    at.appendChild(c); });
+  const ar=document.getElementById('arates');
+  for (const ck of ['grau','gold','gruen','lila','orange','rot']){
+    const d=document.createElement('button'); d.className='a-dot'+(ck==='grau'?' on':'');
+    d.style.background=COLORS[ck]; d.title=RLABEL[ck];
+    d.onclick=()=>{ ar.querySelectorAll('.a-dot').forEach(x=>x.classList.remove('on'));
+                    d.classList.add('on'); addSel.rate=ck; };
+    ar.appendChild(d);
+  }
+  document.querySelectorAll('#astatus .a-chip').forEach(b=>b.onclick=()=>{
+    document.querySelectorAll('#astatus .a-chip').forEach(x=>x.classList.remove('on'));
+    b.classList.add('on'); addSel.status=b.dataset.s; });
+  document.getElementById('alookup').onclick=doLookup;
+  document.getElementById('asave').onclick=doSave;
+}
+async function doLookup(){
+  const v=document.getElementById('addq').value.trim(); if(!v) return;
+  toast('Nachschlagen …', 9000);
+  const j=await postJson(/^https?:\/\//.test(v) ? { action:'lookupPlace', url:v } : { action:'lookupPlace', query:v });
+  if (!j) return;
+  if (!j.place){ toast('Kein Treffer — anders formulieren?'); return; }
+  addSel.place=j.place;
+  const r=document.getElementById('aresult'); r.style.display='block';
+  r.innerHTML=`<b>${esc(j.place.name)}</b><br>${esc(j.place.addr)}`+
+    (j.place.status && j.place.status!=='OPERATIONAL' ? `<br><b style="color:#7B1420">${esc(j.place.status)}</b>` : '');
+  document.getElementById('aform').style.display='block';
+  if (j.place.typHint){ addSel.typ=j.place.typHint;
+    document.querySelectorAll('#atyps .a-chip').forEach(c=>c.classList.toggle('on', c.textContent===j.place.typHint)); }
+  toast('Treffer gefunden — Typ/Bewertung wählen');
+}
+async function doSave(){
+  const p=addSel.place; if (!p) return;
+  if (!addSel.typ){ toast('Bitte Typ wählen'); return; }
+  const [qv, pv]=RATE2QP[addSel.rate];
+  toast('Speichern …', 9000);
+  const j=await postJson({ action:'addRow', row:{ name:p.name, lat:p.lat, lon:p.lng, typ:addSel.typ,
+    status:addSel.status, qualitaet:qv, preis:pv, place_id:p.place_id,
+    gmaps_url:'https://www.google.com/maps/place/?q=place_id:'+p.place_id } });
+  if (!j) return;
+  const f={ type:'Feature', geometry:{ type:'Point', coordinates:[p.lng,p.lat] },
+    properties:{ id:j.id, name:p.name, typ:addSel.typ, status:addSel.status, q:qv, p:pv,
+                 notiz:'', tags:'', besucht_am:'' } };
+  f.properties.rk=ratingKey(qv,pv); f.properties.prioInv=5-PRIO[f.properties.rk];
+  f.properties.icon=addSel.typ+'|'+f.properties.rk+'|'+(addSel.status==='wunschliste'?'w':'b');
+  allFeatures.push(f); applyFilter();
+  document.getElementById('addpanel').classList.remove('open');
+  document.getElementById('addq').value=''; document.getElementById('aresult').style.display='none';
+  document.getElementById('aform').style.display='none'; addSel.place=null;
+  map.flyTo({ center:[p.lng,p.lat], zoom:16 });
+  toast(`${p.name} hinzugefügt ✓`);
 }
 </script>
 </body>
