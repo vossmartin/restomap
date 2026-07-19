@@ -12,7 +12,7 @@ jobs:
   backup:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Sheet abrufen und GeoJSON bauen
         run: |
           curl -sL "https://docs.google.com/spreadsheets/d/18nYehpbpOmARe9NI6EXdKKFiYG53C3OMgKm4A5CuLFk/gviz/tq?tqx=out:csv" -o data/sheet-backup.csv
