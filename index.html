@@ -190,14 +190,15 @@ const ANLAESSE = [ { key:'fruehstueck', label:'Frühstück', tags:['fruehstueck'
                    { key:'lunch',       label:'Lunch',     tags:['lunch'] },
                    { key:'kaffee',      label:'Kaffee',    tags:['kaffee'] },
                    { key:'dinner',      label:'Dinner',    tags:['dinner'] },
-                   { key:'drinks',      label:'Drinks',    tags:['drinks'] } ];
+                   { key:'drinks',      label:'Drinks',    tags:['drinks'] },
+                   { key:'music',       label:'Musik',     tags:['music'] } ];
 // Anlass-Vorbelegung beim Neuanlegen (identisch zu den Migrations-Regeln)
 const ANLASS_DEFAULT = { "Restaurant":["lunch","dinner"], "Asia":["lunch","dinner"], "Sushi":["lunch","dinner"],
   "Pizza":["lunch","dinner"], "Burger":["lunch","dinner"], "Steak/Grill":["lunch","dinner"],
   "Fisch":["lunch","dinner"], "Imbiss":["lunch","dinner"], "Café":["fruehstueck","kaffee"],
   "Bäcker":["fruehstueck","kaffee"], "Eis":["kaffee"], "Dessert":["kaffee"],
   "Biergarten":["kaffee","dinner","drinks"], "Cocktail-Bar":["drinks"], "Weinbar":["drinks"],
-  "Kneipe":["drinks"], "Sportsbar":["drinks"], "Club/Livemusik":["drinks"], "Karaoke":["drinks"] };
+  "Kneipe":["drinks"], "Sportsbar":["drinks"], "Club/Livemusik":["drinks","music"], "Karaoke":["drinks","music"] };
 
 function ratingKey(q, p) {
   if (p === "ueberteuert") return "orange";
@@ -487,7 +488,7 @@ function openPopup(feat){
            ${canEdit?`<button class="p-statusbtn">${nextStatus==='besucht'?'✓ Als besucht markieren':'↩︎ Zurück auf die Watchlist'}</button>
            <button class="p-visitbtn">📅 Heute hier gewesen</button>
            <div class="p-tagrow">
-             ${['fruehstueck','brunch','lunch','kaffee','dinner','drinks'].map(tg=>
+             ${['fruehstueck','brunch','lunch','kaffee','dinner','drinks','music'].map(tg=>
                `<button class="p-tag${(pr.tags||'').includes(tg)?' on':''}" data-tg="${tg}">${tg}</button>`).join('')}
            </div>`:''}`).addTo(map);
         if (canEdit) {
@@ -689,7 +690,7 @@ function renderStats(){
         <span class="bar" style="width:${Math.round(58*n/tmax)}%;background:var(--muted)"></span>
         <span class="val">${n}</span></div>`;
   }
-  const ATAGS=['fruehstueck','brunch','lunch','kaffee','dinner','drinks'];
+  const ATAGS=['fruehstueck','brunch','lunch','kaffee','dinner','drinks','music'];
   const tagged=cnt(P,p=>{ const t=(p.tags||'').toLowerCase(); return ATAGS.some(tg=>t.includes(tg)); });
   const visited=cnt(P,p=>p.besucht_am);
   h+=`<p style="font-size:12px;color:var(--muted)">Besuchs-Log: ${visited} Einträge · Anlass-Tags: ${tagged} Orte · Stand: beim Öffnen berechnet</p>`;
