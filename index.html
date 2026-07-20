@@ -146,6 +146,7 @@
     <button id="rolbtn" title="Zufalls-Vorschlag aus dem aktiven Filter">🎲</button>
     <span id="count"></span>
   </div>
+  <div class="row" id="anlassrow"></div>
   <div class="row" id="chips"></div>
 </div>
 <div id="legend"><div class="sheet">
@@ -174,8 +175,29 @@ const COLORS = { gold:"#F0A800", lila:"#9C27B0", gruen:"#0F9D58", orange:"#E6510
 const PRIO   = { gold:0, lila:1, rot:2, orange:3, gruen:4, grau:5 };
 const RLABEL = { gold:"Sehr gut", lila:"Sehr gut · Anlass (teuer)", gruen:"Gut & günstig",
                  orange:"Zu teuer (P/L)", grau:"Ohne Urteil", rot:"Nie wieder" };
-const TYPES = ["Restaurant","Asia","Bar","Café","Frühstück","Kneipe","Imbiss","Pizza","Club/Livemusik",
-               "Biergarten","Sushi","Eis","Weinbar","Burger","Steak/Grill","Fisch","Sport-/Kickerbar","Karaoke"];
+/* Datenlogik v2 (2026-07-20): typ = Speisen-/Venue-Schwerpunkt (Icon) · kueche = Herkunft (später Flaggen-Badge)
+   · Anlass-Tags (fruehstueck/brunch/lunch/kaffee/dinner/drinks) = erste Filter-Weiche, nur Filter, keine Pin-Optik. */
+const TYPES = ["Restaurant","Asia","Café","Kneipe","Cocktail-Bar","Imbiss","Pizza","Club/Livemusik",
+               "Biergarten","Sushi","Eis","Weinbar","Burger","Steak/Grill","Fisch","Sportsbar","Karaoke",
+               "Bäcker","Dessert"];
+// Alt-Werte (Sheet vor Migration, alte Teilen-Links) → neue Typen
+const TYP_ALIAS = { "Bar":"Cocktail-Bar", "Sport-/Kickerbar":"Sportsbar", "Frühstück":"Restaurant" };
+// Kurzformen für enge UI-Stellen (Chips); Langform bleibt in Legende/Popup
+const TYP_SHORT = { "Cocktail-Bar":"Bar" };
+const TYP_LEGENDE = { "Asia":"Asia · Suppen/Nudeln" };
+// Anlass-Weiche: Chip → Tag-Menge (OR innerhalb des Chips und zwischen Chips)
+const ANLAESSE = [ { key:'fruehstueck', label:'Frühstück', tags:['fruehstueck','brunch'] },
+                   { key:'lunch',       label:'Lunch',     tags:['lunch'] },
+                   { key:'kaffee',      label:'Kaffee',    tags:['kaffee'] },
+                   { key:'dinner',      label:'Dinner',    tags:['dinner'] },
+                   { key:'drinks',      label:'Drinks',    tags:['drinks'] } ];
+// Anlass-Vorbelegung beim Neuanlegen (identisch zu den Migrations-Regeln)
+const ANLASS_DEFAULT = { "Restaurant":["lunch","dinner"], "Asia":["lunch","dinner"], "Sushi":["lunch","dinner"],
+  "Pizza":["lunch","dinner"], "Burger":["lunch","dinner"], "Steak/Grill":["lunch","dinner"],
+  "Fisch":["lunch","dinner"], "Imbiss":["lunch","dinner"], "Café":["fruehstueck","kaffee"],
+  "Bäcker":["fruehstueck","kaffee"], "Eis":["kaffee"], "Dessert":["kaffee"],
+  "Biergarten":["kaffee","dinner","drinks"], "Cocktail-Bar":["drinks"], "Weinbar":["drinks"],
+  "Kneipe":["drinks"], "Sportsbar":["drinks"], "Club/Livemusik":["drinks"], "Karaoke":["drinks"] };
 
 function ratingKey(q, p) {
   if (p === "ueberteuert") return "orange";
@@ -188,9 +210,16 @@ function ratingKey(q, p) {
 /* ====== Icon-Glyphen (weiß, schlicht) — gezeichnet in 24×24-Box ====== */
 const GLYPH = {
   "Restaurant": {v:15, d:["M3.5,0l-1,5.5c-0.1464,0.805,1.7815,1.181,1.75,2L4,14c-0.0384,0.9993,1,1,1,1s1.0384-0.0007,1-1L5.75,7.5  c-0.0314-0.8176,1.7334-1.1808,1.75-2L6.5,0H6l0.25,4L5.5,4.5L5.25,0h-0.5L4.5,4.5L3.75,4L4,0H3.5z M12,0  c-0.7364,0-1.9642,0.6549-2.4551,1.6367C9.1358,2.3731,9,4.0182,9,5v2.5c0,0.8182,1.0909,1,1.5,1L10,14c-0.0905,0.9959,1,1,1,1  s1,0,1-1V0z"]},
-  "Bar": {v:15, d:["M7.5,1c-2,0-7,0.25-6.5,0.75L7,8v4  c0,1-3,0.5-3,2h7c0-1.5-3-1-3-2V8l6-6.25C14.5,1.25,9.5,1,7.5,1z M7.5,2c2.5,0,4.75,0.25,4.75,0.25L11.5,3h-8L2.75,2.25  C2.75,2.25,5,2,7.5,2z"]},
+  "Cocktail-Bar": {v:15, d:["M7.5,1c-2,0-7,0.25-6.5,0.75L7,8v4  c0,1-3,0.5-3,2h7c0-1.5-3-1-3-2V8l6-6.25C14.5,1.25,9.5,1,7.5,1z M7.5,2c2.5,0,4.75,0.25,4.75,0.25L11.5,3h-8L2.75,2.25  C2.75,2.25,5,2,7.5,2z"]},
   "Café": {v:15, d:["M12,5h-2V3H2v4c0.0133,2.2091,1.8149,3.9891,4.024,3.9758C7.4345,10.9673,8.7362,10.2166,9.45,9H12c1.1046,0,2-0.8954,2-2  S13.1046,5,12,5z M12,8H9.86C9.9487,7.6739,9.9958,7.3379,10,7V6h2c0.5523,0,1,0.4477,1,1S12.5523,8,12,8z M10,12.5  c0,0.2761-0.2239,0.5-0.5,0.5h-7C2.2239,13,2,12.7761,2,12.5S2.2239,12,2.5,12h7C9.7761,12,10,12.2239,10,12.5z"]},
-  "Frühstück": {v:15, d:["M5.294,4.382,6,9.5a.979.979,0,0,0,1,1H8a.979.979,0,0,0,1-1l.706-5.118C9.706,3,7.5,3,7.5,3S5.291,3,5.294,4.382ZM3.5,5C2,5,2,6,2,6l1,4H4.5a.793.793,0,0,0,.794-.765L4.5,5Zm-2,2.5a1.533,1.533,0,0,0-1.059.412A1.366,1.366,0,0,0,0,8.794V11H.882A1.02,1.02,0,0,0,2,10ZM11.5,5C13,5,13,6,13,6l-1,4H10.5a.793.793,0,0,1-.794-.765L10.5,5Zm2,2.5a1.533,1.533,0,0,1,1.059.412A1.366,1.366,0,0,1,15,8.794V11h-.882A1.02,1.02,0,0,1,13,10Z"]},
+  "Bäcker": c => { c.beginPath(); c.ellipse(12,10.8,7.2,4.4,0,Math.PI,0); c.fill(); rr(c,4.8,10.6,14.4,5.6,2.4);
+                       c.save(); c.globalCompositeOperation='destination-out';
+                       line(c,7.8,7.8,9.6,10.6,1.1); line(c,11.2,7.0,13.0,9.8,1.1); line(c,14.6,7.8,16.4,10.6,1.1); c.restore(); },
+  "Dessert": c => { c.beginPath(); c.moveTo(7.2,12.2); c.lineTo(16.8,12.2); c.lineTo(15.2,19.6); c.lineTo(8.8,19.6); c.closePath(); c.fill();
+                       c.beginPath(); c.arc(12,11.2,5.6,Math.PI,0); c.closePath(); c.fill();
+                       dot(c,12,4.6,1.6);
+                       c.save(); c.globalCompositeOperation='destination-out';
+                       line(c,10.4,13.4,10.0,18.4,0.9); line(c,13.6,13.4,14.0,18.4,0.9); c.restore(); },
   "Pizza": {v:15, d:["M1.393 7.931.025 7.315A14.05 14.05 0 0 1 7.764-.001l.027.07.511 1.331-.003.001a12.613 12.613 0 0 0-6.906 6.53Zm10.963 4.96L2.42 8.414a11.604 11.604 0 0 1 6.354-6.009l.003-.001.817 2.122c-.028-.002-.052-.016-.081-.016a1.062 1.062 0 1 0 .764 1.793l2.413 6.273a.249.249 0 0 1-.334.316ZM7.426 7.52a.925.925 0 1 0-1.849 0 .925.925 0 0 0 1.849 0Zm3.017 2.03a.925.925 0 1 0-.07.353.924.924 0 0 0 .07-.354Z"]},
   "Asia": c => { c.beginPath(); c.arc(12,12.5,6.5,0,Math.PI); c.closePath(); c.fill(); bar(c,12,13,9,1.6,true); bar(c,12,19,5,1.5,true);
                        line(c,7.5,4.5,13.5,9.5,1.5); line(c,10.5,3.8,15.5,8.8,1.5); },
@@ -220,7 +249,7 @@ const GLYPH = {
   "Fisch": c => { c.beginPath(); c.ellipse(10.6,12,5.9,3.7,0,0,7); c.fill();
                        c.beginPath(); c.moveTo(15.4,12); c.lineTo(19.6,8.8); c.lineTo(19.6,15.2); c.closePath(); c.fill();
                        c.save(); c.globalCompositeOperation='destination-out'; dot(c,7.7,10.9,0.95); c.restore(); },
-  "Sport-/Kickerbar": c => { ring(c,12,12,7,1.7); dot(c,12,12,2.2); dot(c,12,6.6,1.2); dot(c,6.9,10.3,1.2);
+  "Sportsbar": c => { ring(c,12,12,7,1.7); dot(c,12,12,2.2); dot(c,12,6.6,1.2); dot(c,6.9,10.3,1.2);
                        dot(c,8.8,16.4,1.2); dot(c,15.2,16.4,1.2); dot(c,17.1,10.3,1.2); },
   "Karaoke": c => { rr(c,9.8,4.2,4.4,8.6,2.2); bar(c,12,12.8,1.6,4.4); bar(c,12,18.6,6.5,1.5,true);
                        c.save(); c.globalCompositeOperation='destination-out'; line(c,9.8,7.2,14.2,7.2,0.9); line(c,9.8,9.4,14.2,9.4,0.9); c.restore(); },
@@ -307,7 +336,7 @@ const RATE2QP = { gold:['top','normal'], lila:['top','teuer'], gruen:['gut','gue
 
 /* ====== State & Filter ====== */
 const state = { status:"beide", ratings:new Set(Object.keys(COLORS)), types:new Set(), query:"",
-                price:"alle", mtags:new Set() };
+                price:"alle", mtags:new Set(), anlass:new Set() };
 let allFeatures = [];
 
 const PRICEMAP = { "€":["guenstig"], "€€":["normal"], "€€€":["teuer","ueberteuert"] };
@@ -316,6 +345,9 @@ function matches(pr){
   if (!state.ratings.has(pr.rk)) return false;
   if (state.types.size && !state.types.has(pr.typ)) return false;
   if (state.price!=="alle" && !PRICEMAP[state.price].includes(pr.p)) return false;
+  if (state.anlass.size){ const t=(pr.tags||'').toLowerCase(); let hit=false;
+    for (const a of ANLAESSE) if (state.anlass.has(a.key) && a.tags.some(tg=>t.includes(tg))) { hit=true; break; }
+    if (!hit) return false; }
   if (state.mtags.size){ const t=(pr.tags||'').toLowerCase();
     for (const tg of state.mtags) if (!t.includes(tg)) return false; }
   if (state.query && !pr.name.toLowerCase().includes(state.query)) return false;
@@ -337,6 +369,7 @@ function stateToHash(){
   if (state.ratings.size < 6) p.set('r', [...state.ratings].join('.'));
   if (state.types.size) p.set('t', [...state.types].join('.'));
   if (state.price!=='alle') p.set('p', state.price);
+  if (state.anlass.size) p.set('a', [...state.anlass].join('.'));
   if (state.mtags.size) p.set('tg', [...state.mtags].join('.'));
   if (state.query) p.set('q', state.query);
   const c = map.getCenter();
@@ -348,9 +381,12 @@ function applyHash(){
   const p = new URLSearchParams(location.hash.slice(1));
   if (p.get('s')) state.status = p.get('s');
   if (p.get('r')) state.ratings = new Set(p.get('r').split('.').filter(k => COLORS[k]));
-  if (p.get('t')) state.types = new Set(p.get('t').split('.').filter(t => TYPES.includes(t)));
+  if (p.get('t')) state.types = new Set(p.get('t').split('.').map(t => TYP_ALIAS[t]||t).filter(t => TYPES.includes(t)));
   if (p.get('p') && PRICEMAP[p.get('p')]) state.price = p.get('p');
-  if (p.get('tg')) state.mtags = new Set(p.get('tg').split('.').filter(t => ['lunch','dinner'].includes(t)));
+  if (p.get('a')) state.anlass = new Set(p.get('a').split('.').filter(k => ANLAESSE.some(x=>x.key===k)));
+  // Alt-Links: tg=lunch/dinner (frühere Tag-Chips) → Anlass-Weiche
+  if (p.get('tg')) for (const t of p.get('tg').split('.'))
+    if (['lunch','dinner'].includes(t)) state.anlass.add(t);
   if (p.get('q')) state.query = p.get('q');
   const m = p.get('m');
   if (m) { const [lng, lat, z] = m.split(',').map(Number);
@@ -409,7 +445,12 @@ function addMapContent(){
 map.on('load', async () => {
   try {
     allFeatures = await loadData();
-    allFeatures.forEach(f=>{ const pr=f.properties; pr.rk=ratingKey(pr.q,pr.p); pr.prioInv=5-PRIO[pr.rk];
+    allFeatures.forEach(f=>{ const pr=f.properties;
+                             if (TYP_ALIAS[pr.typ]) { // Alt-Daten (vor Migration): Frühstück behält seinen Anlass als Tag
+                               if (pr.typ==='Frühstück' && !(pr.tags||'').includes('fruehstueck'))
+                                 pr.tags=(pr.tags?pr.tags+', ':'')+'fruehstueck, brunch';
+                               pr.typ=TYP_ALIAS[pr.typ]; }
+                             pr.rk=ratingKey(pr.q,pr.p); pr.prioInv=5-PRIO[pr.rk];
                              pr.icon=pr.typ+"|"+pr.rk+"|"+(pr.status==="wunschliste"?"w":"b"); });
     document.body.classList.toggle('dark', isDark() );
     addMapContent();
@@ -446,8 +487,8 @@ function openPopup(feat){
            ${canEdit?`<button class="p-statusbtn">${nextStatus==='besucht'?'✓ Als besucht markieren':'↩︎ Zurück auf die Watchlist'}</button>
            <button class="p-visitbtn">📅 Heute hier gewesen</button>
            <div class="p-tagrow">
-             <button class="p-tag${(pr.tags||'').includes('lunch')?' on':''}" data-tg="lunch">lunch</button>
-             <button class="p-tag${(pr.tags||'').includes('dinner')?' on':''}" data-tg="dinner">dinner</button>
+             ${['fruehstueck','brunch','lunch','kaffee','dinner','drinks'].map(tg=>
+               `<button class="p-tag${(pr.tags||'').includes(tg)?' on':''}" data-tg="${tg}">${tg}</button>`).join('')}
            </div>`:''}`).addTo(map);
         if (canEdit) {
           const el = popup.getElement();
@@ -509,22 +550,26 @@ function buildUI(){
     pseg.appendChild(b);
   }
   document.getElementById('row1').insertBefore(pseg, document.getElementById('count'));
-  // Typ-Chips (+ lunch/dinner-Tag-Chips)
+  // Anlass-Weiche (erste Filterebene): Frühstück · Lunch · Kaffee · Dinner · Drinks
+  const arow=document.getElementById('anlassrow');
+  for (const a of ANLAESSE){
+    const ch=document.createElement('button'); ch.className='chip'+(state.anlass.has(a.key)?' on':'');
+    ch.textContent=a.label;
+    ch.onclick=()=>{ if(state.anlass.has(a.key)){state.anlass.delete(a.key); ch.classList.remove('on');}
+                     else {state.anlass.add(a.key); ch.classList.add('on');} applyFilter(); };
+    arow.appendChild(ch);
+  }
+  // Typ-Chips (zweite Ebene)
   const chips=document.getElementById('chips');
   const counts={}; allFeatures.forEach(f=>counts[f.properties.typ]=(counts[f.properties.typ]||0)+1);
   const alle=document.createElement('button'); alle.className='chip'+(state.types.size?'':' on'); alle.textContent='Alle';
   alle.onclick=()=>{ state.types.clear(); chips.querySelectorAll('.chip[data-typ]').forEach(x=>x.classList.remove('on'));
                      alle.classList.add('on'); applyFilter(); };
   chips.appendChild(alle);
-  for (const tg of ['lunch','dinner']){
-    const ch=document.createElement('button'); ch.className='chip'+(state.mtags.has(tg)?' on':''); ch.textContent='· '+tg;
-    ch.onclick=()=>{ if(state.mtags.has(tg)){state.mtags.delete(tg); ch.classList.remove('on');}
-                     else {state.mtags.add(tg); ch.classList.add('on');} applyFilter(); };
-    chips.appendChild(ch);
-  }
   for (const t of [...TYPES].sort((a,b)=>(counts[b]||0)-(counts[a]||0))){
+    if (!(counts[t]) && !state.types.has(t)) continue; // leere neue Typen (Bäcker/Dessert) erst zeigen, wenn es Orte gibt
     const ch=document.createElement('button'); ch.className='chip'+(state.types.has(t)?' on':'');
-    ch.dataset.typ=t; ch.textContent=`${t} ${counts[t]||0}`;
+    ch.dataset.typ=t; ch.textContent=`${TYP_SHORT[t]||t} ${counts[t]||0}`;
     ch.onclick=()=>{ if(state.types.has(t)){state.types.delete(t); ch.classList.remove('on');}
                      else {state.types.add(t); ch.classList.add('on');}
                      alle.classList.toggle('on', state.types.size===0); applyFilter(); };
@@ -570,7 +615,7 @@ function buildUI(){
     const cv=document.createElement('canvas'); cv.width=cv.height=56;
     cv.getContext('2d').putImageData(makeIcon(t,'gold',false),0,0);
     cell.appendChild(cv);
-    const lb=document.createElement('span'); lb.textContent=t; cell.appendChild(lb);
+    const lb=document.createElement('span'); lb.textContent=TYP_LEGENDE[t]||t; cell.appendChild(lb);
     gi.appendChild(cell);
   }
   let seen=false; try{ seen=!!localStorage.getItem('rm_legend_seen'); }catch(e){}
@@ -644,9 +689,10 @@ function renderStats(){
         <span class="bar" style="width:${Math.round(58*n/tmax)}%;background:var(--muted)"></span>
         <span class="val">${n}</span></div>`;
   }
-  const tagged=cnt(P,p=>(p.tags||'').includes('lunch')||(p.tags||'').includes('dinner'));
+  const ATAGS=['fruehstueck','brunch','lunch','kaffee','dinner','drinks'];
+  const tagged=cnt(P,p=>{ const t=(p.tags||'').toLowerCase(); return ATAGS.some(tg=>t.includes(tg)); });
   const visited=cnt(P,p=>p.besucht_am);
-  h+=`<p style="font-size:12px;color:var(--muted)">Besuchs-Log: ${visited} Einträge · lunch/dinner-Tags: ${tagged} Orte · Stand: beim Öffnen berechnet</p>`;
+  h+=`<p style="font-size:12px;color:var(--muted)">Besuchs-Log: ${visited} Einträge · Anlass-Tags: ${tagged} Orte · Stand: beim Öffnen berechnet</p>`;
   document.getElementById('statsbody').innerHTML=h;
 }
 
@@ -659,7 +705,8 @@ function initAdd(){
   btn.onclick=()=>panel.classList.add('open');
   panel.onclick=e=>{ if(e.target===panel) panel.classList.remove('open'); };
   const at=document.getElementById('atyps');
-  TYPES.forEach(t=>{ const c=document.createElement('button'); c.className='a-chip'; c.textContent=t;
+  TYPES.forEach(t=>{ const c=document.createElement('button'); c.className='a-chip'; c.textContent=TYP_SHORT[t]||t;
+    c.dataset.typ=t;
     c.onclick=()=>{ at.querySelectorAll('.a-chip').forEach(x=>x.classList.remove('on'));
                     c.classList.add('on'); addSel.typ=t; };
     at.appendChild(c); });
@@ -688,22 +735,23 @@ async function doLookup(){
   r.innerHTML=`<b>${esc(j.place.name)}</b><br>${esc(j.place.addr)}`+
     (j.place.status && j.place.status!=='OPERATIONAL' ? `<br><b style="color:#7B1420">${esc(j.place.status)}</b>` : '');
   document.getElementById('aform').style.display='block';
-  if (j.place.typHint){ addSel.typ=j.place.typHint;
-    document.querySelectorAll('#atyps .a-chip').forEach(c=>c.classList.toggle('on', c.textContent===j.place.typHint)); }
+  if (j.place.typHint){ addSel.typ=TYP_ALIAS[j.place.typHint]||j.place.typHint;
+    document.querySelectorAll('#atyps .a-chip').forEach(c=>c.classList.toggle('on', c.dataset.typ===addSel.typ)); }
   toast('Treffer gefunden — Typ/Bewertung wählen');
 }
 async function doSave(){
   const p=addSel.place; if (!p) return;
   if (!addSel.typ){ toast('Bitte Typ wählen'); return; }
   const [qv, pv]=RATE2QP[addSel.rate];
+  const autoTags=(ANLASS_DEFAULT[addSel.typ]||[]).join(', '); // Anlass-Vorbelegung wie in der Migration
   toast('Speichern …', 9000);
   const j=await postJson({ action:'addRow', row:{ name:p.name, lat:p.lat, lon:p.lng, typ:addSel.typ,
-    status:addSel.status, qualitaet:qv, preis:pv, place_id:p.place_id,
+    status:addSel.status, qualitaet:qv, preis:pv, place_id:p.place_id, tags:autoTags,
     gmaps_url:'https://www.google.com/maps/place/?q=place_id:'+p.place_id } });
   if (!j) return;
   const f={ type:'Feature', geometry:{ type:'Point', coordinates:[p.lng,p.lat] },
     properties:{ id:j.id, name:p.name, typ:addSel.typ, status:addSel.status, q:qv, p:pv,
-                 notiz:'', tags:'', besucht_am:'' } };
+                 notiz:'', tags:autoTags, besucht_am:'' } };
   f.properties.rk=ratingKey(qv,pv); f.properties.prioInv=5-PRIO[f.properties.rk];
   f.properties.icon=addSel.typ+'|'+f.properties.rk+'|'+(addSel.status==='wunschliste'?'w':'b');
   allFeatures.push(f); applyFilter();
