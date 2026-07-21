@@ -76,7 +76,7 @@
   .lrow .sw { width:20px; height:20px; border-radius:50%; flex:0 0 auto; border:2px solid #fff; box-shadow:0 0 0 1px var(--line); }
   .lrow .sq { border-radius:5px; }
 
-  .maplibregl-popup-content { border-radius:12px; padding:12px 14px; box-shadow:0 4px 18px rgba(0,0,0,.18); min-width:200px; max-width:270px; }
+  .maplibregl-popup-content { border-radius:12px; padding:12px 14px; box-shadow:0 4px 18px rgba(0,0,0,.18); min-width:200px; max-width:270px; max-height:62vh; overflow-y:auto; }
   .p-name { font-weight:600; font-size:15px; margin-bottom:3px; padding-right:14px; }
   .p-meta { font-size:13px; color:var(--muted); margin-bottom:2px; }
   .p-note { font-size:12px; color:var(--muted); font-style:italic; margin-top:5px; }
@@ -93,6 +93,15 @@
   .p-tag { flex:0 0 auto; padding:6px 10px; border:1px solid var(--line); border-radius:9px; background:#fff;
            color:var(--muted); font-size:12.5px; }
   .p-tag.on { background:var(--ink); color:#fff; border-color:var(--ink); }
+  .p-editbtn { display:block; width:100%; margin-top:8px; padding:7px 10px; border:1px solid var(--line);
+               border-radius:9px; background:transparent; color:var(--muted); font-size:12.5px; }
+  .p-edit { display:none; margin-top:8px; border-top:1px solid var(--line); padding-top:8px; }
+  .p-edit.open { display:block; }
+  .p-edit .p-elabel { font-size:11px; color:var(--muted); margin:6px 0 4px; text-transform:uppercase; letter-spacing:.03em; }
+  .p-edit .a-row { margin:2px 0; }
+  .p-etypes { display:flex; flex-wrap:wrap; gap:5px; max-height:132px; overflow-y:auto; }
+  /* MapLibre-Controls (Zoom/Standort) unter die eigenen Buttons schieben statt drüber */
+  .maplibregl-ctrl-top-right { top:calc(148px + env(safe-area-inset-top)); }
   #addbtn { position:absolute; top:calc(102px + env(safe-area-inset-top)); right:10px; z-index:5; width:38px; height:38px;
             border-radius:50%; border:1px solid var(--line); background:var(--ink); color:#fff; font-size:20px;
             box-shadow:0 2px 10px rgba(0,0,0,.12); display:none; }
@@ -436,7 +445,7 @@ function addMapContent(){
     map.addLayer({ id:'pins', type:'symbol', source:'orte',
       layout:{ 'icon-image':['get','icon'], 'icon-allow-overlap':true,
                'symbol-sort-key':['get','prioInv'],
-               'icon-size':['interpolate',['linear'],['zoom'], 8,0.34, 11,0.5, 13,0.7, 16,1],
+               'icon-size':['interpolate',['linear'],['zoom'], 8,0.34, 11,0.5, 13,0.7, 16,1, 17.5,1.25],
                'text-field':['step',['zoom'],'',13.5,['get','name']], 'text-font':['Noto Sans Regular'],
                'text-size':11, 'text-offset':[0,1.6],
                'text-anchor':'top', 'text-optional':true },
@@ -490,6 +499,12 @@ function openPopup(feat){
            <div class="p-tagrow">
              ${['fruehstueck','brunch','lunch','kaffee','dinner','drinks','music'].map(tg=>
                `<button class="p-tag${(pr.tags||'').includes(tg)?' on':''}" data-tg="${tg}">${tg}</button>`).join('')}
+           </div>
+           <button class="p-editbtn">✏️ Bearbeiten (Bewertung · Preis · Typ)</button>
+           <div class="p-edit">
+             <div class="p-elabel">Bewertung</div><div class="a-row p-edots"></div>
+             <div class="p-elabel">Preis</div><div class="a-row p-eprice"></div>
+             <div class="p-elabel">Typ</div><div class="p-etypes"></div>
            </div>`:''}`).addTo(map);
         if (canEdit) {
           const el = popup.getElement();
@@ -519,6 +534,60 @@ function openPopup(feat){
             b.classList.toggle('on'); applyFilter();
             saveField(pr.id, { tags: f.properties.tags });
           });
+          // ✏️ Ebene 2: Bewertung / Preis / Typ (seltene Eingriffe, ein Tap dahinter)
+          const editBox = el.querySelector('.p-edit');
+          el.querySelector('.p-editbtn').onclick = () => editBox.classList.toggle('open');
+          const refresh = (f) => {           // Pin + Kopfzeile live aktualisieren
+            const p2 = f.properties;
+            p2.rk = ratingKey(p2.q, p2.p); p2.prioInv = 5 - PRIO[p2.rk];
+            p2.icon = p2.typ + '|' + p2.rk + '|' + (p2.status === 'wunschliste' ? 'w' : 'b');
+            const meta = el.querySelector('.p-meta');
+            if (meta) meta.textContent = p2.typ + ' · ' + RLABEL[p2.rk];
+            applyFilter();
+          };
+          const dots = el.querySelector('.p-edots');
+          for (const ck of ['gold','gruen','lila','orange','rot','grau']) {
+            const d = document.createElement('button'); d.className = 'a-dot' + (pr.rk === ck ? ' on' : '');
+            d.style.background = COLORS[ck]; d.title = RLABEL[ck];
+            d.onclick = async () => {
+              const f = feat(); if (!f) return;
+              const [qv, pv] = RATE2QP[ck];
+              f.properties.q = qv; f.properties.p = pv; refresh(f);
+              dots.querySelectorAll('.a-dot').forEach(x => x.classList.remove('on')); d.classList.add('on');
+              priceRow.querySelectorAll('.a-chip').forEach(x => x.classList.toggle('on', x.dataset.p === pv));
+              toast(RLABEL[ck] + ' ✓');
+              saveField(pr.id, { qualitaet: qv, preis: pv });
+            };
+            dots.appendChild(d);
+          }
+          const priceRow = el.querySelector('.p-eprice');
+          for (const [pv, lbl] of [['guenstig','€'],['normal','€€'],['teuer','€€€'],['ueberteuert','€€€ überteuert']]) {
+            const c = document.createElement('button'); c.className = 'a-chip' + (pr.p === pv ? ' on' : '');
+            c.dataset.p = pv; c.textContent = lbl;
+            c.onclick = async () => {
+              const f = feat(); if (!f) return;
+              f.properties.p = pv; refresh(f);
+              priceRow.querySelectorAll('.a-chip').forEach(x => x.classList.remove('on')); c.classList.add('on');
+              dots.querySelectorAll('.a-dot').forEach((x, i) => x.classList.toggle('on',
+                ['gold','gruen','lila','orange','rot','grau'][i] === f.properties.rk));
+              toast('Preis: ' + lbl + ' ✓');
+              saveField(pr.id, { preis: pv });
+            };
+            priceRow.appendChild(c);
+          }
+          const typRow = el.querySelector('.p-etypes');
+          for (const t of TYPES) {
+            const c = document.createElement('button'); c.className = 'a-chip' + (pr.typ === t ? ' on' : '');
+            c.textContent = TYP_SHORT[t] || t;
+            c.onclick = async () => {
+              const f = feat(); if (!f) return;
+              f.properties.typ = t; refresh(f);
+              typRow.querySelectorAll('.a-chip').forEach(x => x.classList.remove('on')); c.classList.add('on');
+              toast('Typ: ' + t + ' ✓');
+              saveField(pr.id, { typ: t });
+            };
+            typRow.appendChild(c);
+          }
         }
 }
 
