@@ -40,6 +40,20 @@
            color:#fff; padding:9px 16px; border-radius:10px; font-size:13px; display:none; z-index:50; }
   #gate { padding:40px 24px; font-size:15px; }
   .done { text-align:center; color:var(--muted); padding:30px 0 10px; font-size:14px; }
+  /* Datenqualitäts-Modus „Nach Typ" */
+  #typbar { padding:6px 16px 2px; }
+  .tchips { display:flex; gap:6px; overflow-x:auto; padding-bottom:6px; scrollbar-width:none; }
+  .tchips::-webkit-scrollbar { display:none; }
+  .tchip { flex:0 0 auto; border:1px solid var(--line); background:#fff; border-radius:9px; padding:5px 9px; font-size:12px; white-space:nowrap; }
+  .tchip.on { background:var(--ink); color:#fff; border-color:var(--ink); }
+  #tsearch { width:100%; margin-top:4px; padding:8px 10px; border:1px solid var(--line); border-radius:9px; font-size:14px; }
+  .te-lbl { font-size:11px; color:var(--muted); margin:9px 0 3px; font-weight:600; }
+  .te-row { display:flex; flex-wrap:wrap; gap:6px; }
+  .chip-sm { border:1px solid var(--line); background:#fff; border-radius:8px; padding:5px 8px; font-size:12.5px; }
+  .chip-sm.on { background:var(--ink); color:#fff; border-color:var(--ink); }
+  .dot { width:26px; height:26px; border-radius:50%; border:2px solid #fff; box-shadow:0 0 0 1px var(--line); padding:0; }
+  .dot.on { outline:2px solid var(--ink); outline-offset:1px; }
+  .sw { display:inline-block; width:12px; height:12px; border-radius:3px; margin-right:6px; vertical-align:middle; }
 </style>
 </head>
 <body>
@@ -49,6 +63,7 @@
   <div class="sub" id="subtitle">lädt …</div>
 </header>
 <div id="stacks" style="display:none"></div>
+<div id="typbar" style="display:none"></div>
 <div id="list"></div>
 <button id="more" style="display:none">Mehr anzeigen</button>
 <div id="toast"></div>
@@ -95,6 +110,23 @@ function parseCSV(text){
 let main = [], stage = [], byId = {}, stById = {};
 const RL = { top:'Top', gut:'Gut', gut_blau:'Gut (blau)', unbewertet:'Ohne Urteil', nie_wieder:'Nie wieder' };
 
+/* ====== Datenqualitäts-Modus „Nach Typ": Konstanten (deckungsgleich mit der Karte) ====== */
+const TYPES = ["Restaurant","Asia","Café","Kneipe","Cocktail-Bar","Imbiss","Pizza","Club/Livemusik",
+               "Biergarten","Sushi","Eis","Weinbar","Burger","Steak/Grill","Fisch","Sportsbar","Karaoke",
+               "Bäcker","Dessert"];
+const TYP_SHORT = { "Cocktail-Bar":"Bar" };
+const COLORS = { gold:"#F0A800", lila:"#9C27B0", gruen:"#0F9D58", blau:"#1976D2", orange:"#E65100", grau:"#8A8A8E", rot:"#7B1420" };
+const RATE_ORDER = ['gold','lila','gruen','blau','grau','orange','rot'];
+const RATE2QP = { gold:['top','normal'], lila:['top','teuer'], gruen:['gut','guenstig'], blau:['gut_blau','normal'],
+                  orange:['unbewertet','ueberteuert'], rot:['nie_wieder','normal'], grau:['unbewertet','normal'] };
+const RATE_LBL = { gold:"Sehr gut", lila:"Sehr gut·teuer", gruen:"Sehr gut & günstig", blau:"Gut", orange:"Zu teuer", grau:"Mittel / —", rot:"Nie wieder" };
+function ratingKey(q,p){ if(p==="ueberteuert")return "orange"; if(q==="nie_wieder")return "rot";
+  if(q==="top")return p==="teuer"?"lila":"gold"; if(q==="gut")return "gruen";
+  if(q==="gut_blau")return p==="teuer"?"orange":"blau"; return "grau"; }
+const ANLASS_KEYS = ['fruehstueck','brunch','lunch','kaffee','dinner','drinks','music'];
+const PRICES = [['guenstig','€'],['normal','€€'],['teuer','€€€'],['ueberteuert','€€€!']];
+let typFilter = '', typSearch = '';
+
 function gmaps(r){ return `https://www.google.com/maps/search/?api=1&query=${r.lat},${r.lon}`; }
 function meta(r){ return `${r.typ} · ${r.status==='besucht'?'Besucht':'Watchlist'} · ${RL[r.qualitaet]||r.qualitaet}${r.preis==='ueberteuert'?' · zu teuer':''}${r.notiz?' · '+r.notiz:''}`; }
 
@@ -119,12 +151,20 @@ function qDupes(){
 function qGrau(){ return main.filter(r => r.qualitaet==='unbewertet' && r.preis!=='ueberteuert'
   && r.status==='besucht' && !HANDLED.has('g'+r.id)); }
 
+function qTyp(){
+  let a = main.slice();
+  if (typFilter) a = a.filter(r => (r.typ||'') === typFilter);
+  if (typSearch){ const q = typSearch.toLowerCase(); a = a.filter(r => (r.name||'').toLowerCase().includes(q)); }
+  a.sort((x,y)=> (x.typ||'').localeCompare(y.typ||'') || (x.name||'').localeCompare(y.name||''));
+  return a;
+}
 const STACKS = [
   { key:'closed', name:'Geschlossen?', q:qClosed, render:renderStaging },
   { key:'temp',  name:'Temporär zu', q:qTemp, render:renderStaging },
   { key:'match', name:'Match prüfen', q:qMatch, render:renderMatch },
   { key:'dupes', name:'Duplikate', q:qDupes, render:renderDupes },
   { key:'grau',  name:'Graue', q:qGrau, render:renderGrau },
+  { key:'typ',   name:'Nach Typ', q:qTyp, render:renderTypEdit },
 ];
 let active = 'closed', shown = PAGE;
 
@@ -236,14 +276,55 @@ function card(r, extra, btns){
     <div class="btns">${btns}</div></div>`;
 }
 
+/* ====== Datenqualitäts-Modus „Nach Typ": Editieren ====== */
+function _save(r, updates){ Object.assign(r, updates); drawList(); post({ id:r.id, updates }); }
+function setTyp(id, t){ const r=byId[id]; if(!r || r.typ===t) return; _save(r,{ typ:t }); toast('Typ: '+t); }
+function setRate(id, ck){ const r=byId[id]; if(!r) return; const qp=RATE2QP[ck]; _save(r,{ qualitaet:qp[0], preis:qp[1] }); toast(RATE_LBL[ck]+' ✓'); }
+function setPreis(id, p){ const r=byId[id]; if(!r || r.preis===p) return; _save(r,{ preis:p }); toast('Preis ✓'); }
+function toggleAnlass(id, tag){ const r=byId[id]; if(!r) return;
+  let tags=(r.tags||'').split(',').map(x=>x.trim()).filter(Boolean);
+  tags = tags.includes(tag) ? tags.filter(x=>x!==tag) : tags.concat(tag);
+  _save(r,{ tags: tags.join(', ') }); }
+
+function renderTypEdit(r){
+  const tags=(r.tags||'').toLowerCase();
+  const rk=ratingKey(r.qualitaet, r.preis);
+  const typChips = TYPES.map(t=>`<button class="chip-sm${r.typ===t?' on':''}" onclick="setTyp('${r.id}','${t}')">${esc(TYP_SHORT[t]||t)}</button>`).join('');
+  const rateDots = RATE_ORDER.map(ck=>`<button class="dot${rk===ck?' on':''}" style="background:${COLORS[ck]}" title="${RATE_LBL[ck]}" onclick="setRate('${r.id}','${ck}')"></button>`).join('');
+  const priceChips = PRICES.map(pl=>`<button class="chip-sm${r.preis===pl[0]?' on':''}" onclick="setPreis('${r.id}','${pl[0]}')">${pl[1]}</button>`).join('');
+  const anlassChips = ANLASS_KEYS.map(a=>`<button class="chip-sm${tags.includes(a)?' on':''}" onclick="toggleAnlass('${r.id}','${a}')">${a}</button>`).join('');
+  return `<div class="card">
+    <div class="c-name"><span class="sw" style="background:${COLORS[rk]||'#ccc'}"></span>${esc(r.name)}</div>
+    <div class="c-meta">${esc(r.typ||'—')} · ${r.status==='besucht'?'Besucht':'Watchlist'} · ${RL[r.qualitaet]||r.qualitaet||'—'} · <a class="glink" style="margin:0" href="${gmaps(r)}" target="_blank" rel="noopener">Maps ↗</a></div>
+    <div class="te-lbl">Typ</div><div class="te-row">${typChips}</div>
+    <div class="te-lbl">Bewertung</div><div class="te-row">${rateDots}</div>
+    <div class="te-lbl">Preis</div><div class="te-row">${priceChips}</div>
+    <div class="te-lbl">Anlass</div><div class="te-row">${anlassChips}</div>
+  </div>`;
+}
+function renderTypbar(){
+  const tb=document.getElementById('typbar');
+  if (active!=='typ'){ tb.style.display='none'; return; }
+  tb.style.display='block';
+  const counts={}; main.forEach(r=>{ const t=r.typ||'—'; counts[t]=(counts[t]||0)+1; });
+  const chips = [''].concat(TYPES).map(t=>{
+    const lbl = t===''?'Alle':(TYP_SHORT[t]||t);
+    const n = t===''?main.length:(counts[t]||0);
+    return `<button class="tchip${typFilter===t?' on':''}" onclick="pickTyp('${t}')">${esc(lbl)} <b>${n}</b></button>`;
+  }).join('');
+  tb.innerHTML = `<div class="tchips">${chips}</div>`+
+    `<input id="tsearch" placeholder="Name suchen …" value="${esc(typSearch)}" oninput="typSearch=this.value; drawList();">`;
+}
+function pickTyp(t){ typFilter=t; shown=PAGE; renderTypbar(); drawList(); window.scrollTo(0,0); }
+
 /* ====== Draw ====== */
-function draw(){
-  const bar = document.getElementById('stacks');
-  bar.innerHTML = STACKS.map(s=>`<button class="stack${s.key===active?' on':''}" onclick="setStack('${s.key}')">${s.name} <b>${s.q().length}</b></button>`).join('');
+function drawList(){
   const st = STACKS.find(s=>s.key===active);
   const items = st.q();
   const list = document.getElementById('list');
-  if (!items.length){ list.innerHTML = '<div class="done">🎉 Stapel leer — nächsten wählen.</div>'; }
+  if (!items.length){ list.innerHTML = active==='typ'
+      ? '<div class="done">Keine Orte in dieser Auswahl.</div>'
+      : '<div class="done">🎉 Stapel leer — nächsten wählen.</div>'; }
   else {
     const mark = { closed:'c', temp:'t' }[active] || '';
     list.innerHTML = items.slice(0, shown).map(it => st.render(it, mark)).join('');
@@ -251,6 +332,12 @@ function draw(){
   document.getElementById('more').style.display = items.length > shown ? 'block' : 'none';
   document.getElementById('subtitle').textContent =
     `${qClosed().length + qTemp().length + qMatch().length} Orts-Checks · ${qDupes().length} Namens-Gruppen · ${qGrau().length} Graue`;
+}
+function draw(){
+  const bar = document.getElementById('stacks');
+  bar.innerHTML = STACKS.map(s=>`<button class="stack${s.key===active?' on':''}" onclick="setStack('${s.key}')">${s.name} <b>${s.q().length}</b></button>`).join('');
+  renderTypbar();
+  drawList();
 }
 function setStack(k){ active=k; shown=PAGE; draw(); window.scrollTo(0,0); }
 document.getElementById('more').onclick = ()=>{ shown += PAGE; draw(); };
