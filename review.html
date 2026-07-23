@@ -7,7 +7,7 @@
 <link rel="icon" href="data:,">
 <style>
   :root { --ink:#1c1c1e; --muted:#6e6e73; --line:#e4e4e7; --gold:#F0A800; --gruen:#0F9D58;
-          --rot:#7B1420; --orange:#E65100; --grau:#8A8A8E; }
+          --rot:#7B1420; --orange:#E65100; --grau:#8A8A8E; --blau:#1976D2; }
   * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
   body { margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
          background:#f4f4f2; color:var(--ink); padding-bottom:40px; }
@@ -32,6 +32,7 @@
   .b-arch { background:var(--rot); } .b-ok { background:var(--gruen); } .b-skip { background:#c9c9cd; color:#333; }
   .b-top { background:var(--gold); } .b-gut { background:var(--gruen); } .b-nie { background:var(--rot); }
   .b-teuer { background:var(--orange); } .b-grau { background:#c9c9cd; color:#333; }
+  .b-blau { background:var(--blau); }
   .b-merge { background:var(--ink); }
   #more { margin:6px 16px 20px; width:calc(100% - 32px); padding:12px; border:1px dashed var(--line);
           background:#fff; border-radius:12px; font-size:14px; color:var(--muted); }
@@ -92,7 +93,7 @@ function parseCSV(text){
 }
 
 let main = [], stage = [], byId = {}, stById = {};
-const RL = { top:'Top', gut:'Gut', unbewertet:'Ohne Urteil', nie_wieder:'Nie wieder' };
+const RL = { top:'Top', gut:'Gut', gut_blau:'Gut (blau)', unbewertet:'Ohne Urteil', nie_wieder:'Nie wieder' };
 
 function gmaps(r){ return `https://www.google.com/maps/search/?api=1&query=${r.lat},${r.lon}`; }
 function meta(r){ return `${r.typ} · ${r.status==='besucht'?'Besucht':'Watchlist'} · ${RL[r.qualitaet]||r.qualitaet}${r.preis==='ueberteuert'?' · zu teuer':''}${r.notiz?' · '+r.notiz:''}`; }
@@ -222,6 +223,7 @@ function renderGrau(r){
   return card(r, '', `
     <button class="b-top" onclick="actJudge('${r.id}','top')">Top</button>
     <button class="b-gut" onclick="actJudge('${r.id}','gut')">Gut</button>
+    <button class="b-blau" onclick="actJudge('${r.id}','gut_blau')">Gut (blau)</button>
     <button class="b-teuer" onclick="actJudge('${r.id}','teuer')">Zu teuer</button>
     <button class="b-nie" onclick="actJudge('${r.id}','nie_wieder')">Nie wieder</button>
     <button class="b-grau" onclick="actSkip('${r.id}','g')">Bleibt grau</button>
