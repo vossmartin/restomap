@@ -82,6 +82,12 @@
   .p-name { font-weight:600; font-size:15px; margin-bottom:3px; padding-right:14px; }
   .p-meta { font-size:13px; color:var(--muted); margin-bottom:2px; }
   .p-note { font-size:12px; color:var(--muted); font-style:italic; margin-top:5px; }
+  .p-danach { font-size:12px; margin-top:6px; line-height:1.5; }
+  .p-danach-lbl { color:var(--muted); }
+  .danach-lnk { background:none; border:0; color:#1a6fd4; font-size:12px; padding:0 1px; cursor:pointer; }
+  body.dark .danach-lnk { color:#6db3ff; }
+  .a-sel, #aquellefrei { width:100%; margin-top:8px; padding:9px 10px; border:1px solid var(--line);
+          border-radius:10px; font-size:14px; background:var(--bg); color:var(--ink); }
   .p-link { display:inline-block; margin-top:8px; font-size:13px; color:#1a6fd4; text-decoration:none; }
   #err { position:absolute; top:40%; left:10%; right:10%; z-index:30; background:#fff; border:1px solid var(--line);
          border-radius:12px; padding:16px; font-size:14px; display:none; }
@@ -143,6 +149,18 @@
       <button class="a-chip on" data-s="wunschliste">Watchlist</button>
       <button class="a-chip" data-s="besucht">Besucht</button>
     </div>
+    <select id="aquelle" class="a-sel">
+      <option value="Spontanfund">Quelle: Spontanfund</option>
+      <option value="tip">tip</option>
+      <option value="tip Speisekarte">tip Speisekarte</option>
+      <option value="Mit Vergnügen">Mit Vergnügen</option>
+      <option value="CeeCee">CeeCee</option>
+      <option value="Tagesspiegel">Tagesspiegel</option>
+      <option value="Monats-Check">Monats-Check</option>
+      <option value="Selma">Selma</option>
+      <option value="__frei">Quelle: Andere …</option>
+    </select>
+    <input id="aquellefrei" type="text" placeholder="Quelle eintippen …" autocomplete="off" style="display:none">
     <button class="a-main" id="asave">Speichern</button>
   </div>
 </div></div>
@@ -523,6 +541,34 @@ map.on('load', async () => {
   }
 });
 
+/* ====== „Und danach?" — nächste gute Bar/Eis zu Fuß (Luftlinie, client-seitig) ====== */
+const DANACH_FOOD = new Set(['Restaurant','Asia','Sushi','Pizza','Burger','Steak/Grill','Fisch','Imbiss','Café','Bäcker']);
+const DANACH_DRINKS = new Set(['Cocktail-Bar','Weinbar','Kneipe','Biergarten','Sportsbar','Club/Livemusik']);
+const DANACH_SWEET = new Set(['Eis','Dessert']);
+function distM(lat1,lon1,lat2,lon2){ const R=6371000, rad=Math.PI/180;
+  const x=(lat2-lat1)*rad, y=(lon2-lon1)*rad*Math.cos((lat1+lat2)/2*rad); return R*Math.sqrt(x*x+y*y); }
+function nearestOf(lon, lat, typesSet, maxM, exclId){
+  const good=['gold','lila','gruen','blau']; const cand=[];
+  for (const f of allFeatures){ const p=f.properties;
+    if (p.id===exclId || !typesSet.has(p.typ) || p.rk==='rot') continue;
+    const c=f.geometry.coordinates; const d=distM(lat,lon,c[1],c[0]);
+    if (d<maxM) cand.push({f:f, d:d, good:good.indexOf(p.rk)>=0}); }
+  if (!cand.length) return null;
+  const goods=cand.filter(c=>c.good); const pool=goods.length?goods:cand;
+  pool.sort((a,b)=>a.d-b.d); return { f:pool[0].f, d:Math.round(pool[0].d) };
+}
+function danachLine(pr, lon, lat){
+  if (!DANACH_FOOD.has(pr.typ)) return '';
+  const bar=nearestOf(lon,lat,DANACH_DRINKS,600,pr.id), sweet=nearestOf(lon,lat,DANACH_SWEET,600,pr.id);
+  const parts=[];
+  if (bar)   parts.push(`<button class="danach-lnk" onclick="gotoPlace('${bar.f.properties.id}')">🍸 ${esc(bar.f.properties.name)} · ${bar.d} m</button>`);
+  if (sweet) parts.push(`<button class="danach-lnk" onclick="gotoPlace('${sweet.f.properties.id}')">🍨 ${esc(sweet.f.properties.name)} · ${sweet.d} m</button>`);
+  if (!parts.length) return '';
+  return `<div class="p-danach"><span class="p-danach-lbl">Und danach?</span> ${parts.join(' ')}</div>`;
+}
+function gotoPlace(id){ const f=allFeatures.find(x=>x.properties.id===id); if(!f) return;
+  const c=f.geometry.coordinates; map.flyTo({ center:[c[0],c[1]], zoom:16 }); openPopup(f); }
+
 function openPopup(feat){
         const pr = feat.properties;
         const [lon,lat] = feat.geometry.coordinates;
@@ -534,6 +580,7 @@ function openPopup(feat){
            <div class="p-meta">${esc(pr.typ)} · ${RLABEL[pr.rk]}</div>
            <div class="p-meta">${pr.status==="besucht"?"Besucht":"Watchlist"}</div>
            ${pr.notiz?`<div class="p-note">${esc(pr.notiz)}</div>`:''}
+           ${danachLine(pr, lon, lat)}
            <a class="p-link" href="${gm}" target="_blank" rel="noopener">In Google Maps öffnen ↗</a>
            ${canEdit?`<button class="p-statusbtn">${nextStatus==='besucht'?'✓ Als besucht markieren':'↩︎ Zurück auf die Watchlist'}</button>
            <button class="p-visitbtn">📅 Heute hier gewesen</button>
@@ -818,7 +865,7 @@ function renderStats(){
 }
 
 /* ====== Ort hinzufügen (Edit-Modus) ====== */
-const addSel = { typ:'', rate:'grau', status:'wunschliste', place:null };
+const addSel = { typ:'', rate:'grau', status:'wunschliste', quelle:'Spontanfund', place:null };
 function initAdd(){
   if (!getToken()) return;
   const btn=document.getElementById('addbtn'); btn.style.display='block';
@@ -842,6 +889,10 @@ function initAdd(){
   document.querySelectorAll('#astatus .a-chip').forEach(b=>b.onclick=()=>{
     document.querySelectorAll('#astatus .a-chip').forEach(x=>x.classList.remove('on'));
     b.classList.add('on'); addSel.status=b.dataset.s; });
+  const aq=document.getElementById('aquelle'), aqf=document.getElementById('aquellefrei');
+  aq.onchange=()=>{ if(aq.value==='__frei'){ aqf.style.display='block'; aqf.focus(); addSel.quelle=aqf.value.trim(); }
+                    else { aqf.style.display='none'; addSel.quelle=aq.value; } };
+  aqf.oninput=()=>{ addSel.quelle=aqf.value.trim()||'Spontanfund'; };
   document.getElementById('alookup').onclick=doLookup;
   document.getElementById('asave').onclick=doSave;
 }
@@ -866,8 +917,11 @@ async function doSave(){
   const [qv, pv]=RATE2QP[addSel.rate];
   const autoTags=(ANLASS_DEFAULT[addSel.typ]||[]).join(', '); // Anlass-Vorbelegung wie in der Migration
   toast('Speichern …', 9000);
+  const quelle = (document.getElementById('aquelle').value==='__frei'
+    ? (document.getElementById('aquellefrei').value.trim()||'Spontanfund')
+    : document.getElementById('aquelle').value);
   const j=await postJson({ action:'addRow', row:{ name:p.name, lat:p.lat, lon:p.lng, typ:addSel.typ,
-    status:addSel.status, qualitaet:qv, preis:pv, place_id:p.place_id, tags:autoTags,
+    status:addSel.status, qualitaet:qv, preis:pv, place_id:p.place_id, tags:autoTags, quelle:quelle,
     gmaps_url:'https://www.google.com/maps/place/?q=place_id:'+p.place_id } });
   if (!j) return;
   const f={ type:'Feature', geometry:{ type:'Point', coordinates:[p.lng,p.lat] },
@@ -879,6 +933,9 @@ async function doSave(){
   document.getElementById('addpanel').classList.remove('open');
   document.getElementById('addq').value=''; document.getElementById('aresult').style.display='none';
   document.getElementById('aform').style.display='none'; addSel.place=null;
+  const _aq=document.getElementById('aquelle'); if(_aq) _aq.value='Spontanfund';
+  const _aqf=document.getElementById('aquellefrei'); if(_aqf){ _aqf.style.display='none'; _aqf.value=''; }
+  addSel.quelle='Spontanfund';
   map.flyTo({ center:[p.lng,p.lat], zoom:16 });
   toast(`${p.name} hinzugefügt ✓`);
 }
