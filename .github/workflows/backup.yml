@@ -26,6 +26,13 @@ jobs:
           if not rows:
               raise SystemExit('Abbruch: Sheet-Abruf leer — nichts committen.')
 
+          # Schema-Guard (Welle F, 2026-07-27): fehlen Pflichtspalten (umbenannt/gelöscht),
+          # bricht das Backup ab, statt ein kaputtes Backup zu committen.
+          REQUIRED = {'id', 'name', 'lat', 'lon', 'typ', 'status', 'qualitaet', 'preis'}
+          missing = REQUIRED - set(rows[0].keys())
+          if missing:
+              raise SystemExit('Abbruch: Schema-Drift — Spalte(n) fehlen: ' + ', '.join(sorted(missing)))
+
           # 1) Öffentliches CSV-Backup OHNE private Spalten
           fields = [f for f in rows[0].keys() if f not in PRIVATE]
           with open('data/sheet-backup.csv', 'w', encoding='utf-8', newline='') as f:
