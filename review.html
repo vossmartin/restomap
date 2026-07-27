@@ -109,21 +109,32 @@ function parseCSV(text){
 }
 
 let main = [], stage = [], byId = {}, stById = {};
-const RL = { top:'Top', gut:'Gut', gut_blau:'Gut (blau)', unbewertet:'Ohne Urteil', nie_wieder:'Nie wieder' };
+/* Welle F: neue Werte (sehr_gut/gut/mittel) + Alt-Werte (top/gut_blau/Legacy-gut) — beide verstanden. */
+const RL = { sehr_gut:'Sehr gut', gut:'Gut', mittel:'Mittel', unbewertet:'Ohne Urteil', nie_wieder:'Nie wieder',
+             top:'Sehr gut', gut_blau:'Gut' };
 
 /* ====== Datenqualitäts-Modus „Nach Typ": Konstanten (deckungsgleich mit der Karte) ====== */
 const TYPES = ["Restaurant","Asia","Café","Kneipe","Cocktail-Bar","Imbiss","Pizza","Club/Livemusik",
                "Biergarten","Sushi","Eis","Weinbar","Burger","Steak/Grill","Fisch","Sportsbar","Karaoke",
                "Bäcker","Dessert"];
 const TYP_SHORT = { "Cocktail-Bar":"Bar" };
-const COLORS = { gold:"#F0A800", lila:"#9C27B0", gruen:"#0F9D58", blau:"#1976D2", orange:"#E65100", grau:"#8A8A8E", rot:"#7B1420" };
-const RATE_ORDER = ['gold','lila','gruen','blau','grau','orange','rot'];
-const RATE2QP = { gold:['top','normal'], lila:['top','teuer'], gruen:['gut','guenstig'], blau:['gut_blau','normal'],
-                  orange:['unbewertet','ueberteuert'], rot:['nie_wieder','normal'], grau:['unbewertet','normal'] };
-const RATE_LBL = { gold:"Sehr gut", lila:"Sehr gut·teuer", gruen:"Sehr gut & günstig", blau:"Gut", orange:"Zu teuer", grau:"Mittel / —", rot:"Nie wieder" };
-function ratingKey(q,p){ if(p==="ueberteuert")return "orange"; if(q==="nie_wieder")return "rot";
-  if(q==="top")return p==="teuer"?"lila":"gold"; if(q==="gut")return "gruen";
-  if(q==="gut_blau")return p==="teuer"?"orange":"blau"; return "grau"; }
+const COLORS = { gold:"#F0A800", lila:"#9C27B0", gruen:"#0F9D58", blau:"#1976D2", orange:"#E65100", grau:"#8A8A8E", rot:"#7B1420", unbew:"#8A8A8E" };
+const UNBEW_ALPHA = 0.55;   // Grau-Split: „ohne Urteil" gedimmt (deckungsgleich mit der Karte)
+const RATE_ORDER = ['gold','lila','gruen','blau','grau','orange','rot','unbew'];
+// Schreibt IMMER die neuen Werte (Zielmodell); Lesen versteht alte + neue (s. ratingKey/normQ).
+const RATE2QP = { gold:['sehr_gut','normal'], lila:['sehr_gut','teuer'], gruen:['sehr_gut','guenstig'], blau:['gut','normal'],
+                  orange:['unbewertet','ueberteuert'], rot:['nie_wieder','normal'], grau:['mittel','normal'], unbew:['unbewertet','normal'] };
+const RATE_LBL = { gold:"Sehr gut", lila:"Sehr gut·teuer", gruen:"Sehr gut & günstig", blau:"Gut", orange:"Zu teuer", grau:"Mittel", unbew:"Ohne Urteil", rot:"Nie wieder" };
+let LEGACY_GUT = false;   // Alt-Werte im Datensatz? (wird nach dem Laden gesetzt; wie in index.html)
+function normQ(q,p){ if(q==="top")return "sehr_gut"; if(q==="gut_blau")return "gut";
+  if(q==="gut"&&LEGACY_GUT)return p==="guenstig"?"sehr_gut":"gut"; return q; }
+function ratingKey(q,p){ q=normQ(q,p);
+  if(p==="ueberteuert")return "orange"; if(q==="nie_wieder")return "rot";
+  if(q==="sehr_gut")return p==="teuer"?"lila":(p==="guenstig"?"gruen":"gold");
+  if(q==="gut")return p==="teuer"?"orange":"blau";
+  if(q==="mittel")return p==="teuer"?"orange":"grau"; return "unbew"; }
+/* Asia-Split (Welle F): kueche-Werteliste für den Review (Martins Freigabe 27.07.2026) */
+const KUECHEN_ASIA = ['vietnamesisch','thai','chinesisch','koreanisch','japanisch','indisch','sonstige-asiatisch'];
 const ANLASS_KEYS = ['fruehstueck','brunch','lunch','kaffee','dinner','drinks','music'];
 const PRICES = [['guenstig','€'],['normal','€€'],['teuer','€€€'],['ueberteuert','€€€!']];
 let typFilter = '', typSearch = '';
@@ -261,13 +272,14 @@ function renderDupes(group){
     <button class="b-skip" onclick="actSkip('${group[0].id}','d')">Später</button></div></div>`;
 }
 function renderGrau(r){
+  // Welle F: schreibt neue Werte (sehr_gut/gut/mittel); „Gut" = Blau-Kategorie.
   return card(r, '', `
-    <button class="b-top" onclick="actJudge('${r.id}','top')">Top</button>
-    <button class="b-gut" onclick="actJudge('${r.id}','gut')">Gut</button>
-    <button class="b-blau" onclick="actJudge('${r.id}','gut_blau')">Gut (blau)</button>
+    <button class="b-top" onclick="actJudge('${r.id}','sehr_gut')">Sehr gut</button>
+    <button class="b-blau" onclick="actJudge('${r.id}','gut')">Gut</button>
+    <button class="b-grau" onclick="actJudge('${r.id}','mittel')">Mittel</button>
     <button class="b-teuer" onclick="actJudge('${r.id}','teuer')">Zu teuer</button>
     <button class="b-nie" onclick="actJudge('${r.id}','nie_wieder')">Nie wieder</button>
-    <button class="b-grau" onclick="actSkip('${r.id}','g')">Bleibt grau</button>
+    <button class="b-skip" onclick="actSkip('${r.id}','g')">Bleibt grau</button>
     <button class="b-arch" onclick="actArchive('${r.id}','g')">🗑 Gibt's nicht mehr</button>`);
 }
 function card(r, extra, btns){
@@ -280,6 +292,9 @@ function card(r, extra, btns){
 /* ====== Datenqualitäts-Modus „Nach Typ": Editieren ====== */
 function _save(r, updates){ Object.assign(r, updates); drawList(); post({ id:r.id, updates }); }
 function setTyp(id, t){ const r=byId[id]; if(!r || r.typ===t) return; _save(r,{ typ:t }); toast('Typ: '+t); }
+function setKueche(id, k){ const r=byId[id]; if(!r) return;
+  const v = (r.kueche===k) ? '' : k;             // erneuter Tap löscht (zurück auf „offen")
+  _save(r,{ kueche:v }); toast(v ? 'Küche: '+v : 'Küche gelöscht'); }
 function setRate(id, ck){ const r=byId[id]; if(!r) return; const qp=RATE2QP[ck]; _save(r,{ qualitaet:qp[0], preis:qp[1] }); toast(RATE_LBL[ck]+' ✓'); }
 function setPreis(id, p){ const r=byId[id]; if(!r || r.preis===p) return; _save(r,{ preis:p }); toast('Preis ✓'); }
 function toggleAnlass(id, tag){ const r=byId[id]; if(!r) return;
@@ -291,16 +306,23 @@ function renderTypEdit(r){
   const tags=(r.tags||'').toLowerCase();
   const rk=ratingKey(r.qualitaet, r.preis);
   const typChips = TYPES.map(t=>`<button class="chip-sm${r.typ===t?' on':''}" onclick="setTyp('${r.id}','${t}')">${esc(TYP_SHORT[t]||t)}</button>`).join('');
-  const rateDots = RATE_ORDER.map(ck=>`<button class="dot${rk===ck?' on':''}" style="background:${COLORS[ck]}" title="${RATE_LBL[ck]}" onclick="setRate('${r.id}','${ck}')"></button>`).join('');
+  const rateDots = RATE_ORDER.map(ck=>`<button class="dot${rk===ck?' on':''}" style="background:${COLORS[ck]}${ck==='unbew'?`;opacity:${UNBEW_ALPHA}`:''}" title="${RATE_LBL[ck]}" onclick="setRate('${r.id}','${ck}')"></button>`).join('');
   const priceChips = PRICES.map(pl=>`<button class="chip-sm${r.preis===pl[0]?' on':''}" onclick="setPreis('${r.id}','${pl[0]}')">${pl[1]}</button>`).join('');
   const anlassChips = ANLASS_KEYS.map(a=>`<button class="chip-sm${tags.includes(a)?' on':''}" onclick="toggleAnlass('${r.id}','${a}')">${a}</button>`).join('');
+  // Asia-Split (Welle F): kueche-Chips nur bei Typ Asia (kein stadtweiter Backfill — 19 Typen eingefroren)
+  const kuecheBlock = r.typ==='Asia'
+    ? `<div class="te-lbl">Küche</div><div class="te-row">${
+        KUECHEN_ASIA.map(k=>`<button class="chip-sm${r.kueche===k?' on':''}" onclick="setKueche('${r.id}','${k}')">${k}</button>`).join('')
+      }${r.kueche && !KUECHEN_ASIA.includes(r.kueche) ? `<button class="chip-sm on" onclick="setKueche('${r.id}','${esc(r.kueche)}')">${esc(r.kueche)}</button>` : ''}</div>`
+    : '';
   return `<div class="card">
-    <div class="c-name"><span class="sw" style="background:${COLORS[rk]||'#ccc'}"></span>${esc(r.name)}</div>
-    <div class="c-meta">${esc(r.typ||'—')} · ${r.status==='besucht'?'Besucht':'Watchlist'} · ${RL[r.qualitaet]||r.qualitaet||'—'} · <a class="glink" style="margin:0" href="${gmaps(r)}" target="_blank" rel="noopener">Maps ↗</a></div>
+    <div class="c-name"><span class="sw" style="background:${COLORS[rk]||'#ccc'}${rk==='unbew'?`;opacity:${UNBEW_ALPHA}`:''}"></span>${esc(r.name)}</div>
+    <div class="c-meta">${esc(r.typ||'—')} · ${r.status==='besucht'?'Besucht':'Watchlist'} · ${RL[r.qualitaet]||r.qualitaet||'—'}${r.typ==='Asia'&&r.kueche?' · '+esc(r.kueche):''} · <a class="glink" style="margin:0" href="${gmaps(r)}" target="_blank" rel="noopener">Maps ↗</a></div>
     <div class="te-lbl">Typ</div><div class="te-row">${typChips}</div>
     <div class="te-lbl">Bewertung</div><div class="te-row">${rateDots}</div>
     <div class="te-lbl">Preis</div><div class="te-row">${priceChips}</div>
     <div class="te-lbl">Anlass</div><div class="te-row">${anlassChips}</div>
+    ${kuecheBlock}
   </div>`;
 }
 function renderTypbar(){
@@ -344,6 +366,24 @@ function setStack(k){ active=k; shown=PAGE; draw(); window.scrollTo(0,0); }
 document.getElementById('more').onclick = ()=>{ shown += PAGE; draw(); };
 
 /* ====== Init ====== */
+/* Schema-Guard, Lese-Seite (Welle F): warnen statt still falsch anzeigen (wie index.html). */
+function schemaWarn(recs){
+  if (!recs.length) return;
+  const REQ = ['id','name','lat','lon','typ','status','qualitaet','preis','tags','kueche'];
+  const have = Object.keys(recs[0]);
+  const missing = REQ.filter(c=>!have.includes(c));
+  const VQ=['sehr_gut','gut','mittel','unbewertet','nie_wieder','top','gut_blau',''];
+  const bad={};
+  recs.forEach(r=>{ const q=String(r.qualitaet??'').trim();
+    if(!VQ.includes(q)) bad[q]=(bad[q]||0)+1; });
+  const msgs=[];
+  if (missing.length) msgs.push('Spalte(n) fehlen/umbenannt: '+missing.join(', '));
+  if (Object.keys(bad).length) msgs.push('unbekannte qualitaet-Werte: '+Object.keys(bad).join(', '));
+  if (msgs.length){
+    console.warn('[restomap review] Schema-Drift:', missing, bad);
+    document.getElementById('subtitle').textContent = '⚠ Schema-Problem im Sheet — '+msgs.join(' · ');
+  }
+}
 (async function init(){
   if (!getToken()){ document.getElementById('gate').style.display='block'; return; }
   document.getElementById('hdr').style.display='block';
@@ -353,6 +393,8 @@ document.getElementById('more').onclick = ()=>{ shown += PAGE; draw(); };
       fetch(MAIN_URL).then(r=>r.text()), fetch(STAGE_URL).then(r=>r.text()) ]);
     main = parseCSV(m).filter(r=>r.id);
     stage = parseCSV(s).filter(r=>r.id);
+    LEGACY_GUT = main.some(r=>r.qualitaet==='top'||r.qualitaet==='gut_blau');   // Welle F (wie Karte)
+    schemaWarn(main);   // Schema-Guard, Lese-Seite (Welle F)
     main.forEach(r=>byId[r.id]=r);
     stage.forEach(s=>stById[s.id]=s);
     draw();

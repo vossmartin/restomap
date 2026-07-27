@@ -185,8 +185,8 @@
 <div id="legend"><div class="sheet">
   <h3>Farbe = Bewertung</h3><div id="legcolors"></div>
   <h3 style="margin-top:14px">Form = Status</h3>
-  <div class="lrow"><span class="sw" style="background:#888"></span> Kreis = besucht</div>
-  <div class="lrow"><span class="sw sq" style="background:#888"></span> Quadrat = Watchlist (noch nicht besucht)</div>
+  <div class="lrow"><span class="sw" style="background:#888"></span> Kreis = besucht (volle Farbe)</div>
+  <div class="lrow"><span class="sw sq" style="background:#888;opacity:.55"></span> Quadrat, gedimmt = Watchlist (noch nicht besucht)</div>
   <h3 style="margin-top:14px">Icon = Typ</h3>
   <div class="lgrid" id="legicons"></div>
   <button class="lbtn" id="statsbtn">📊 Statistik anzeigen</button>
@@ -206,11 +206,21 @@ const DATA_URL = "data/orte.geojson";   // Fallback, falls das Sheet nicht errei
 const WRITE_URL = "https://script.google.com/macros/s/AKfycbyxI4tO5BqzceSnml-mbChZitp5SzfcUyJfBpYdlWvf4TWTB3aKVigIWKoGbZL_BeDL/exec";
 const BASEMAP = "https://tiles.openfreemap.org/styles/positron";
 
-const COLORS = { gold:"#F0A800", lila:"#9C27B0", gruen:"#0F9D58", blau:"#1976D2", orange:"#E65100", grau:"#8A8A8E", rot:"#7B1420" };
-const PRIO   = { gold:0, lila:1, rot:2, orange:3, gruen:4, blau:5, grau:6 };
+/* Welle F (2026-07-27) — Grau-Split: 'unbew' = eigener Render-Key für qualitaet=unbewertet
+   (gedimmt, UNBEW_ALPHA); 'grau' = sattes Grau = bewusstes Urteil „Mittel".
+   'unbew' steht bewusst am ENDE von RATE_ORDER (alte r=-Teilen-Links bleiben gültig).
+   Nachtrag (2026-07-27, Martins Entscheidung): Dimmen heißt auf der KARTE „noch nicht
+   besucht" — ALLE Wunschliste-Pins rendern gedimmt in ihrer Bewertungsfarbe (Gold gedimmt,
+   Orange gedimmt, …), besuchte in voller Deckkraft. Zusätzlich bleibt „ohne Urteil" IMMER
+   gedimmt (auch besucht), sonst wäre besucht×unbewertet optisch identisch mit „Mittel". */
+const COLORS = { gold:"#F0A800", lila:"#9C27B0", gruen:"#0F9D58", blau:"#1976D2", orange:"#E65100", grau:"#8A8A8E", rot:"#7B1420", unbew:"#8A8A8E" };
+const UNBEW_ALPHA = 0.55;            // Deckkraft gedimmter Pins: Wunschliste + „ohne Urteil" (Martins Abnahme: V1)
+const PRIO   = { gold:0, lila:1, rot:2, orange:3, gruen:4, blau:5, grau:6, unbew:7 };
 const PRIO_MAX = Math.max(...Object.values(PRIO));   // z-Reihenfolge: hoeher = zeichnet oben
 const RLABEL = { gold:"Sehr gut", lila:"Sehr gut · Anlass (teuer)", gruen:"Sehr gut & günstig",
-                 blau:"Gut", orange:"Zu teuer (P/L)", grau:"Mittel / ohne Urteil", rot:"Nie wieder" };
+                 blau:"Gut", orange:"Zu teuer (P/L)", grau:"Mittel", unbew:"Ohne Urteil", rot:"Nie wieder" };
+// „Und danach?" temporär aus der UI (Martin, 27.07.2026) — Neukonzept (zeit- & typabhängig) kommt in Welle K.
+const FEATURE_DANACH = false;
 /* Datenlogik v2 (2026-07-20): typ = Speisen-/Venue-Schwerpunkt (Icon) · kueche = Herkunft (später Flaggen-Badge)
    · Anlass-Tags (fruehstueck/brunch/lunch/kaffee/dinner/drinks) = erste Filter-Weiche, nur Filter, keine Pin-Optik. */
 const TYPES = ["Restaurant","Asia","Café","Kneipe","Cocktail-Bar","Imbiss","Pizza","Club/Livemusik",
@@ -236,13 +246,29 @@ const ANLASS_DEFAULT = { "Restaurant":["lunch","dinner"], "Asia":["lunch","dinne
   "Biergarten":["kaffee","dinner","drinks"], "Cocktail-Bar":["drinks"], "Weinbar":["drinks"],
   "Kneipe":["drinks"], "Sportsbar":["drinks"], "Club/Livemusik":["drinks","music"], "Karaoke":["drinks","music"] };
 
+/* ====== Bewertungs-Farblogik (Welle F, Entscheidung 1) ======
+   Zielmodell: qualitaet ∈ {sehr_gut, gut, mittel, nie_wieder, unbewertet} · preis orthogonal ·
+   Farbe IMMER berechnet, nie gespeichert. Alt-Werte (top, gut_blau, Legacy-gut) werden hier
+   normalisiert, damit die UI VOR und NACH der Sheet-Migration identisch rendert (Deploy-Regel:
+   erst UI, dann Migration).
+   LEGACY_GUT: solange der Datensatz noch Alt-Werte (top/gut_blau) enthält, heißt 'gut' das
+   ALTE Grün („Gold in günstig" bei guenstig). Nach der Migration existieren die Alt-Werte
+   nicht mehr → 'gut'ד guenstig" ist dann eine legitime Blau-Kombination. */
+let LEGACY_GUT = false;   // wird beim Datenladen gesetzt (Alt-Werte im Datensatz vorhanden?)
+function normQ(q, p) {
+  if (q === "top")      return "sehr_gut";
+  if (q === "gut_blau") return "gut";
+  if (q === "gut" && LEGACY_GUT) return p === "guenstig" ? "sehr_gut" : "gut";
+  return q;
+}
 function ratingKey(q, p) {
-  if (p === "ueberteuert") return "orange";
-  if (q === "nie_wieder")  return "rot";              // „schlecht" -> Dunkelrot-Achteck (Form in makeIcon)
-  if (q === "top")         return p === "teuer" ? "lila" : "gold";
-  if (q === "gut")         return "gruen";            // Legacy-„gut" bleibt gruen (kein Remap; grandfathered)
-  if (q === "gut_blau")    return p === "teuer" ? "orange" : "blau";  // NEU: „gut" = Blau; teuer -> Orange (P/L)
-  return "grau";
+  q = normQ(q, p);
+  if (p === "ueberteuert")  return "orange";           // explizites P/L-Veto dominiert (auch bei unbewertet)
+  if (q === "nie_wieder")   return "rot";              // „schlecht" -> Dunkelrot-Achteck (Form in makeIcon)
+  if (q === "sehr_gut")     return p === "teuer" ? "lila" : (p === "guenstig" ? "gruen" : "gold");
+  if (q === "gut")          return p === "teuer" ? "orange" : "blau";   // P/L-Veto abgeleitet (Entscheidung 1b)
+  if (q === "mittel")       return p === "teuer" ? "orange" : "grau";
+  return "unbew";                                      // unbewertet/leer -> gedimmt (Grau-Split, Entscheidung 6)
 }
 
 /* ============================================================================
@@ -323,6 +349,9 @@ function octa(c,cx,cy,r){ c.beginPath(); for(let i=0;i<8;i++){ const a=Math.PI/8
 function makeIcon(typ, colorKey, square) {
   const S = 56, cv = document.createElement('canvas'); cv.width = cv.height = S;
   const c = cv.getContext('2d');
+  // Grau-Split (Welle F) + Nachtrag: gedimmt = Wunschliste (square-Variante 'w') ODER „ohne
+  // Urteil" — bewertete Watchlist-Pins behalten so ihre Farbe (Gold gedimmt statt Grau).
+  if (colorKey === 'unbew' || square) c.globalAlpha = UNBEW_ALPHA;
   // Pin (Kreis · abgerundetes Quadrat · Achteck fuer „schlecht"/nie_wieder)
   c.save();
   if (square) { c.beginPath(); c.roundRect(3.5,3.5,S-7,S-7,7); }
@@ -397,10 +426,11 @@ async function postJson(payload){
   } catch(e) { toast('Speichern fehlgeschlagen (Netz?)'); return null; }
 }
 async function saveField(id, updates){ return !!(await postJson({ id, updates })); }
-const RATE2QP = { gold:['top','normal'], lila:['top','teuer'], gruen:['gut','guenstig'], blau:['gut_blau','normal'],
-                  orange:['unbewertet','ueberteuert'], rot:['nie_wieder','normal'], grau:['unbewertet','normal'] };
+// Schreibt IMMER die neuen Werte (die UI versteht beide; das Sheet konvergiert Richtung Zielmodell).
+const RATE2QP = { gold:['sehr_gut','normal'], lila:['sehr_gut','teuer'], gruen:['sehr_gut','guenstig'], blau:['gut','normal'],
+                  orange:['unbewertet','ueberteuert'], rot:['nie_wieder','normal'], grau:['mittel','normal'], unbew:['unbewertet','normal'] };
 // Reihenfolge Bewertungs-Dots/Legende (eine Quelle -> Popup-Dots + Index-Highlight bleiben synchron)
-const RATE_ORDER = ['gold','lila','gruen','blau','grau','orange','rot'];
+const RATE_ORDER = ['gold','lila','gruen','blau','grau','orange','rot','unbew'];
 
 /* ====== State & Filter ====== */
 const state = { status:"beide", ratings:new Set(Object.keys(COLORS)), types:new Set(), query:"",
@@ -482,9 +512,36 @@ map.addControl(new maplibregl.GeolocateControl({positionOptions:{enableHighAccur
 
 map.on('error', e => { const m=(e&&e.error&&e.error.message)||''; if(m) console.warn('[restomap] map error:', m); });
 
+/* ====== Schema-Guard, Lese-Seite (Welle F): warnen statt still falsch rendern ======
+   Schreiben validiert der Server (Code v7) streng; hier bleibt die Karte benutzbar,
+   macht aber laut auf Drift aufmerksam (Sheet-Direktedits sind ausdrücklich legitim). */
+function schemaWarn(recs){
+  if (!recs.length) return;
+  const REQ = ['id','name','lat','lon','typ','status','qualitaet','preis'];
+  const have = Object.keys(recs[0]);
+  const missing = REQ.filter(c=>!have.includes(c));
+  if (missing.length){
+    const el=document.getElementById('err'); el.style.display='block';
+    el.textContent='⚠ Schema-Problem im Sheet: Spalte(n) fehlen/umbenannt: '+missing.join(', ')+
+                   ' — Karte kann Falschfarben zeigen.';
+    console.warn('[restomap] Schema-Drift:', missing);
+  }
+  const VQ=['sehr_gut','gut','mittel','unbewertet','nie_wieder','top','gut_blau',''];
+  const VP=['guenstig','normal','teuer','ueberteuert',''];
+  const bad={};
+  recs.forEach(r=>{ const q=String(r.qualitaet??'').trim(), p=String(r.preis??'').trim();
+    if(!VQ.includes(q)) bad['qualitaet='+q]=(bad['qualitaet='+q]||0)+1;
+    if(!VP.includes(p)) bad['preis='+p]=(bad['preis='+p]||0)+1; });
+  const keys=Object.keys(bad);
+  if (keys.length){
+    console.warn('[restomap] Unbekannte Werte im Sheet (Tippfehler?):', bad);
+    toast('⚠ Unbekannte Werte im Sheet: '+keys.slice(0,3).join(', ')+(keys.length>3?' …':''), 6000);
+  }
+}
 async function loadData(){
   if (SHEET_CSV_URL){
-    try { const t=await (await fetch(SHEET_CSV_URL)).text(); return toFeatures(parseCSV(t)); }
+    try { const t=await (await fetch(SHEET_CSV_URL)).text();
+          const recs=parseCSV(t); schemaWarn(recs); return toFeatures(recs); }
     catch(e){ console.warn('[restomap] Sheet nicht erreichbar, nutze GeoJSON-Fallback', e); }
   }
   const gj = await (await fetch(DATA_URL)).json();
@@ -515,6 +572,9 @@ function addMapContent(){
 map.on('load', async () => {
   try {
     allFeatures = await loadData();
+    // Welle F: Alt-Werte im Datensatz? -> Legacy-Deutung von 'gut' (s. normQ). Nach der
+    // Sheet-Migration verschwinden top/gut_blau und der Schalter kippt von selbst auf false.
+    LEGACY_GUT = allFeatures.some(f=>f.properties.q==='top'||f.properties.q==='gut_blau');
     allFeatures.forEach(f=>{ const pr=f.properties;
                              if (TYP_ALIAS[pr.typ]) { // Alt-Daten (vor Migration): Frühstück behält seinen Anlass als Tag
                                if (pr.typ==='Frühstück' && !(pr.tags||'').includes('fruehstueck'))
@@ -559,6 +619,7 @@ function nearestOf(lon, lat, typesSet, maxM, exclId){
   pool.sort((a,b)=>a.d-b.d); return { f:pool[0].f, d:Math.round(pool[0].d) };
 }
 function danachLine(pr, lon, lat){
+  if (!FEATURE_DANACH) return '';   // temporär aus (Martin, 27.07.2026) — Code bleibt für „Und danach? v2" (Welle K)
   if (!DANACH_FOOD.has(pr.typ)) return '';
   const bar=nearestOf(lon,lat,DANACH_DRINKS,600,pr.id), sweet=nearestOf(lon,lat,DANACH_SWEET,600,pr.id);
   const parts=[];
@@ -638,6 +699,7 @@ function openPopup(feat){
           for (const ck of RATE_ORDER) {
             const d = document.createElement('button'); d.className = 'a-dot' + (pr.rk === ck ? ' on' : '');
             d.style.background = COLORS[ck]; d.title = RLABEL[ck];
+            if (ck === 'unbew') d.style.opacity = UNBEW_ALPHA;   // Grau-Split: gedimmter Dot
             d.onclick = async () => {
               const f = feat(); if (!f) return;
               const [qv, pv] = RATE2QP[ck];
@@ -764,7 +826,8 @@ function buildUI(){
   const lc=document.getElementById('legcolors');
   for (const ck of RATE_ORDER){
     const r=document.createElement('div'); r.className='lrow';
-    r.innerHTML=`<span class="sw" style="background:${COLORS[ck]}"></span> ${RLABEL[ck]}`; lc.appendChild(r);
+    const dim = ck==='unbew' ? `opacity:${UNBEW_ALPHA}` : '';
+    r.innerHTML=`<span class="sw" style="background:${COLORS[ck]};${dim}"></span> ${RLABEL[ck]}`; lc.appendChild(r);
   }
   const gi=document.getElementById('legicons');
   for (const t of TYPES){
@@ -842,11 +905,13 @@ function renderStats(){
     <div class="kpi"><b>${pct(goldW,wl.length)}</b><span>Gold/Lila Watchlist</span></div>
     <div class="kpi"><b>${cnt(P,p=>p.rk==='rot')}</b><span>nie wieder</span></div></div>`;
   h+='<h3>Bewertungen</h3>';
-  const rmax=Math.max(...Object.keys(COLORS).map(ck=>cnt(P,p=>p.rk===ck)),1);
-  for (const ck of ['gold','grau','orange','gruen','lila','rot']){
+  const rmax=Math.max(...RATE_ORDER.map(ck=>cnt(P,p=>p.rk===ck)),1);
+  // Welle F: RATE_ORDER statt fester Liste (die alte Liste hatte blau vergessen); unbew gedimmt.
+  for (const ck of RATE_ORDER){
     const n=cnt(P,p=>p.rk===ck);
+    const dim = ck==='unbew' ? `;opacity:${UNBEW_ALPHA}` : '';
     h+=`<div class="brow"><span class="lbl">${RLABEL[ck]}</span>
-        <span class="bar" style="width:${Math.round(58*n/rmax)}%;background:${COLORS[ck]}"></span>
+        <span class="bar" style="width:${Math.round(58*n/rmax)}%;background:${COLORS[ck]}${dim}"></span>
         <span class="val">${n}</span></div>`;
   }
   h+='<h3>Typen</h3>';
@@ -866,7 +931,7 @@ function renderStats(){
 }
 
 /* ====== Ort hinzufügen (Edit-Modus) ====== */
-const addSel = { typ:'', rate:'grau', status:'wunschliste', quelle:'Spontanfund', place:null };
+const addSel = { typ:'', rate:'unbew', status:'wunschliste', quelle:'Spontanfund', place:null };  // Default: ohne Urteil (Grau-Split)
 function initAdd(){
   if (!getToken()) return;
   const btn=document.getElementById('addbtn'); btn.style.display='block';
@@ -881,8 +946,9 @@ function initAdd(){
     at.appendChild(c); });
   const ar=document.getElementById('arates');
   for (const ck of RATE_ORDER){
-    const d=document.createElement('button'); d.className='a-dot'+(ck==='grau'?' on':'');
+    const d=document.createElement('button'); d.className='a-dot'+(ck==='unbew'?' on':'');
     d.style.background=COLORS[ck]; d.title=RLABEL[ck];
+    if (ck==='unbew') d.style.opacity=UNBEW_ALPHA;   // Grau-Split: gedimmter Dot
     d.onclick=()=>{ ar.querySelectorAll('.a-dot').forEach(x=>x.classList.remove('on'));
                     d.classList.add('on'); addSel.rate=ck; };
     ar.appendChild(d);
