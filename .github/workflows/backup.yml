@@ -13,21 +13,37 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
-      - name: Sheet abrufen und GeoJSON bauen
+      - name: Sheet abrufen, private Felder strippen, GeoJSON bauen
         run: |
-          curl -sL "https://docs.google.com/spreadsheets/d/18nYehpbpOmARe9NI6EXdKKFiYG53C3OMgKm4A5CuLFk/gviz/tq?tqx=out:csv" -o data/sheet-backup.csv
+          # Voller Abruf nur in eine TEMPORÄRE Datei — sie wird NICHT committet.
+          curl -sL "https://docs.google.com/spreadsheets/d/18nYehpbpOmARe9NI6EXdKKFiYG53C3OMgKm4A5CuLFk/gviz/tq?tqx=out:csv" -o /tmp/sheet-full.csv
           python3 - << 'EOF'
           import csv, json
-          rows = list(csv.DictReader(open('data/sheet-backup.csv', encoding='utf-8')))
-          feats = [{"type":"Feature",
-                    "geometry":{"type":"Point","coordinates":[float(r['lon']), float(r['lat'])]},
-                    "properties":{"id":r['id'],"name":r['name'],"typ":r['typ'],"status":r['status'],
-                                  "q":r['qualitaet'],"p":r['preis'],"notiz":r.get('notiz',''),
-                                  "tags":r.get('tags',''),"besucht_am":r.get('besucht_am','')}}
+
+          PRIVATE = {'notiz', 'besucht_am'}   # Paket 0 (2026-07-25): nie ins öffentliche Repo
+
+          rows = list(csv.DictReader(open('/tmp/sheet-full.csv', encoding='utf-8')))
+          if not rows:
+              raise SystemExit('Abbruch: Sheet-Abruf leer — nichts committen.')
+
+          # 1) Öffentliches CSV-Backup OHNE private Spalten
+          fields = [f for f in rows[0].keys() if f not in PRIVATE]
+          with open('data/sheet-backup.csv', 'w', encoding='utf-8', newline='') as f:
+              w = csv.DictWriter(f, fieldnames=fields, extrasaction='ignore')
+              w.writeheader()
+              for r in rows:
+                  w.writerow({k: r.get(k, '') for k in fields})
+
+          # 2) GeoJSON OHNE private Properties
+          feats = [{"type": "Feature",
+                    "geometry": {"type": "Point", "coordinates": [float(r['lon']), float(r['lat'])]},
+                    "properties": {"id": r['id'], "name": r['name'], "typ": r['typ'], "status": r['status'],
+                                   "q": r['qualitaet'], "p": r['preis'],
+                                   "tags": r.get('tags', '')}}
                    for r in rows if r.get('lat') and r.get('lon') and r.get('id')]
-          json.dump({"type":"FeatureCollection","features":feats},
-                    open('data/orte.geojson','w',encoding='utf-8'), ensure_ascii=False)
-          print(len(feats), 'Orte gesichert')
+          json.dump({"type": "FeatureCollection", "features": feats},
+                    open('data/orte.geojson', 'w', encoding='utf-8'), ensure_ascii=False)
+          print(len(feats), 'Orte gesichert (ohne private Felder:', ', '.join(sorted(PRIVATE)) + ')')
           EOF
       - name: Committen wenn geändert
         run: |
