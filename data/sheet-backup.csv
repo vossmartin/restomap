@@ -408,7 +408,7 @@ r0441,Roter Rabe,52.496584,13.419306,Cocktail-Bar,besucht,top,normal,fav,,2026-0
 r0442,Rotisserie Weingrün,52.5126612,13.402987,Restaurant,besucht,top,normal,fav,,2026-07-20,,,,"lunch, dinner",
 r0443,royals & rice Berlin,52.5289076,13.3959643,Asia,besucht,unbewertet,normal,fav,,2026-07-20,,,,"lunch, dinner",
 r0444,Rutz - Restaurant und Weinbar,52.528294,13.386413,Restaurant,besucht,top,teuer,fav,,2026-07-20,,,,"lunch, dinner",
-r0446,Röststätte,52.5290239,13.3974463,Café,wunschliste,top,normal,fav,,2026-07-27,,,,"fruehstueck, kaffee",
+r0446,Röststätte,52.5290239,13.3974463,Café,besucht,top,normal,fav,,2026-07-27,,,,"fruehstueck, kaffee",
 r0447,Röststätte Berlin,52.5241984,13.4022848,Café,besucht,top,normal,fav,,2026-07-20,,,,"fruehstueck, kaffee",
 r0448,Rüya Gemüse Kebap,52.5138084,13.316974,Imbiss,besucht,gut,guenstig,fav,,2026-07-20,,,,"lunch, dinner",
 r0449,Rüyam Gemüse Kebab 2,52.5405338,13.4125814,Imbiss,besucht,gut,guenstig,fav,,2026-07-20,,,,"lunch, dinner",
@@ -423,7 +423,7 @@ r0458,Salsabil,52.5121505,13.4538144,Imbiss,besucht,unbewertet,normal,fav,,2026-
 r0459,SammyS Berliner Donuts,52.5262981,13.3992822,Dessert,besucht,gut_blau,normal,fav,,2026-07-23,,,,"fruehstueck, kaffee",
 r0460,SAN,52.5269769,13.4146945,Sushi,besucht,top,teuer,fav,,2026-07-20,,,,"lunch, dinner",
 r0461,Sanku Maots'ai 三顾冒菜,52.5264478,13.3869873,Asia,besucht,unbewertet,normal,fav,,2026-07-20,,,,"lunch, dinner",
-r0462,Sant Buena,52.5294637,13.3970636,Restaurant,wunschliste,unbewertet,ueberteuert,fav,,2026-07-27,,,,"fruehstueck, brunch, kaffee",
+r0462,Sant Buena,52.5294637,13.3970636,Restaurant,besucht,unbewertet,ueberteuert,fav,,2026-07-27,,,,"fruehstueck, brunch, kaffee",
 r0464,Saphire Bar,52.531868,13.43401,Cocktail-Bar,besucht,unbewertet,ueberteuert,fav,,2026-07-20,,,,drinks,
 r0465,Saravanaa Bhavan,52.5102496,13.3761846,Asia,besucht,unbewertet,normal,fav,,2026-07-20,,,,"lunch, dinner",
 r0466,Sasaya,52.5443009,13.4185897,Sushi,besucht,top,normal,fav,,2026-07-20,,,,"lunch, dinner",
@@ -1069,3 +1069,4 @@ r1168,Coffee Circle Oranienburger Tor,52.5265228,13.3887761,Café,besucht,unbewe
 r1169,Eispatisserie Hokey Pokey Mitte,52.5297033,13.3987939,Eis,besucht,top,normal,,,2026-07-23,https://www.google.com/maps/place/?q=place_id:ChIJ-bOuEcVRqEcRv1a3C1ax4Xo,ChIJ-bOuEcVRqEcRv1a3C1ax4Xo,,kaffee,
 r1170,Café Tillmann Koppenplatz - Bio Konditorei,52.527297,13.3978781,Bäcker,besucht,top,normal,,,2026-07-23,https://www.google.com/maps/place/?q=place_id:ChIJmZwEE_NRqEcR0j-lCBJE81k,ChIJmZwEE_NRqEcR0j-lCBJE81k,,"fruehstueck, kaffee",
 r1171,Bäcker Taudien,52.5322808,13.3966781,Bäcker,besucht,top,normal,,,2026-07-23,https://www.google.com/maps/place/?q=place_id:ChIJrfqg9-9RqEcRo7j6hWsvNKE,ChIJrfqg9-9RqEcRo7j6hWsvNKE,,"fruehstueck, kaffee",
+r1172,Croissant Couture Breakfast & Brunch,52.5265223,13.3898775,Restaurant,besucht,unbewertet,normal,,,2026-07-27,https://www.google.com/maps/place/?q=place_id:ChIJhfYxx_lRqEcREPhCBHnFXLM,ChIJhfYxx_lRqEcREPhCBHnFXLM,,"lunch, dinner",Spontanfund
