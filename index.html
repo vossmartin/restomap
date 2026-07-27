@@ -185,8 +185,8 @@
 <div id="legend"><div class="sheet">
   <h3>Farbe = Bewertung</h3><div id="legcolors"></div>
   <h3 style="margin-top:14px">Form = Status</h3>
-  <div class="lrow"><span class="sw" style="background:#888"></span> Kreis = besucht (volle Farbe)</div>
-  <div class="lrow"><span class="sw sq" style="background:#888;opacity:.55"></span> Quadrat, gedimmt = Watchlist (noch nicht besucht)</div>
+  <div class="lrow"><span class="sw" style="background:#888"></span> Kreis = besucht</div>
+  <div class="lrow"><span class="sw sq" style="background:#888"></span> Quadrat = Watchlist (noch nicht besucht)</div>
   <h3 style="margin-top:14px">Icon = Typ</h3>
   <div class="lgrid" id="legicons"></div>
   <button class="lbtn" id="statsbtn">📊 Statistik anzeigen</button>
@@ -208,13 +208,9 @@ const BASEMAP = "https://tiles.openfreemap.org/styles/positron";
 
 /* Welle F (2026-07-27) — Grau-Split: 'unbew' = eigener Render-Key für qualitaet=unbewertet
    (gedimmt, UNBEW_ALPHA); 'grau' = sattes Grau = bewusstes Urteil „Mittel".
-   'unbew' steht bewusst am ENDE von RATE_ORDER (alte r=-Teilen-Links bleiben gültig).
-   Nachtrag (2026-07-27, Martins Entscheidung): Dimmen heißt auf der KARTE „noch nicht
-   besucht" — ALLE Wunschliste-Pins rendern gedimmt in ihrer Bewertungsfarbe (Gold gedimmt,
-   Orange gedimmt, …), besuchte in voller Deckkraft. Zusätzlich bleibt „ohne Urteil" IMMER
-   gedimmt (auch besucht), sonst wäre besucht×unbewertet optisch identisch mit „Mittel". */
+   'unbew' steht bewusst am ENDE von RATE_ORDER (alte r=-Teilen-Links bleiben gültig). */
 const COLORS = { gold:"#F0A800", lila:"#9C27B0", gruen:"#0F9D58", blau:"#1976D2", orange:"#E65100", grau:"#8A8A8E", rot:"#7B1420", unbew:"#8A8A8E" };
-const UNBEW_ALPHA = 0.55;            // Deckkraft gedimmter Pins: Wunschliste + „ohne Urteil" (Martins Abnahme: V1)
+const UNBEW_ALPHA = 0.55;            // Deckkraft der „ohne Urteil"-Pins (Martins Abnahme: V1 gedimmt)
 const PRIO   = { gold:0, lila:1, rot:2, orange:3, gruen:4, blau:5, grau:6, unbew:7 };
 const PRIO_MAX = Math.max(...Object.values(PRIO));   // z-Reihenfolge: hoeher = zeichnet oben
 const RLABEL = { gold:"Sehr gut", lila:"Sehr gut · Anlass (teuer)", gruen:"Sehr gut & günstig",
@@ -349,9 +345,8 @@ function octa(c,cx,cy,r){ c.beginPath(); for(let i=0;i<8;i++){ const a=Math.PI/8
 function makeIcon(typ, colorKey, square) {
   const S = 56, cv = document.createElement('canvas'); cv.width = cv.height = S;
   const c = cv.getContext('2d');
-  // Grau-Split (Welle F) + Nachtrag: gedimmt = Wunschliste (square-Variante 'w') ODER „ohne
-  // Urteil" — bewertete Watchlist-Pins behalten so ihre Farbe (Gold gedimmt statt Grau).
-  if (colorKey === 'unbew' || square) c.globalAlpha = UNBEW_ALPHA;
+  // Grau-Split (Welle F): „ohne Urteil" = gleicher Grauton, aber gedimmt (V1, Martins Abnahme).
+  if (colorKey === 'unbew') c.globalAlpha = UNBEW_ALPHA;
   // Pin (Kreis · abgerundetes Quadrat · Achteck fuer „schlecht"/nie_wieder)
   c.save();
   if (square) { c.beginPath(); c.roundRect(3.5,3.5,S-7,S-7,7); }
@@ -415,17 +410,40 @@ function toast(msg, ms=2500){
   t.textContent = msg; t.style.display='block';
   clearTimeout(t._h); t._h = setTimeout(()=>t.style.display='none', ms);
 }
+let lastErr = '';
 async function postJson(payload){
   let wu = getWriteUrl(); if (!wu) wu = askWriteUrl();
   if (!wu) { toast('Keine Schreib-URL hinterlegt.'); return null; }
   try {
     const res = await fetch(wu, { method:'POST', body: JSON.stringify({ token:getToken(), ...payload }) });
     const j = await res.json();
-    if (!j.ok) { toast('Fehler: ' + (j.error||'?')); return null; }
-    return j;
-  } catch(e) { toast('Speichern fehlgeschlagen (Netz?)'); return null; }
+    if (!j.ok) { lastErr = j.error||'?'; toast('Fehler: ' + lastErr); return null; }
+    lastErr = ''; return j;
+  } catch(e) { lastErr = 'netz'; toast('Speichern fehlgeschlagen (Netz?)'); return null; }
 }
-async function saveField(id, updates){ return !!(await postJson({ id, updates })); }
+/* Warn-Banner + ehrliche Speicherung (deckungsgleich mit review.html) */
+function saveBanner(){ let b=document.getElementById('saveErr');
+  if(!b){ b=document.createElement('div'); b.id='saveErr';
+    b.style.cssText='position:fixed;top:0;left:0;right:0;z-index:200;background:#7B1420;color:#fff;'
+      +'padding:12px 40px 12px 16px;font-size:14px;line-height:1.35;box-shadow:0 2px 8px rgba(0,0,0,.3);display:none';
+    const s=document.createElement('span'); s.id='saveErrTxt'; b.appendChild(s);
+    const x=document.createElement('button'); x.textContent='×';
+    x.style.cssText='position:absolute;right:10px;top:8px;background:none;border:none;color:#fff;font-size:20px;cursor:pointer';
+    x.onclick=()=>b.style.display='none'; b.appendChild(x);
+    document.body.appendChild(b); }
+  return b; }
+function saveErrShow(html){ const b=saveBanner(); b.querySelector('#saveErrTxt').innerHTML=html; b.style.display='block'; }
+function saveErrHide(){ const b=document.getElementById('saveErr'); if(b) b.style.display='none'; }
+const ERR_AUTH='<b>Nicht gespeichert — Edit-Zugang abgelaufen.</b> Öffne einmal deinen aktuellen Edit-Link '
+  +'(<code>?edit=…</code>) auf diesem Gerät, dann tippe erneut. Bis dahin wird nichts gesichert.';
+async function commit(payload){ const ok=!!(await postJson(payload));
+  if(!ok) saveErrShow(lastErr==='auth'?ERR_AUTH:'<b>Nicht gespeichert</b> (Fehler: '+esc(lastErr||'?')+'). Bitte erneut versuchen.');
+  else saveErrHide(); return ok; }
+async function saveField(id, updates){ return await commit({ id, updates }); }
+/* Startpruefung: nur bei eindeutigem Auth-Fehler warnen (Alt-Skript ohne "ping"/Netz-Wackler -> kein Banner). */
+async function checkAuth(){ if(!getToken()) return;
+  try { const res=await fetch(getWriteUrl(), { method:'POST', body: JSON.stringify({ token:getToken(), action:'ping' }) });
+    const j=await res.json(); if(j && j.error==='auth') saveErrShow(ERR_AUTH); } catch(e){} }
 // Schreibt IMMER die neuen Werte (die UI versteht beide; das Sheet konvergiert Richtung Zielmodell).
 const RATE2QP = { gold:['sehr_gut','normal'], lila:['sehr_gut','teuer'], gruen:['sehr_gut','guenstig'], blau:['gut','normal'],
                   orange:['unbewertet','ueberteuert'], rot:['nie_wieder','normal'], grau:['mittel','normal'], unbew:['unbewertet','normal'] };
@@ -594,6 +612,7 @@ map.on('load', async () => {
       map.on('mouseleave', layer, ()=>map.getCanvas().style.cursor='');
     }
     applyHash(); buildUI(); hashReady = true; applyFilter();
+    checkAuth();   // Startpruefung: warnt sofort, wenn der Edit-Token ungueltig ist
     map.on('moveend', () => stateToHash());
     if (window.matchMedia) matchMedia('(prefers-color-scheme: dark)').addEventListener('change', ()=>applyTheme());
   } catch (err) {
@@ -664,25 +683,27 @@ function openPopup(feat){
           el.querySelector('.p-statusbtn').onclick = async () => {
             const f = feat(); if (!f) return;
             const old = f.properties.status;
-            setStatus(f, nextStatus); applyFilter(); popup.remove();
-            toast(nextStatus==='besucht' ? 'Gespeichert: Besucht ✓' : 'Gespeichert: Watchlist');
-            if (!await saveField(pr.id, { status: nextStatus })) { setStatus(f, old); applyFilter(); }
+            setStatus(f, nextStatus); applyFilter(); popup.remove();   // schnell, mit Rollback bei Fehler
+            if (await saveField(pr.id, { status: nextStatus }))
+              toast(nextStatus==='besucht' ? 'Gespeichert: Besucht ✓' : 'Gespeichert: Watchlist');
+            else { setStatus(f, old); applyFilter(); }
           };
           el.querySelector('.p-visitbtn').onclick = async () => {
             const f = feat(); if (!f) return;
+            const oldStatus = f.properties.status, oldBes = f.properties.besucht_am;
             const heute = new Date().toLocaleDateString('sv-SE');
             f.properties.besucht_am = heute; setStatus(f, 'besucht'); applyFilter(); popup.remove();
-            toast('Besuch notiert: ' + heute + ' ✓');
-            saveField(pr.id, { besucht_am: heute, status: 'besucht' });
+            if (await saveField(pr.id, { besucht_am: heute, status: 'besucht' })) toast('Besuch notiert: ' + heute + ' ✓');
+            else { f.properties.besucht_am = oldBes; setStatus(f, oldStatus); applyFilter(); }
           };
           el.querySelectorAll('.p-tag').forEach(b => b.onclick = async () => {
             const f = feat(); if (!f) return;
             const tg = b.dataset.tg;
             let tags = (f.properties.tags||'').split(',').map(s=>s.trim()).filter(Boolean);
             if (tags.includes(tg)) tags = tags.filter(t=>t!==tg); else tags.push(tg);
-            f.properties.tags = tags.join(', ');
-            b.classList.toggle('on'); applyFilter();
-            saveField(pr.id, { tags: f.properties.tags });
+            const newTags = tags.join(', ');
+            if (!(await commit({ id: pr.id, updates:{ tags: newTags } }))) return;   // erst Server, dann UI
+            f.properties.tags = newTags; b.classList.toggle('on'); applyFilter();
           });
           // ✏️ Ebene 2: Bewertung / Preis / Typ (seltene Eingriffe, ein Tap dahinter)
           const editBox = el.querySelector('.p-edit');
@@ -703,11 +724,11 @@ function openPopup(feat){
             d.onclick = async () => {
               const f = feat(); if (!f) return;
               const [qv, pv] = RATE2QP[ck];
+              if (!(await commit({ id: pr.id, updates:{ qualitaet: qv, preis: pv } }))) return;   // erst Server, dann UI
               f.properties.q = qv; f.properties.p = pv; refresh(f);
               dots.querySelectorAll('.a-dot').forEach(x => x.classList.remove('on')); d.classList.add('on');
               priceRow.querySelectorAll('.a-chip').forEach(x => x.classList.toggle('on', x.dataset.p === pv));
               toast(RLABEL[ck] + ' ✓');
-              saveField(pr.id, { qualitaet: qv, preis: pv });
             };
             dots.appendChild(d);
           }
@@ -717,12 +738,12 @@ function openPopup(feat){
             c.dataset.p = pv; c.textContent = lbl;
             c.onclick = async () => {
               const f = feat(); if (!f) return;
+              if (!(await commit({ id: pr.id, updates:{ preis: pv } }))) return;   // erst Server, dann UI
               f.properties.p = pv; refresh(f);
               priceRow.querySelectorAll('.a-chip').forEach(x => x.classList.remove('on')); c.classList.add('on');
               dots.querySelectorAll('.a-dot').forEach((x, i) => x.classList.toggle('on',
                 RATE_ORDER[i] === f.properties.rk));
               toast('Preis: ' + lbl + ' ✓');
-              saveField(pr.id, { preis: pv });
             };
             priceRow.appendChild(c);
           }
@@ -732,10 +753,10 @@ function openPopup(feat){
             c.textContent = TYP_SHORT[t] || t;
             c.onclick = async () => {
               const f = feat(); if (!f) return;
+              if (!(await commit({ id: pr.id, updates:{ typ: t } }))) return;   // erst Server, dann UI
               f.properties.typ = t; refresh(f);
               typRow.querySelectorAll('.a-chip').forEach(x => x.classList.remove('on')); c.classList.add('on');
               toast('Typ: ' + t + ' ✓');
-              saveField(pr.id, { typ: t });
             };
             typRow.appendChild(c);
           }

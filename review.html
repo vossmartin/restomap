@@ -8,7 +8,7 @@
 <link rel="icon" href="data:,">
 <style>
   :root { --ink:#1c1c1e; --muted:#6e6e73; --line:#e4e4e7; --gold:#F0A800; --gruen:#0F9D58;
-          --rot:#7B1420; --orange:#E65100; --grau:#8A8A8E; --blau:#1976D2; }
+          --rot:#7B1420; --orange:#E65100; --grau:#8A8A8E; --blau:#1976D2; --lila:#9C27B0; }
   * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
   body { margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
          background:#f4f4f2; color:var(--ink); padding-bottom:40px; }
@@ -33,7 +33,7 @@
   .b-arch { background:var(--rot); } .b-ok { background:var(--gruen); } .b-skip { background:#c9c9cd; color:#333; }
   .b-top { background:var(--gold); } .b-gut { background:var(--gruen); } .b-nie { background:var(--rot); }
   .b-teuer { background:var(--orange); } .b-grau { background:#c9c9cd; color:#333; }
-  .b-blau { background:var(--blau); }
+  .b-blau { background:var(--blau); } .b-lila { background:var(--lila); }
   .b-merge { background:var(--ink); }
   #more { margin:6px 16px 20px; width:calc(100% - 32px); padding:12px; border:1px dashed var(--line);
           background:#fff; border-radius:12px; font-size:14px; color:var(--muted); }
@@ -55,9 +55,15 @@
   .dot { width:26px; height:26px; border-radius:50%; border:2px solid #fff; box-shadow:0 0 0 1px var(--line); padding:0; }
   .dot.on { outline:2px solid var(--ink); outline-offset:1px; }
   .sw { display:inline-block; width:12px; height:12px; border-radius:3px; margin-right:6px; vertical-align:middle; }
+  #saveErr { display:none; position:sticky; top:0; z-index:50; background:var(--rot); color:#fff;
+    padding:12px 40px 12px 16px; font-size:14px; line-height:1.35; box-shadow:0 2px 8px rgba(0,0,0,.25); }
+  #saveErr b { font-weight:700; }
+  #saveErr .x { position:absolute; right:10px; top:8px; cursor:pointer; font-size:20px; line-height:1;
+    background:none; border:none; color:#fff; padding:4px; }
 </style>
 </head>
 <body>
+<div id="saveErr"><button class="x" onclick="saveErrHide()" title="Ausblenden">×</button><span id="saveErrTxt"></span></div>
 <div id="gate" style="display:none">Diese Seite braucht den Edit-Zugang. Öffne einmal die Karte über Deinen Edit-Link (<code>?edit=…</code>) auf diesem Gerät — danach funktioniert auch das Review.</div>
 <header style="display:none" id="hdr">
   <h1>Review</h1>
@@ -85,14 +91,28 @@ if (urlParams.get('edit')) { try { localStorage.setItem('rm_token', urlParams.ge
 function toast(m, ms=2200){ const t=document.getElementById('toast'); t.textContent=m; t.style.display='block';
   clearTimeout(t._h); t._h=setTimeout(()=>t.style.display='none', ms); }
 
+let lastErr = '';
 async function post(payload){ return !!(await postJson(payload)); }
 async function postJson(payload){
   try {
     const res = await fetch(WRITE_URL, { method:'POST', body: JSON.stringify({ token:getToken(), ...payload }) });
     const j = await res.json();
-    if (!j.ok) { toast('Fehler: ' + (j.error||'?')); return null; }
-    return j;
-  } catch(e){ toast('Netzfehler — Aktion nicht gespeichert'); return null; }
+    if (!j.ok) { lastErr = j.error||'?'; toast('Fehler: ' + lastErr); return null; }
+    lastErr = ''; return j;
+  } catch(e){ lastErr = 'netz'; toast('Netzfehler — Aktion nicht gespeichert'); return null; }
+}
+/* Ehrliche Speicherung: schreibt und meldet Erfolg zurück; bei Fehler bleibt der Dauer-Banner stehen. */
+function saveErrShow(msg){ document.getElementById('saveErrTxt').innerHTML = msg;
+  document.getElementById('saveErr').style.display='block'; }
+function saveErrHide(){ document.getElementById('saveErr').style.display='none'; }
+const ERR_AUTH = '<b>Nicht gespeichert — Edit-Zugang abgelaufen.</b> Öffne einmal deinen aktuellen Edit-Link '
+  + '(<code>?edit=…</code>) auf diesem Gerät, dann tippe erneut. Bis dahin wird nichts gesichert.';
+async function commit(payload){
+  const ok = !!(await postJson(payload));
+  if (!ok){ saveErrShow(lastErr==='auth' ? ERR_AUTH
+      : '<b>Nicht gespeichert</b> (Fehler: '+esc(lastErr||'?')+'). Bitte erneut versuchen.'); }
+  else { saveErrHide(); }
+  return ok;
 }
 
 function parseCSV(text){
@@ -182,36 +202,40 @@ let active = 'closed', shown = PAGE;
 
 /* ====== Aktionen ====== */
 async function actArchive(id, mark){
-  const r = byId[id]; HANDLED.add(mark+id);
-  main = main.filter(x=>x.id!==id); delete byId[id];
+  const r = byId[id];
+  if (!(await commit({ action:'archive', id }))) return;   // Fehler → Eintrag bleibt stehen
+  post({ action:'stageUpdate', id, value:'archiviert' });
+  HANDLED.add(mark+id); main = main.filter(x=>x.id!==id); delete byId[id];
   draw(); toast(`${r.name}: archiviert ✓`);
-  if (await post({ action:'archive', id })) post({ action:'stageUpdate', id, value:'archiviert' });
 }
 async function actKeep(id, mark){
+  if (!(await commit({ action:'stageUpdate', id, value:'ok' }))) return;
   HANDLED.add(mark+id); draw(); toast('Bleibt — Fehlalarm vermerkt');
-  post({ action:'stageUpdate', id, value:'ok' });
 }
 async function actMatch(id, good){
+  if (!(await commit({ action:'stageUpdate', id, value: good?'ja':'nein' }))) return;
   HANDLED.add('m'+id); draw(); toast(good ? 'Match bestätigt' : 'Match verworfen');
-  post({ action:'stageUpdate', id, value: good?'ja':'nein' });
 }
 async function actJudge(id, q){
-  const r = byId[id]; HANDLED.add('g'+id);
-  if (q==='teuer'){ r.preis='ueberteuert'; draw(); toast(`${r.name}: zu teuer (P/L)`);
-    post({ id, updates:{ preis:'ueberteuert' } }); return; }
-  r.qualitaet=q; draw(); toast(`${r.name}: ${RL[q]}`);
-  post({ id, updates:{ qualitaet:q } });
+  const r = byId[id];
+  let updates, msg;
+  if (q==='teuer'){ updates={ preis:'ueberteuert' }; msg=`${r.name}: zu teuer (P/L)`; }
+  else if (q==='lila'){ updates={ qualitaet:'sehr_gut', preis:'teuer' }; msg=`${r.name}: Sehr gut · teuer`; }
+  else { updates={ qualitaet:q }; msg=`${r.name}: ${RL[q]}`; }
+  if (!(await commit({ id, updates }))) return;
+  Object.assign(r, updates); HANDLED.add('g'+id); draw(); toast(msg);
 }
 async function actMergePair(keepId, archId){
+  if (!(await commit({ action:'archive', id: archId }))) return;
+  post({ id: keepId, updates:{ dupe_flag:'' } });
   HANDLED.add('d'+keepId); HANDLED.add('d'+archId);
-  const keep = byId[keepId];
   main = main.filter(x=>x.id!==archId); delete byId[archId];
   draw(); toast('Zusammengeführt ✓');
-  if (await post({ action:'archive', id: archId })) post({ id: keepId, updates:{ dupe_flag:'' } });
 }
 async function actFiliale(group){
+  const oks = await Promise.all(group.map(r=>commit({ id:r.id, updates:{ dupe_flag:'filiale' } })));
+  if (oks.some(x=>!x)) return;   // mind. ein Schreibvorgang fehlgeschlagen → nichts als erledigt markieren
   group.forEach(r=>HANDLED.add('d'+r.id)); draw(); toast('Als Filialen markiert');
-  group.forEach(r=>post({ id:r.id, updates:{ dupe_flag:'filiale' } }));
 }
 function actSkip(id, mark){ HANDLED.add(mark+id); draw(); }
 async function actRematch(id){
@@ -275,6 +299,7 @@ function renderGrau(r){
   // Welle F: schreibt neue Werte (sehr_gut/gut/mittel); „Gut" = Blau-Kategorie.
   return card(r, '', `
     <button class="b-top" onclick="actJudge('${r.id}','sehr_gut')">Sehr gut</button>
+    <button class="b-lila" onclick="actJudge('${r.id}','lila')">Sehr gut · teuer</button>
     <button class="b-blau" onclick="actJudge('${r.id}','gut')">Gut</button>
     <button class="b-grau" onclick="actJudge('${r.id}','mittel')">Mittel</button>
     <button class="b-teuer" onclick="actJudge('${r.id}','teuer')">Zu teuer</button>
@@ -290,7 +315,7 @@ function card(r, extra, btns){
 }
 
 /* ====== Datenqualitäts-Modus „Nach Typ": Editieren ====== */
-function _save(r, updates){ Object.assign(r, updates); drawList(); post({ id:r.id, updates }); }
+async function _save(r, updates){ if (!(await commit({ id:r.id, updates }))) return; Object.assign(r, updates); drawList(); }
 function setTyp(id, t){ const r=byId[id]; if(!r || r.typ===t) return; _save(r,{ typ:t }); toast('Typ: '+t); }
 function setKueche(id, k){ const r=byId[id]; if(!r) return;
   const v = (r.kueche===k) ? '' : k;             // erneuter Tap löscht (zurück auf „offen")
@@ -398,10 +423,19 @@ function schemaWarn(recs){
     main.forEach(r=>byId[r.id]=r);
     stage.forEach(s=>stById[s.id]=s);
     draw();
+    checkAuth();   // Startpruefung: warnt SOFORT, wenn der Edit-Token ungueltig ist (bevor du editierst)
   } catch(e){
     document.getElementById('subtitle').textContent = 'Daten konnten nicht geladen werden: ' + e.message;
   }
 })();
+/* Nur bei echtem Auth-Fehler warnen; ein Netz-Wackler oder ein Alt-Skript ohne "ping" loest KEINEN Banner aus. */
+async function checkAuth(){
+  try {
+    const res = await fetch(WRITE_URL, { method:'POST', body: JSON.stringify({ token:getToken(), action:'ping' }) });
+    const j = await res.json();
+    if (j && j.error==='auth') saveErrShow(ERR_AUTH);   // nur der eindeutige Token-Fehler
+  } catch(e){ /* Netzfehler beim Laden ignorieren */ }
+}
 </script>
 </body>
 </html>
