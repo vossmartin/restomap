@@ -733,9 +733,10 @@ function openPopup(feat){
             const tg = b.dataset.tg;
             let tags = (f.properties.tags||'').split(',').map(s=>s.trim()).filter(Boolean);
             if (tags.includes(tg)) tags = tags.filter(t=>t!==tg); else tags.push(tg);
-            const newTags = tags.join(', ');
-            if (!(await commit({ id: pr.id, updates:{ tags: newTags } }))) return;   // erst Server, dann UI
-            f.properties.tags = newTags; b.classList.toggle('on'); applyFilter();
+            const newTags = tags.join(', '), alt = f.properties.tags||'';
+            f.properties.tags = newTags; b.classList.toggle('on'); applyFilter();   // sofort
+            if (!(await commit({ id: pr.id, updates:{ tags: newTags } }))){         // Rücknahme bei Fehler
+              f.properties.tags = alt; b.classList.toggle('on'); applyFilter(); }
           });
           // ✏️ Ebene 2: Bewertung / Preis / Typ (seltene Eingriffe, ein Tap dahinter)
           const editBox = el.querySelector('.p-edit');
@@ -756,11 +757,16 @@ function openPopup(feat){
             d.onclick = async () => {
               const f = feat(); if (!f) return;
               const [qv, pv] = RATE2QP[ck];
-              if (!(await commit({ id: pr.id, updates:{ qualitaet: qv, preis: pv } }))) return;   // erst Server, dann UI
-              f.properties.q = qv; f.properties.p = pv; refresh(f);
+              const altQ = f.properties.q, altP = f.properties.p;
+              f.properties.q = qv; f.properties.p = pv; refresh(f);                 // sofort reagieren
               dots.querySelectorAll('.a-dot').forEach(x => x.classList.remove('on')); d.classList.add('on');
               priceRow.querySelectorAll('.a-chip').forEach(x => x.classList.toggle('on', x.dataset.p === pv));
               toast(RLABEL[ck] + ' ✓');
+              if (!(await commit({ id: pr.id, updates:{ qualitaet: qv, preis: pv } }))){   // Rücknahme bei Fehler
+                f.properties.q = altQ; f.properties.p = altP; refresh(f);
+                dots.querySelectorAll('.a-dot').forEach((x,i) => x.classList.toggle('on', RATE_ORDER[i]===f.properties.rk));
+                priceRow.querySelectorAll('.a-chip').forEach(x => x.classList.toggle('on', x.dataset.p === altP));
+                toast('Zurückgenommen — nicht gespeichert'); }
             };
             dots.appendChild(d);
           }
@@ -770,12 +776,17 @@ function openPopup(feat){
             c.dataset.p = pv; c.textContent = lbl;
             c.onclick = async () => {
               const f = feat(); if (!f) return;
-              if (!(await commit({ id: pr.id, updates:{ preis: pv } }))) return;   // erst Server, dann UI
-              f.properties.p = pv; refresh(f);
+              const altP = f.properties.p;
+              f.properties.p = pv; refresh(f);                                     // sofort reagieren
               priceRow.querySelectorAll('.a-chip').forEach(x => x.classList.remove('on')); c.classList.add('on');
               dots.querySelectorAll('.a-dot').forEach((x, i) => x.classList.toggle('on',
                 RATE_ORDER[i] === f.properties.rk));
               toast('Preis: ' + lbl + ' ✓');
+              if (!(await commit({ id: pr.id, updates:{ preis: pv } }))){          // Rücknahme bei Fehler
+                f.properties.p = altP; refresh(f);
+                priceRow.querySelectorAll('.a-chip').forEach(x => x.classList.toggle('on', x.dataset.p === altP));
+                dots.querySelectorAll('.a-dot').forEach((x,i) => x.classList.toggle('on', RATE_ORDER[i]===f.properties.rk));
+                toast('Zurückgenommen — nicht gespeichert'); }
             };
             priceRow.appendChild(c);
           }
@@ -785,10 +796,14 @@ function openPopup(feat){
             c.textContent = TYP_SHORT[t] || t;
             c.onclick = async () => {
               const f = feat(); if (!f) return;
-              if (!(await commit({ id: pr.id, updates:{ typ: t } }))) return;   // erst Server, dann UI
-              f.properties.typ = t; refresh(f);
+              const altT = f.properties.typ;
+              f.properties.typ = t; refresh(f);                                  // sofort reagieren
               typRow.querySelectorAll('.a-chip').forEach(x => x.classList.remove('on')); c.classList.add('on');
               toast('Typ: ' + t + ' ✓');
+              if (!(await commit({ id: pr.id, updates:{ typ: t } }))){           // Rücknahme bei Fehler
+                f.properties.typ = altT; refresh(f);
+                typRow.querySelectorAll('.a-chip').forEach(x => x.classList.toggle('on', x.textContent===(TYP_SHORT[altT]||altT)));
+                toast('Zurückgenommen — nicht gespeichert'); }
             };
             typRow.appendChild(c);
           }

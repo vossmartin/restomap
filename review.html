@@ -285,14 +285,21 @@ async function actMatch(id, good){
   if (!(await commit({ action:'stageUpdate', id, value: good?'ja':'nein' }))) return;
   HANDLED.add('m'+id); draw(); toast(good ? 'Match bestätigt' : 'Match verworfen');
 }
+/* Graue-Stapel: ebenfalls sofort reagieren (Bewertung ist nicht destruktiv, Rücknahme bei Fehler). */
 async function actJudge(id, q){
   const r = byId[id];
   let updates, msg;
   if (q==='teuer'){ updates={ preis:'ueberteuert' }; msg=`${r.name}: zu teuer (P/L)`; }
   else if (q==='lila'){ updates={ qualitaet:'sehr_gut', preis:'teuer' }; msg=`${r.name}: Sehr gut · teuer`; }
   else { updates={ qualitaet:q }; msg=`${r.name}: ${RL[q]}`; }
-  if (!(await commit({ id, updates }))) return;
+  const seq = ++seqNr; PENDING.set(id, seq);
+  const vorher = {}; Object.keys(updates).forEach(k => vorher[k] = r[k]);
   Object.assign(r, updates); HANDLED.add('g'+id); draw(); toast(msg);
+  const ok = await commit({ id, updates });
+  if (PENDING.get(id) === seq){
+    PENDING.delete(id);
+    if (!ok){ Object.assign(r, vorher); HANDLED.delete('g'+id); draw(); toast('Zurückgenommen — nicht gespeichert'); }
+  }
 }
 async function actMergePair(keepId, archId){
   if (!(await commit({ action:'archive', id: archId }))) return;
@@ -384,20 +391,40 @@ function card(r, extra, btns){
 }
 
 /* ====== Datenqualitäts-Modus „Nach Typ": Editieren ====== */
-async function _save(r, updates){ if (!(await commit({ id:r.id, updates }))) return; Object.assign(r, updates);
-  if (active==='typ') renderTypbar();   // Zähler der Farb-Chips aktuell halten
-  drawList(); }
+/* ====== Sofort-Reaktion mit Rücknahme (schnell UND sicher) ======
+   Die UI aktualisiert SOFORT und speichert im Hintergrund. Scheitert der Schreibvorgang
+   (nach dem automatischen zweiten Versuch), wird die Änderung zurückgenommen und der rote
+   Banner erklärt warum — also nie ein stiller Verlust, aber auch kein Warten auf Google.
+   PENDING verhindert, dass eine späte Fehlermeldung eine NEUERE Eingabe überschreibt. */
+const PENDING = new Map(); let seqNr = 0;
+function refreshTyp(){ if (active==='typ') renderTypbar(); drawList(); }
+async function optimistisch(r, updates, msg){
+  const seq = ++seqNr; PENDING.set(r.id, seq);
+  const vorher = {}; Object.keys(updates).forEach(k => vorher[k] = r[k]);
+  Object.assign(r, updates); refreshTyp(); if (msg) toast(msg);
+  const ok = await commit({ id:r.id, updates });
+  if (PENDING.get(r.id) === seq){                 // nur reagieren, wenn kein neuerer Tap kam
+    PENDING.delete(r.id);
+    if (!ok){ Object.assign(r, vorher); refreshTyp(); toast('Zurückgenommen — nicht gespeichert'); }
+  }
+  return ok;
+}
+async function _save(r, updates){ return optimistisch(r, updates); }
 /* „Geprüft"-Haken: setzt geprueft_am=heute → Ort verschwindet für 12 Monate aus „Nach Typ".
    Wirkt NUR hier; Geschlossen/Temporär/Match/Duplikate/Graue zeigen den Ort weiterhin. */
 async function actGeprueft(id){
   const r = byId[id]; if(!r) return;
   const vorher = r.geprueft_am || '';
-  if (!(await commit({ id, updates:{ geprueft_am: heute() } }))) return;
-  r.geprueft_am = heute(); renderTypbar(); drawList();
+  const seq = ++seqNr; PENDING.set(id, seq);
+  r.geprueft_am = heute(); refreshTyp();            // Karte verschwindet SOFORT
   toastUndo(`${r.name}: geprüft ✓`, async () => {
-    if (!(await commit({ id, updates:{ geprueft_am: vorher } }))) return;
-    r.geprueft_am = vorher; renderTypbar(); drawList(); toast('Zurückgenommen');
+    await optimistisch(r, { geprueft_am: vorher }, 'Zurückgenommen');
   });
+  const ok = await commit({ id, updates:{ geprueft_am: heute() } });
+  if (PENDING.get(id) === seq){
+    PENDING.delete(id);
+    if (!ok){ r.geprueft_am = vorher; refreshTyp(); toast('Zurückgenommen — nicht gespeichert'); }
+  }
 }
 function setTyp(id, t){ const r=byId[id]; if(!r || r.typ===t) return; _save(r,{ typ:t }); toast('Typ: '+t); }
 function setKueche(id, k){ const r=byId[id]; if(!r) return;
