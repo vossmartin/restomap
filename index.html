@@ -410,16 +410,35 @@ function toast(msg, ms=2500){
   t.textContent = msg; t.style.display='block';
   clearTimeout(t._h); t._h = setTimeout(()=>t.style.display='none', ms);
 }
-let lastErr = '';
+let lastErr = '', lastErrDetail = '';
+/* Ein Versuch. Wirft mit .code: 'http:<status>' | 'parse' (Antwort war kein JSON — Apps Script
+   liefert sporadisch eine Google-Drive-Fehlerseite) | 'netz' (Anfrage kam nicht durch / CORS). */
+async function postOnce(wu, payload){
+  let res;
+  try { res = await fetch(wu, { method:'POST', body: JSON.stringify({ token:getToken(), ...payload }) }); }
+  catch(e){ const err=new Error('netz'); err.code='netz'; err.detail=String(e.message||e); throw err; }
+  const txt = await res.text();
+  if (!res.ok){ const err=new Error('http'); err.code='http:'+res.status; err.detail=txt.slice(0,160); throw err; }
+  try { return JSON.parse(txt); }
+  catch(_){ const err=new Error('parse'); err.code='parse'; err.detail=txt.slice(0,160); throw err; }
+}
+/* Transiente Google-Aussetzer einmal still wiederholen; fachliche Fehler (ok:false) nicht. */
 async function postJson(payload){
   let wu = getWriteUrl(); if (!wu) wu = askWriteUrl();
   if (!wu) { toast('Keine Schreib-URL hinterlegt.'); return null; }
-  try {
-    const res = await fetch(wu, { method:'POST', body: JSON.stringify({ token:getToken(), ...payload }) });
-    const j = await res.json();
-    if (!j.ok) { lastErr = j.error||'?'; toast('Fehler: ' + lastErr); return null; }
-    lastErr = ''; return j;
-  } catch(e) { lastErr = 'netz'; toast('Speichern fehlgeschlagen (Netz?)'); return null; }
+  for (let versuch=1; versuch<=2; versuch++){
+    try {
+      const j = await postOnce(wu, payload);
+      if (!j.ok) { lastErr = j.error||'?'; lastErrDetail=''; toast('Fehler: ' + lastErr); return null; }
+      lastErr = ''; lastErrDetail=''; return j;
+    } catch(e) {
+      lastErr = e.code || 'netz'; lastErrDetail = e.detail || '';
+      console.warn('[restomap] Schreibversuch '+versuch+' fehlgeschlagen:', lastErr, lastErrDetail);
+      if (versuch===1){ await new Promise(r=>setTimeout(r, 900)); continue; }
+      toast('Nicht gespeichert (' + lastErr + ')');
+      return null;
+    }
+  }
 }
 /* Warn-Banner + ehrliche Speicherung (deckungsgleich mit review.html) */
 function saveBanner(){ let b=document.getElementById('saveErr');
@@ -436,8 +455,21 @@ function saveErrShow(html){ const b=saveBanner(); b.querySelector('#saveErrTxt')
 function saveErrHide(){ const b=document.getElementById('saveErr'); if(b) b.style.display='none'; }
 const ERR_AUTH='<b>Nicht gespeichert — Edit-Zugang abgelaufen.</b> Öffne einmal deinen aktuellen Edit-Link '
   +'(<code>?edit=…</code>) auf diesem Gerät, dann tippe erneut. Bis dahin wird nichts gesichert.';
+/* Klartext statt Fehlercode — sagt, was zu prüfen ist (deckungsgleich mit review.html). */
+function errText(code){
+  if (code==='auth') return ERR_AUTH;
+  if (code==='netz') return '<b>Nicht gespeichert — Server nicht erreichbar.</b> Die Anfrage kam nicht bei Google an '
+    + '(auch nach einem automatischen zweiten Versuch). Meist ein vorübergehender Apps-Script-Aussetzer — '
+    + 'gleich nochmal tippen. Hält es an: <code>/exec</code> im Browser öffnen, dort sollte <code>version:7</code> stehen.';
+  if (code==='parse') return '<b>Nicht gespeichert — unerwartete Antwort von Google.</b> Statt JSON kam eine '
+    + 'HTML-Seite (typisch: vorübergehende Google-Störung, seltener eine abgelaufene Bereitstellung). '
+    + 'Gleich nochmal versuchen; hält es an, <code>/exec</code> im Browser prüfen.';
+  if (String(code).startsWith('http:')) return '<b>Nicht gespeichert — Google antwortete mit '+esc(code)+'.</b> '
+    + 'Bei 401/403 stimmt der Zugriff der Bereitstellung nicht; bei 5xx ist es meist vorübergehend.';
+  return '<b>Nicht gespeichert</b> (Fehler: '+esc(code||'?')+'). Bitte erneut versuchen.';
+}
 async function commit(payload){ const ok=!!(await postJson(payload));
-  if(!ok) saveErrShow(lastErr==='auth'?ERR_AUTH:'<b>Nicht gespeichert</b> (Fehler: '+esc(lastErr||'?')+'). Bitte erneut versuchen.');
+  if(!ok) saveErrShow(errText(lastErr) + (lastErrDetail ? '<br><small>Antwort: '+esc(lastErrDetail)+'</small>' : ''));
   else saveErrHide(); return ok; }
 async function saveField(id, updates){ return await commit({ id, updates }); }
 /* Startpruefung: nur bei eindeutigem Auth-Fehler warnen (Alt-Skript ohne "ping"/Netz-Wackler -> kein Banner). */

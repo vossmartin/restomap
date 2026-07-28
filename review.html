@@ -91,6 +91,9 @@ const WRITE_URL = "https://script.google.com/macros/s/AKfycbyxI4tO5BqzceSnml-mbC
 const PAGE = 20;
 
 function getToken(){ try { return localStorage.getItem('rm_token') || ''; } catch(e){ return ''; } }
+/* Schreib-URL wie in index.html: eine per Karte hinterlegte URL gewinnt (sonst laufen Karte und
+   Review nach einem NEUEN Apps-Script-Deployment auf verschiedene Endpunkte). */
+function getWriteUrl(){ try { return localStorage.getItem('rm_write_url') || WRITE_URL; } catch(e){ return WRITE_URL; } }
 const urlParams = new URLSearchParams(location.search);
 if (urlParams.get('edit')) { try { localStorage.setItem('rm_token', urlParams.get('edit')); } catch(e){}
   history.replaceState(null,'',location.pathname); }
@@ -103,15 +106,35 @@ function toastUndo(m, fn, ms=7000){ const t=document.getElementById('toast');
   t.querySelector('.undo').onclick = () => { t.style.display='none'; fn(); };
   t.style.display='block'; clearTimeout(t._h); t._h=setTimeout(()=>t.style.display='none', ms); }
 
-let lastErr = '';
+let lastErr = '', lastErrDetail = '';
 async function post(payload){ return !!(await postJson(payload)); }
+/* Ein Versuch. Wirft mit .code: 'http:<status>' | 'parse' (Antwort war kein JSON, meist eine
+   Google-Fehlerseite) | 'netz' (Anfrage kam gar nicht durch / CORS). */
+async function postOnce(payload){
+  let res;
+  try { res = await fetch(getWriteUrl(), { method:'POST', body: JSON.stringify({ token:getToken(), ...payload }) }); }
+  catch(e){ const err=new Error('netz'); err.code='netz'; err.detail=String(e.message||e); throw err; }
+  const txt = await res.text();
+  if (!res.ok){ const err=new Error('http'); err.code='http:'+res.status; err.detail=txt.slice(0,160); throw err; }
+  try { return JSON.parse(txt); }
+  catch(_){ const err=new Error('parse'); err.code='parse'; err.detail=txt.slice(0,160); throw err; }
+}
+/* Transiente Fehler (Apps Script antwortet gelegentlich mit einer Fehlerseite) einmal still
+   wiederholen. Fachliche Fehler (ok:false, z. B. auth/schema) werden NICHT wiederholt. */
 async function postJson(payload){
-  try {
-    const res = await fetch(WRITE_URL, { method:'POST', body: JSON.stringify({ token:getToken(), ...payload }) });
-    const j = await res.json();
-    if (!j.ok) { lastErr = j.error||'?'; toast('Fehler: ' + lastErr); return null; }
-    lastErr = ''; return j;
-  } catch(e){ lastErr = 'netz'; toast('Netzfehler — Aktion nicht gespeichert'); return null; }
+  for (let versuch=1; versuch<=2; versuch++){
+    try {
+      const j = await postOnce(payload);
+      if (!j.ok){ lastErr = j.error||'?'; lastErrDetail=''; toast('Fehler: ' + lastErr); return null; }
+      lastErr = ''; lastErrDetail=''; return j;
+    } catch(e){
+      lastErr = e.code || 'netz'; lastErrDetail = e.detail || '';
+      console.warn('[restomap review] Schreibversuch '+versuch+' fehlgeschlagen:', lastErr, lastErrDetail);
+      if (versuch===1){ await new Promise(r=>setTimeout(r, 900)); continue; }   // stiller Wiederholversuch
+      toast('Nicht gespeichert (' + lastErr + ')');
+      return null;
+    }
+  }
 }
 /* Ehrliche Speicherung: schreibt und meldet Erfolg zurück; bei Fehler bleibt der Dauer-Banner stehen. */
 function saveErrShow(msg){ document.getElementById('saveErrTxt').innerHTML = msg;
@@ -119,10 +142,27 @@ function saveErrShow(msg){ document.getElementById('saveErrTxt').innerHTML = msg
 function saveErrHide(){ document.getElementById('saveErr').style.display='none'; }
 const ERR_AUTH = '<b>Nicht gespeichert — Edit-Zugang abgelaufen.</b> Öffne einmal deinen aktuellen Edit-Link '
   + '(<code>?edit=…</code>) auf diesem Gerät, dann tippe erneut. Bis dahin wird nichts gesichert.';
+/* Klartext statt Fehlercode — sagt, was zu prüfen ist. */
+function errText(code){
+  if (code==='auth') return ERR_AUTH;
+  if (code==='netz') return '<b>Nicht gespeichert — Server nicht erreichbar.</b> Die Anfrage kam nicht bei Google an '
+    + '(auch nach einem automatischen zweiten Versuch). Häufigste Ursache ist nicht das Internet, sondern eine '
+    + '<b>veraltete Schreib-URL</b>: Wenn das Apps Script als <i>neues</i> Deployment statt als neue Version '
+    + 'veröffentlicht wurde, ändert sich die <code>/exec</code>-Adresse. Prüfen: Apps Script → Bereitstellen → '
+    + 'Bereitstellungen verwalten → URL mit der in dieser Datei vergleichen.';
+  if (code==='parse') return '<b>Nicht gespeichert — unerwartete Antwort von Google.</b> Statt JSON kam eine '
+    + 'HTML-Seite zurück (typisch bei abgelaufener Bereitstellung, fehlendem Zugriff „Jeder“, oder einer '
+    + 'Google-Störung). Prüfen: <code>/exec</code> im Browser öffnen — es sollte <code>version:7</code> zeigen.';
+  if (String(code).startsWith('http:')) return '<b>Nicht gespeichert — Google antwortete mit '+esc(code)+'.</b> '
+    + 'Bei 401/403 stimmt der Zugriff der Bereitstellung nicht („Ausführen als: Ich“, „Zugriff: Jeder“); '
+    + 'bei 5xx ist es meist vorübergehend.';
+  if (String(code).startsWith('schema')) return '<b>Nicht gespeichert — Schema-Fehler:</b> '+esc(code)
+    + '. Läuft schon die neue <code>Code-v7.gs</code> (mit <code>geprueft_am</code>) als Bereitstellung?';
+  return '<b>Nicht gespeichert</b> (Fehler: '+esc(code||'?')+'). Bitte erneut versuchen.';
+}
 async function commit(payload){
   const ok = !!(await postJson(payload));
-  if (!ok){ saveErrShow(lastErr==='auth' ? ERR_AUTH
-      : '<b>Nicht gespeichert</b> (Fehler: '+esc(lastErr||'?')+'). Bitte erneut versuchen.'); }
+  if (!ok){ saveErrShow(errText(lastErr) + (lastErrDetail ? '<br><small>Antwort: '+esc(lastErrDetail)+'</small>' : '')); }
   else { saveErrHide(); }
   return ok;
 }
@@ -499,7 +539,7 @@ function schemaWarn(recs){
 /* Nur bei echtem Auth-Fehler warnen; ein Netz-Wackler oder ein Alt-Skript ohne "ping" loest KEINEN Banner aus. */
 async function checkAuth(){
   try {
-    const res = await fetch(WRITE_URL, { method:'POST', body: JSON.stringify({ token:getToken(), action:'ping' }) });
+    const res = await fetch(getWriteUrl(), { method:'POST', body: JSON.stringify({ token:getToken(), action:'ping' }) });
     const j = await res.json();
     if (j && j.error==='auth') saveErrShow(ERR_AUTH);   // nur der eindeutige Token-Fehler
   } catch(e){ /* Netzfehler beim Laden ignorieren */ }
