@@ -35,6 +35,8 @@
   .b-teuer { background:var(--orange); } .b-grau { background:#c9c9cd; color:#333; }
   .b-blau { background:var(--blau); } .b-lila { background:var(--lila); }
   .b-merge { background:var(--ink); }
+  .b-done { background:var(--gruen); width:100%; }
+  #toast .undo { margin-left:10px; text-decoration:underline; font-weight:700; cursor:pointer; }
   #more { margin:6px 16px 20px; width:calc(100% - 32px); padding:12px; border:1px dashed var(--line);
           background:#fff; border-radius:12px; font-size:14px; color:var(--muted); }
   #toast { position:fixed; bottom:24px; left:50%; transform:translateX(-50%); background:rgba(28,28,30,.92);
@@ -47,6 +49,11 @@
   .tchips::-webkit-scrollbar { display:none; }
   .tchip { flex:0 0 auto; border:1px solid var(--line); background:#fff; border-radius:9px; padding:5px 9px; font-size:12px; white-space:nowrap; }
   .tchip.on { background:var(--ink); color:#fff; border-color:var(--ink); }
+  .tchips.rate { margin-top:2px; }
+  .tchips.status .tchip { font-weight:600; }
+  .fortschritt { font-size:12px; color:var(--muted); padding:2px 0 5px; }
+  .fortschritt b { color:var(--ink); }
+  .tchip .sw { width:10px; height:10px; border-radius:50%; margin-right:5px; box-shadow:0 0 0 1px rgba(0,0,0,.15); }
   #tsearch { width:100%; margin-top:4px; padding:8px 10px; border:1px solid var(--line); border-radius:9px; font-size:14px; }
   .te-lbl { font-size:11px; color:var(--muted); margin:9px 0 3px; font-weight:600; }
   .te-row { display:flex; flex-wrap:wrap; gap:6px; }
@@ -90,6 +97,11 @@ if (urlParams.get('edit')) { try { localStorage.setItem('rm_token', urlParams.ge
 
 function toast(m, ms=2200){ const t=document.getElementById('toast'); t.textContent=m; t.style.display='block';
   clearTimeout(t._h); t._h=setTimeout(()=>t.style.display='none', ms); }
+/* Toast mit Rückgängig-Link (Sicherheitsnetz: Geprüfte sind sonst 12 Monate unsichtbar) */
+function toastUndo(m, fn, ms=7000){ const t=document.getElementById('toast');
+  t.innerHTML = esc(m) + '<span class="undo">Rückgängig</span>';
+  t.querySelector('.undo').onclick = () => { t.style.display='none'; fn(); };
+  t.style.display='block'; clearTimeout(t._h); t._h=setTimeout(()=>t.style.display='none', ms); }
 
 let lastErr = '';
 async function post(payload){ return !!(await postJson(payload)); }
@@ -157,7 +169,19 @@ function ratingKey(q,p){ q=normQ(q,p);
 const KUECHEN_ASIA = ['vietnamesisch','thai','chinesisch','koreanisch','japanisch','indisch','sonstige-asiatisch'];
 const ANLASS_KEYS = ['fruehstueck','brunch','lunch','kaffee','dinner','drinks','music'];
 const PRICES = [['guenstig','€'],['normal','€€'],['teuer','€€€'],['ueberteuert','€€€!']];
-let typFilter = '', typSearch = '';
+let typFilter = '', typSearch = '', rateFilter = '', statusFilter = '';   // Filter im Modus „Nach Typ"
+const STATUS_OPT = [['','Beide'],['besucht','Besucht'],['wunschliste','Watchlist']];
+
+/* ====== „Geprüft"-Haken (nur Modus „Nach Typ"; andere Stapel bleiben unberührt) ====== */
+const GEPRUEFT_MONATE = 12;
+function heute(){ return new Date().toLocaleDateString('sv-SE'); }   // YYYY-MM-DD, lokale Zeit
+/** true = in den letzten 12 Monaten geprüft (→ ausgeblendet). Unlesbare/leere Daten = nicht geprüft. */
+function istGeprueft(r){
+  const d = (r.geprueft_am||'').trim();
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(d)) return false;
+  const grenze = new Date(); grenze.setMonth(grenze.getMonth() - GEPRUEFT_MONATE);
+  return new Date(d+'T00:00:00') > grenze;
+}
 
 function gmaps(r){ return `https://www.google.com/maps/search/?api=1&query=${r.lat},${r.lon}`; }
 function meta(r){ return `${r.typ} · ${r.status==='besucht'?'Besucht':'Watchlist'} · ${RL[r.qualitaet]||r.qualitaet}${r.preis==='ueberteuert'?' · zu teuer':''}${r.notiz?' · '+r.notiz:''}`; }
@@ -183,9 +207,14 @@ function qDupes(){
 function qGrau(){ return main.filter(r => r.qualitaet==='unbewertet' && r.preis!=='ueberteuert'
   && r.status==='besucht' && !HANDLED.has('g'+r.id)); }
 
+/* Filter-Kaskade „Nach Typ": Status → Typ → Farbe → Suche.
+   Jede Ebene zählt auf Basis der Ebenen darüber; „geprüft" ist überall ausgeblendet. */
+function qTypStatusAll(){ return statusFilter ? main.filter(r => (r.status||'') === statusFilter) : main.slice(); }
+function qTypOffen(){ return qTypStatusAll().filter(r => !istGeprueft(r)); }
+function qTypByType(){ const a=qTypOffen(); return typFilter ? a.filter(r => (r.typ||'') === typFilter) : a; }
 function qTyp(){
-  let a = main.slice();
-  if (typFilter) a = a.filter(r => (r.typ||'') === typFilter);
+  let a = qTypByType();
+  if (rateFilter) a = a.filter(r => ratingKey(r.qualitaet, r.preis) === rateFilter);
   if (typSearch){ const q = typSearch.toLowerCase(); a = a.filter(r => (r.name||'').toLowerCase().includes(q)); }
   a.sort((x,y)=> (x.typ||'').localeCompare(y.typ||'') || (x.name||'').localeCompare(y.name||''));
   return a;
@@ -315,7 +344,21 @@ function card(r, extra, btns){
 }
 
 /* ====== Datenqualitäts-Modus „Nach Typ": Editieren ====== */
-async function _save(r, updates){ if (!(await commit({ id:r.id, updates }))) return; Object.assign(r, updates); drawList(); }
+async function _save(r, updates){ if (!(await commit({ id:r.id, updates }))) return; Object.assign(r, updates);
+  if (active==='typ') renderTypbar();   // Zähler der Farb-Chips aktuell halten
+  drawList(); }
+/* „Geprüft"-Haken: setzt geprueft_am=heute → Ort verschwindet für 12 Monate aus „Nach Typ".
+   Wirkt NUR hier; Geschlossen/Temporär/Match/Duplikate/Graue zeigen den Ort weiterhin. */
+async function actGeprueft(id){
+  const r = byId[id]; if(!r) return;
+  const vorher = r.geprueft_am || '';
+  if (!(await commit({ id, updates:{ geprueft_am: heute() } }))) return;
+  r.geprueft_am = heute(); renderTypbar(); drawList();
+  toastUndo(`${r.name}: geprüft ✓`, async () => {
+    if (!(await commit({ id, updates:{ geprueft_am: vorher } }))) return;
+    r.geprueft_am = vorher; renderTypbar(); drawList(); toast('Zurückgenommen');
+  });
+}
 function setTyp(id, t){ const r=byId[id]; if(!r || r.typ===t) return; _save(r,{ typ:t }); toast('Typ: '+t); }
 function setKueche(id, k){ const r=byId[id]; if(!r) return;
   const v = (r.kueche===k) ? '' : k;             // erneuter Tap löscht (zurück auf „offen")
@@ -348,22 +391,47 @@ function renderTypEdit(r){
     <div class="te-lbl">Preis</div><div class="te-row">${priceChips}</div>
     <div class="te-lbl">Anlass</div><div class="te-row">${anlassChips}</div>
     ${kuecheBlock}
+    <div class="btns"><button class="b-done" onclick="actGeprueft('${r.id}')">✓ Geprüft — für 12 Monate erledigt</button></div>
   </div>`;
 }
 function renderTypbar(){
   const tb=document.getElementById('typbar');
   if (active!=='typ'){ tb.style.display='none'; return; }
   tb.style.display='block';
-  const counts={}; main.forEach(r=>{ const t=r.typ||'—'; counts[t]=(counts[t]||0)+1; });
+  // Status-Zeile (Besucht/Watchlist getrennt durchgehen); Zähler = noch offene Orte je Status
+  const sChips = STATUS_OPT.map(([v,lbl])=>{
+    const n = main.filter(r => (!v || (r.status||'')===v) && !istGeprueft(r)).length;
+    return `<button class="tchip${statusFilter===v?' on':''}" onclick="pickStatus('${v}')">${lbl} <b>${n}</b></button>`;
+  }).join('');
+  // Zähler zeigen nur OFFENE (nicht geprüfte) Orte — die Liste schrumpft beim Durcharbeiten
+  const offen = qTypOffen();
+  const counts={}; offen.forEach(r=>{ const t=r.typ||'—'; counts[t]=(counts[t]||0)+1; });
   const chips = [''].concat(TYPES).map(t=>{
     const lbl = t===''?'Alle':(TYP_SHORT[t]||t);
-    const n = t===''?main.length:(counts[t]||0);
+    const n = t===''?offen.length:(counts[t]||0);
     return `<button class="tchip${typFilter===t?' on':''}" onclick="pickTyp('${t}')">${esc(lbl)} <b>${n}</b></button>`;
   }).join('');
-  tb.innerHTML = `<div class="tchips">${chips}</div>`+
-    `<input id="tsearch" placeholder="Name suchen …" value="${esc(typSearch)}" oninput="typSearch=this.value; drawList();">`;
+  // Fortschritt im Rahmen der Status-Auswahl (Besucht und Watchlist getrennt zählbar)
+  const imStatus = qTypStatusAll();
+  const fertig = imStatus.length - offen.length;
+  const sLbl = statusFilter ? (STATUS_OPT.find(o=>o[0]===statusFilter)[1]+': ') : '';
+  const fortschritt = `<div class="fortschritt">${sLbl}${fertig} von ${imStatus.length} geprüft · <b>${offen.length} offen</b></div>`;
+  // Farb-Bewertungs-Filter: Zähler beziehen sich auf die aktuelle Typ-Auswahl
+  const base = qTypByType();
+  const rCounts={}; base.forEach(r=>{ const k=ratingKey(r.qualitaet,r.preis); rCounts[k]=(rCounts[k]||0)+1; });
+  const rChips = [''].concat(RATE_ORDER).map(ck=>{
+    if (ck==='') return `<button class="tchip${rateFilter===''?' on':''}" onclick="pickRate('')">Alle Farben <b>${base.length}</b></button>`;
+    const dim = ck==='unbew' ? `;opacity:${UNBEW_ALPHA}` : '';
+    return `<button class="tchip${rateFilter===ck?' on':''}" onclick="pickRate('${ck}')">`
+         + `<span class="sw" style="background:${COLORS[ck]}${dim}"></span>${esc(RATE_LBL[ck])} <b>${rCounts[ck]||0}</b></button>`;
+  }).join('');
+  tb.innerHTML = fortschritt + `<div class="tchips status">${sChips}</div>`
+    + `<div class="tchips">${chips}</div><div class="tchips rate">${rChips}</div>`
+    + `<input id="tsearch" placeholder="Name suchen …" value="${esc(typSearch)}" oninput="typSearch=this.value; drawList();">`;
 }
 function pickTyp(t){ typFilter=t; shown=PAGE; renderTypbar(); drawList(); window.scrollTo(0,0); }
+function pickRate(ck){ rateFilter=ck; shown=PAGE; renderTypbar(); drawList(); window.scrollTo(0,0); }
+function pickStatus(v){ statusFilter=v; shown=PAGE; renderTypbar(); drawList(); window.scrollTo(0,0); }
 
 /* ====== Draw ====== */
 function drawList(){
