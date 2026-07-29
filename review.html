@@ -36,6 +36,7 @@
   .b-teuer { background:var(--orange); } .b-grau { background:#c9c9cd; color:#333; }
   .b-blau { background:var(--blau); } .b-lila { background:var(--lila); }
   .b-merge { background:var(--ink); }
+  .b-status { background:var(--ink); flex:0 0 auto; }
   .b-done { background:var(--gruen); flex:1 1 auto; }
   .b-arch2 { flex:0 0 auto; opacity:.75; }            /* dezenter als der Haupt-Knopf */
   .b-arch2.armed { opacity:1; background:#5c0f18; box-shadow:0 0 0 2px var(--rot); }
@@ -76,7 +77,7 @@
 <div id="saveErr"><button class="x" onclick="saveErrHide()" title="Ausblenden">×</button><span id="saveErrTxt"></span></div>
 <div id="gate" style="display:none">Diese Seite braucht den Edit-Zugang. Öffne einmal die Karte über Deinen Edit-Link (<code>?edit=…</code>) auf diesem Gerät — danach funktioniert auch das Review.</div>
 <header style="display:none" id="hdr">
-  <h1>Review <span id="build" title="Welcher Stand läuft gerade? (Cache-Kontrolle)">b28-4</span></h1>
+  <h1>Review <span id="build" title="Welcher Stand läuft gerade? (Cache-Kontrolle)">b28-5</span></h1>
   <div class="sub" id="subtitle">lädt …</div>
 </header>
 <div id="stacks" style="display:none"></div>
@@ -494,6 +495,13 @@ function setKueche(id, k){ const r=byId[id]; if(!r) return;
   _save(r,{ kueche:v }); toast(v ? 'Küche: '+v : 'Küche gelöscht'); }
 function setRate(id, ck){ const r=byId[id]; if(!r) return; const qp=RATE2QP[ck]; _save(r,{ qualitaet:qp[0], preis:qp[1] }); toast(RATE_LBL[ck]+' ✓'); }
 function setPreis(id, p){ const r=byId[id]; if(!r || r.preis===p) return; _save(r,{ preis:p }); toast('Preis ✓'); }
+/* Status im Modus „Nach Typ" umschalten (Watchlist ↔ Besucht). Setzt bewusst KEIN `besucht_am` —
+   beim Review ist das Datum unbekannt; „Heute hier gewesen" in der Karte bleibt dafür zuständig.
+   Bei aktivem Status-Filter verschwindet die Karte danach aus der Auswahl (passtInAuswahl). */
+function setStatusTyp(id){ const r=byId[id]; if(!r) return;
+  const neu = r.status==='besucht' ? 'wunschliste' : 'besucht';
+  optimistisch(r, { status: neu }, neu==='besucht' ? `${r.name}: besucht ✓` : `${r.name}: zurück auf die Watchlist`);
+}
 function toggleAnlass(id, tag){ const r=byId[id]; if(!r) return;
   let tags=(r.tags||'').split(',').map(x=>x.trim()).filter(Boolean);
   tags = tags.includes(tag) ? tags.filter(x=>x!==tag) : tags.concat(tag);
@@ -521,6 +529,8 @@ function renderTypEdit(r){
     <div class="te-lbl">Anlass</div><div class="te-row">${anlassChips}</div>
     ${kuecheBlock}
     <div class="btns">
+      <button class="b-status" onclick="setStatusTyp('${r.id}')">${r.status==='besucht'
+        ? '↩︎ Zurück auf die Watchlist' : '✓ Als besucht markieren'}</button>
       <button class="b-done" onclick="actGeprueft('${r.id}')">✓ Geprüft — für 12 Monate erledigt</button>
       <button class="b-arch b-arch2" onclick="actArchivTyp('${r.id}', this)">🗑 Gibt's nicht mehr</button>
     </div>
