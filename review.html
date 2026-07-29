@@ -14,6 +14,7 @@
          background:#f4f4f2; color:var(--ink); padding-bottom:40px; }
   header { padding:calc(14px + env(safe-area-inset-top)) 16px 10px; }
   h1 { font-size:18px; margin:0 0 2px; } .sub { font-size:13px; color:var(--muted); }
+  #build { font-size:10px; font-weight:400; color:var(--muted); vertical-align:super; letter-spacing:.3px; }
   #stacks { display:flex; gap:8px; overflow-x:auto; padding:10px 16px; scrollbar-width:none; }
   #stacks::-webkit-scrollbar { display:none; }
   .stack { flex:0 0 auto; border:1px solid var(--line); background:#fff; border-radius:12px;
@@ -35,7 +36,9 @@
   .b-teuer { background:var(--orange); } .b-grau { background:#c9c9cd; color:#333; }
   .b-blau { background:var(--blau); } .b-lila { background:var(--lila); }
   .b-merge { background:var(--ink); }
-  .b-done { background:var(--gruen); width:100%; }
+  .b-done { background:var(--gruen); flex:1 1 auto; }
+  .b-arch2 { flex:0 0 auto; opacity:.75; }            /* dezenter als der Haupt-Knopf */
+  .b-arch2.armed { opacity:1; background:#5c0f18; box-shadow:0 0 0 2px var(--rot); }
   #toast .undo { margin-left:10px; text-decoration:underline; font-weight:700; cursor:pointer; }
   #more { margin:6px 16px 20px; width:calc(100% - 32px); padding:12px; border:1px dashed var(--line);
           background:#fff; border-radius:12px; font-size:14px; color:var(--muted); }
@@ -73,7 +76,7 @@
 <div id="saveErr"><button class="x" onclick="saveErrHide()" title="Ausblenden">×</button><span id="saveErrTxt"></span></div>
 <div id="gate" style="display:none">Diese Seite braucht den Edit-Zugang. Öffne einmal die Karte über Deinen Edit-Link (<code>?edit=…</code>) auf diesem Gerät — danach funktioniert auch das Review.</div>
 <header style="display:none" id="hdr">
-  <h1>Review</h1>
+  <h1>Review <span id="build" title="Welcher Stand läuft gerade? (Cache-Kontrolle)">b28-4</span></h1>
   <div class="sub" id="subtitle">lädt …</div>
 </header>
 <div id="stacks" style="display:none"></div>
@@ -270,6 +273,23 @@ const STACKS = [
 let active = 'closed', shown = PAGE;
 
 /* ====== Aktionen ====== */
+/* „Gibt's nicht mehr" im Modus „Nach Typ" — für Läden, die Google noch als offen führt.
+   Zwei Schritte, weil der Knopf direkt neben dem oft getippten Haken sitzt und Archivieren
+   destruktiv ist (Zeile wandert ins archiv-Tab; Rückholen nur von Hand im Sheet).
+   Nach 4 Sekunden ohne zweiten Tap entschärft er sich von selbst. */
+function actArchivTyp(id, btn){
+  if (btn.dataset.armed !== '1'){
+    btn.dataset.scharf = btn.textContent;
+    btn.dataset.armed = '1'; btn.textContent = '⚠︎ Wirklich? Nochmal tippen';
+    btn.classList.add('armed');
+    clearTimeout(btn._t);
+    btn._t = setTimeout(()=>{ btn.dataset.armed='0'; btn.textContent = btn.dataset.scharf;
+      btn.classList.remove('armed'); }, 4000);
+    return;
+  }
+  clearTimeout(btn._t); btn.dataset.armed='0';
+  actArchive(id, 'y');   // eigene HANDLED-Marke; wartet auf Server-Bestätigung (destruktiv)
+}
 async function actArchive(id, mark){
   const r = byId[id];
   if (!(await commit({ action:'archive', id }))) return;   // Fehler → Eintrag bleibt stehen
@@ -397,15 +417,57 @@ function card(r, extra, btns){
    Banner erklärt warum — also nie ein stiller Verlust, aber auch kein Warten auf Google.
    PENDING verhindert, dass eine späte Fehlermeldung eine NEUERE Eingabe überschreibt. */
 const PENDING = new Map(); let seqNr = 0;
-function refreshTyp(){ if (active==='typ') renderTypbar(); drawList(); }
+
+/* --- Schlanke Aktualisierung: nur die betroffene Karte + die Zahlen, statt der ganzen Liste.
+   (Voller Neuaufbau kostet bei 20–60 Karten ~900–2.800 Buttons; das ist auf dem Handy spürbar.) --- */
+function refreshCard(r){
+  const el = document.querySelector('.card[data-id="'+r.id+'"]');
+  if (!el) { drawList(); return; }
+  const tmp = document.createElement('div'); tmp.innerHTML = renderTypEdit(r);
+  el.replaceWith(tmp.firstElementChild);
+}
+/** Nur die Zähler/Fortschritt neu schreiben — Chips und Suchfeld bleiben unangetastet (kein Fokusverlust). */
+function updateCounts(){
+  const tb = document.getElementById('typbar');
+  if (!tb || active!=='typ' || !tb.querySelector('[data-tc]')) return;
+  const offen = qTypOffen(), imStatus = qTypStatusAll();
+  const setN = (sel, n) => { const b = tb.querySelector(sel+' b'); if (b) b.textContent = n; };
+  STATUS_OPT.forEach(([v]) => setN('[data-sc="'+v+'"]',
+    main.filter(r => (!v || (r.status||'')===v) && !istGeprueft(r)).length));
+  const tCounts={}; offen.forEach(r=>{ const t=r.typ||'—'; tCounts[t]=(tCounts[t]||0)+1; });
+  setN('[data-tc=""]', offen.length);
+  TYPES.forEach(t => setN('[data-tc="'+t.replace(/"/g,'&quot;')+'"]', tCounts[t]||0));
+  const base = qTypByType(), rCounts={};
+  base.forEach(r=>{ const k=ratingKey(r.qualitaet,r.preis); rCounts[k]=(rCounts[k]||0)+1; });
+  setN('[data-rc=""]', base.length);
+  RATE_ORDER.forEach(ck => setN('[data-rc="'+ck+'"]', rCounts[ck]||0));
+  const f = tb.querySelector('.fortschritt');
+  if (f){ const sLbl = statusFilter ? (STATUS_OPT.find(o=>o[0]===statusFilter)[1]+': ') : '';
+    f.innerHTML = `${sLbl}${imStatus.length-offen.length} von ${imStatus.length} geprüft · <b>${offen.length} offen</b>`; }
+}
+/** Bleibt der Ort nach der Änderung überhaupt in der aktuellen Auswahl? */
+function passtInAuswahl(r){
+  if (istGeprueft(r)) return false;
+  if (statusFilter && (r.status||'') !== statusFilter) return false;
+  if (typFilter && (r.typ||'') !== typFilter) return false;
+  if (rateFilter && ratingKey(r.qualitaet, r.preis) !== rateFilter) return false;
+  return true;
+}
+/** Karte fällt aus der Auswahl → nur sie entfernen; sonst nur sie neu zeichnen. Kein Voll-Rebuild. */
+function refreshTyp(r){
+  if (active!=='typ' || !r){ if (active==='typ') renderTypbar(); drawList(); return; }
+  if (passtInAuswahl(r)) refreshCard(r);
+  else { const el=document.querySelector('.card[data-id="'+r.id+'"]'); if (el) el.remove(); else drawList(); }
+  updateCounts();
+}
 async function optimistisch(r, updates, msg){
   const seq = ++seqNr; PENDING.set(r.id, seq);
   const vorher = {}; Object.keys(updates).forEach(k => vorher[k] = r[k]);
-  Object.assign(r, updates); refreshTyp(); if (msg) toast(msg);
+  Object.assign(r, updates); refreshTyp(r); if (msg) toast(msg);
   const ok = await commit({ id:r.id, updates });
   if (PENDING.get(r.id) === seq){                 // nur reagieren, wenn kein neuerer Tap kam
     PENDING.delete(r.id);
-    if (!ok){ Object.assign(r, vorher); refreshTyp(); toast('Zurückgenommen — nicht gespeichert'); }
+    if (!ok){ Object.assign(r, vorher); refreshTyp(r); toast('Zurückgenommen — nicht gespeichert'); }
   }
   return ok;
 }
@@ -416,14 +478,14 @@ async function actGeprueft(id){
   const r = byId[id]; if(!r) return;
   const vorher = r.geprueft_am || '';
   const seq = ++seqNr; PENDING.set(id, seq);
-  r.geprueft_am = heute(); refreshTyp();            // Karte verschwindet SOFORT
+  r.geprueft_am = heute(); refreshTyp(r);           // Karte verschwindet SOFORT
   toastUndo(`${r.name}: geprüft ✓`, async () => {
     await optimistisch(r, { geprueft_am: vorher }, 'Zurückgenommen');
   });
   const ok = await commit({ id, updates:{ geprueft_am: heute() } });
   if (PENDING.get(id) === seq){
     PENDING.delete(id);
-    if (!ok){ r.geprueft_am = vorher; refreshTyp(); toast('Zurückgenommen — nicht gespeichert'); }
+    if (!ok){ r.geprueft_am = vorher; drawList(); updateCounts(); toast('Zurückgenommen — nicht gespeichert'); }
   }
 }
 function setTyp(id, t){ const r=byId[id]; if(!r || r.typ===t) return; _save(r,{ typ:t }); toast('Typ: '+t); }
@@ -450,7 +512,7 @@ function renderTypEdit(r){
         KUECHEN_ASIA.map(k=>`<button class="chip-sm${r.kueche===k?' on':''}" onclick="setKueche('${r.id}','${k}')">${k}</button>`).join('')
       }${r.kueche && !KUECHEN_ASIA.includes(r.kueche) ? `<button class="chip-sm on" onclick="setKueche('${r.id}','${esc(r.kueche)}')">${esc(r.kueche)}</button>` : ''}</div>`
     : '';
-  return `<div class="card">
+  return `<div class="card" data-id="${r.id}">
     <div class="c-name"><span class="sw" style="background:${COLORS[rk]||'#ccc'}${rk==='unbew'?`;opacity:${UNBEW_ALPHA}`:''}"></span>${esc(r.name)}</div>
     <div class="c-meta">${esc(r.typ||'—')} · ${r.status==='besucht'?'Besucht':'Watchlist'} · ${RL[r.qualitaet]||r.qualitaet||'—'}${r.typ==='Asia'&&r.kueche?' · '+esc(r.kueche):''} · <a class="glink" style="margin:0" href="${gmaps(r)}" target="_blank" rel="noopener">Maps ↗</a></div>
     <div class="te-lbl">Typ</div><div class="te-row">${typChips}</div>
@@ -458,7 +520,10 @@ function renderTypEdit(r){
     <div class="te-lbl">Preis</div><div class="te-row">${priceChips}</div>
     <div class="te-lbl">Anlass</div><div class="te-row">${anlassChips}</div>
     ${kuecheBlock}
-    <div class="btns"><button class="b-done" onclick="actGeprueft('${r.id}')">✓ Geprüft — für 12 Monate erledigt</button></div>
+    <div class="btns">
+      <button class="b-done" onclick="actGeprueft('${r.id}')">✓ Geprüft — für 12 Monate erledigt</button>
+      <button class="b-arch b-arch2" onclick="actArchivTyp('${r.id}', this)">🗑 Gibt's nicht mehr</button>
+    </div>
   </div>`;
 }
 function renderTypbar(){
@@ -468,7 +533,7 @@ function renderTypbar(){
   // Status-Zeile (Besucht/Watchlist getrennt durchgehen); Zähler = noch offene Orte je Status
   const sChips = STATUS_OPT.map(([v,lbl])=>{
     const n = main.filter(r => (!v || (r.status||'')===v) && !istGeprueft(r)).length;
-    return `<button class="tchip${statusFilter===v?' on':''}" onclick="pickStatus('${v}')">${lbl} <b>${n}</b></button>`;
+    return `<button class="tchip${statusFilter===v?' on':''}" data-sc="${v}" onclick="pickStatus('${v}')">${lbl} <b>${n}</b></button>`;
   }).join('');
   // Zähler zeigen nur OFFENE (nicht geprüfte) Orte — die Liste schrumpft beim Durcharbeiten
   const offen = qTypOffen();
@@ -476,7 +541,7 @@ function renderTypbar(){
   const chips = [''].concat(TYPES).map(t=>{
     const lbl = t===''?'Alle':(TYP_SHORT[t]||t);
     const n = t===''?offen.length:(counts[t]||0);
-    return `<button class="tchip${typFilter===t?' on':''}" onclick="pickTyp('${t}')">${esc(lbl)} <b>${n}</b></button>`;
+    return `<button class="tchip${typFilter===t?' on':''}" data-tc="${esc(t)}" onclick="pickTyp('${t}')">${esc(lbl)} <b>${n}</b></button>`;
   }).join('');
   // Fortschritt im Rahmen der Status-Auswahl (Besucht und Watchlist getrennt zählbar)
   const imStatus = qTypStatusAll();
@@ -487,9 +552,9 @@ function renderTypbar(){
   const base = qTypByType();
   const rCounts={}; base.forEach(r=>{ const k=ratingKey(r.qualitaet,r.preis); rCounts[k]=(rCounts[k]||0)+1; });
   const rChips = [''].concat(RATE_ORDER).map(ck=>{
-    if (ck==='') return `<button class="tchip${rateFilter===''?' on':''}" onclick="pickRate('')">Alle Farben <b>${base.length}</b></button>`;
+    if (ck==='') return `<button class="tchip${rateFilter===''?' on':''}" data-rc="" onclick="pickRate('')">Alle Farben <b>${base.length}</b></button>`;
     const dim = ck==='unbew' ? `;opacity:${UNBEW_ALPHA}` : '';
-    return `<button class="tchip${rateFilter===ck?' on':''}" onclick="pickRate('${ck}')">`
+    return `<button class="tchip${rateFilter===ck?' on':''}" data-rc="${ck}" onclick="pickRate('${ck}')">`
          + `<span class="sw" style="background:${COLORS[ck]}${dim}"></span>${esc(RATE_LBL[ck])} <b>${rCounts[ck]||0}</b></button>`;
   }).join('');
   tb.innerHTML = fortschritt + `<div class="tchips status">${sChips}</div>`
