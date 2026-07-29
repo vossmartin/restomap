@@ -77,7 +77,7 @@
 <div id="saveErr"><button class="x" onclick="saveErrHide()" title="Ausblenden">×</button><span id="saveErrTxt"></span></div>
 <div id="gate" style="display:none">Diese Seite braucht den Edit-Zugang. Öffne einmal die Karte über Deinen Edit-Link (<code>?edit=…</code>) auf diesem Gerät — danach funktioniert auch das Review.</div>
 <header style="display:none" id="hdr">
-  <h1>Review <span id="build" title="Welcher Stand läuft gerade? (Cache-Kontrolle)">b28-5</span></h1>
+  <h1>Review <span id="build" title="Welcher Stand läuft gerade? (Cache-Kontrolle)">b28-6</span></h1>
   <div class="sub" id="subtitle">lädt …</div>
 </header>
 <div id="stacks" style="display:none"></div>
@@ -97,7 +97,12 @@ const PAGE = 20;
 function getToken(){ try { return localStorage.getItem('rm_token') || ''; } catch(e){ return ''; } }
 /* Schreib-URL wie in index.html: eine per Karte hinterlegte URL gewinnt (sonst laufen Karte und
    Review nach einem NEUEN Apps-Script-Deployment auf verschiedene Endpunkte). */
-function getWriteUrl(){ try { return localStorage.getItem('rm_write_url') || WRITE_URL; } catch(e){ return WRITE_URL; } }
+function storedWriteUrl(){ try { return (localStorage.getItem('rm_write_url')||'').trim(); } catch(e){ return ''; } }
+function verwerfeWriteUrl(){ try { localStorage.removeItem('rm_write_url'); } catch(e){} }
+/* Eine im Browser hinterlegte URL gewinnt — aber nur, wenn sie überhaupt wie ein Apps-Script-
+   Endpunkt aussieht. Ist sie tot (404/403), wird sie zur Laufzeit verworfen (s. postJson). */
+function getWriteUrl(){ const u = storedWriteUrl();
+  return /^https:\/\/script\.google\.com\/macros\/s\/[A-Za-z0-9_-]+\/exec\b/.test(u) ? u : WRITE_URL; }
 const urlParams = new URLSearchParams(location.search);
 if (urlParams.get('edit')) { try { localStorage.setItem('rm_token', urlParams.get('edit')); } catch(e){}
   history.replaceState(null,'',location.pathname); }
@@ -114,9 +119,9 @@ let lastErr = '', lastErrDetail = '';
 async function post(payload){ return !!(await postJson(payload)); }
 /* Ein Versuch. Wirft mit .code: 'http:<status>' | 'parse' (Antwort war kein JSON, meist eine
    Google-Fehlerseite) | 'netz' (Anfrage kam gar nicht durch / CORS). */
-async function postOnce(payload){
+async function postOnce(wu, payload){
   let res;
-  try { res = await fetch(getWriteUrl(), { method:'POST', body: JSON.stringify({ token:getToken(), ...payload }) }); }
+  try { res = await fetch(wu, { method:'POST', body: JSON.stringify({ token:getToken(), ...payload }) }); }
   catch(e){ const err=new Error('netz'); err.code='netz'; err.detail=String(e.message||e); throw err; }
   const txt = await res.text();
   if (!res.ok){ const err=new Error('http'); err.code='http:'+res.status; err.detail=txt.slice(0,160); throw err; }
@@ -124,17 +129,29 @@ async function postOnce(payload){
   catch(_){ const err=new Error('parse'); err.code='parse'; err.detail=txt.slice(0,160); throw err; }
 }
 /* Transiente Fehler (Apps Script antwortet gelegentlich mit einer Fehlerseite) einmal still
-   wiederholen. Fachliche Fehler (ok:false, z. B. auth/schema) werden NICHT wiederholt. */
+   wiederholen. Fachliche Fehler (ok:false, z. B. auth/schema) werden NICHT wiederholt.
+   Neu: Antwortet eine im Browser HINTERLEGTE Schreib-URL mit 4xx (tot/veraltet), wird sie
+   verworfen und sofort mit der eingebauten URL erneut versucht — heilt sich selbst. */
 async function postJson(payload){
-  for (let versuch=1; versuch<=2; versuch++){
+  let urlVerworfen = false, transientVersucht = false;
+  for (;;) {
+    const wu = getWriteUrl();
     try {
-      const j = await postOnce(payload);
+      const j = await postOnce(wu, payload);
       if (!j.ok){ lastErr = j.error||'?'; lastErrDetail=''; toast('Fehler: ' + lastErr); return null; }
       lastErr = ''; lastErrDetail=''; return j;
     } catch(e){
       lastErr = e.code || 'netz'; lastErrDetail = e.detail || '';
-      console.warn('[restomap review] Schreibversuch '+versuch+' fehlgeschlagen:', lastErr, lastErrDetail);
-      if (versuch===1){ await new Promise(r=>setTimeout(r, 900)); continue; }   // stiller Wiederholversuch
+      console.warn('[restomap review] Schreibversuch fehlgeschlagen:', lastErr, wu, lastErrDetail);
+      const istHttp4 = /^http:4/.test(lastErr);
+      if (istHttp4 && wu !== WRITE_URL && !urlVerworfen){
+        urlVerworfen = true; verwerfeWriteUrl();
+        toast('Veraltete Schreib-URL verworfen — neuer Versuch');
+        continue;                                   // sofort mit der eingebauten URL
+      }
+      if (!istHttp4 && !transientVersucht){          // 4xx heilt kein Warten -> nur bei netz/parse/5xx
+        transientVersucht = true; await new Promise(r=>setTimeout(r, 900)); continue;
+      }
       toast('Nicht gespeichert (' + lastErr + ')');
       return null;
     }
@@ -157,6 +174,10 @@ function errText(code){
   if (code==='parse') return '<b>Nicht gespeichert — unerwartete Antwort von Google.</b> Statt JSON kam eine '
     + 'HTML-Seite zurück (typisch bei abgelaufener Bereitstellung, fehlendem Zugriff „Jeder“, oder einer '
     + 'Google-Störung). Prüfen: <code>/exec</code> im Browser öffnen — es sollte <code>version:7</code> zeigen.';
+  if (code==='http:404') return '<b>Nicht gespeichert — die Schreib-Adresse existiert nicht (404).</b> '
+    + 'Die Seite hat eine ggf. im Browser hinterlegte Adresse bereits verworfen und die eingebaute erneut '
+    + 'versucht. Klappt es weiter nicht, ist die Bereitstellung selbst weg: Apps Script → Bereitstellen → '
+    + 'Bereitstellungen verwalten → als <b>neue Version</b> veröffentlichen und die <code>/exec</code>-URL vergleichen.';
   if (String(code).startsWith('http:')) return '<b>Nicht gespeichert — Google antwortete mit '+esc(code)+'.</b> '
     + 'Bei 401/403 stimmt der Zugriff der Bereitstellung nicht („Ausführen als: Ich“, „Zugriff: Jeder“); '
     + 'bei 5xx ist es meist vorübergehend.';

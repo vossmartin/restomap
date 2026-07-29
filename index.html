@@ -183,7 +183,7 @@
   </div>
 </div>
 <div id="legend"><div class="sheet">
-  <h3>Farbe = Bewertung</h3><div id="legcolors"></div>
+  <h3>Farbe = Bewertung <span style="font-size:10px;font-weight:400;color:var(--muted);vertical-align:super" title="Welcher Stand läuft? (Cache-Kontrolle)">b28-6</span></h3><div id="legcolors"></div>
   <h3 style="margin-top:14px">Form = Status</h3>
   <div class="lrow"><span class="sw" style="background:#888"></span> Kreis = besucht</div>
   <div class="lrow"><span class="sw sq" style="background:#888"></span> Quadrat = Watchlist (noch nicht besucht)</div>
@@ -396,7 +396,11 @@ if (urlParams.get('edit')) {
   history.replaceState(null, '', location.pathname + (urlParams.toString()?'?'+urlParams.toString():'') + location.hash);
 }
 function getToken(){ try { return localStorage.getItem('rm_token') || ''; } catch(e) { return ''; } }
-function getWriteUrl(){ try { return localStorage.getItem('rm_write_url') || WRITE_URL; } catch(e) { return WRITE_URL; } }
+function storedWriteUrl(){ try { return (localStorage.getItem('rm_write_url')||'').trim(); } catch(e){ return ''; } }
+function verwerfeWriteUrl(){ try { localStorage.removeItem('rm_write_url'); } catch(e){} }
+/* Hinterlegte URL gewinnt — aber nur in gültiger Form; tote URLs verwirft postJson zur Laufzeit. */
+function getWriteUrl(){ const u = storedWriteUrl();
+  return /^https:\/\/script\.google\.com\/macros\/s\/[A-Za-z0-9_-]+\/exec\b/.test(u) ? u : WRITE_URL; }
 function askWriteUrl(){
   const u = prompt('Einmalige Einrichtung: URL der Apps-Script-Web-App einfügen (aus der Anleitung):', getWriteUrl());
   if (u && u.startsWith('https://')) { try { localStorage.setItem('rm_write_url', u.trim()); } catch(e) {} return u.trim(); }
@@ -424,17 +428,25 @@ async function postOnce(wu, payload){
 }
 /* Transiente Google-Aussetzer einmal still wiederholen; fachliche Fehler (ok:false) nicht. */
 async function postJson(payload){
-  let wu = getWriteUrl(); if (!wu) wu = askWriteUrl();
-  if (!wu) { toast('Keine Schreib-URL hinterlegt.'); return null; }
-  for (let versuch=1; versuch<=2; versuch++){
+  let urlVerworfen = false, transientVersucht = false;
+  for (;;) {
+    const wu = getWriteUrl();
     try {
       const j = await postOnce(wu, payload);
       if (!j.ok) { lastErr = j.error||'?'; lastErrDetail=''; toast('Fehler: ' + lastErr); return null; }
       lastErr = ''; lastErrDetail=''; return j;
     } catch(e) {
       lastErr = e.code || 'netz'; lastErrDetail = e.detail || '';
-      console.warn('[restomap] Schreibversuch '+versuch+' fehlgeschlagen:', lastErr, lastErrDetail);
-      if (versuch===1){ await new Promise(r=>setTimeout(r, 900)); continue; }
+      console.warn('[restomap] Schreibversuch fehlgeschlagen:', lastErr, wu, lastErrDetail);
+      const istHttp4 = /^http:4/.test(lastErr);
+      if (istHttp4 && wu !== WRITE_URL && !urlVerworfen){   // tote hinterlegte URL verwerfen
+        urlVerworfen = true; verwerfeWriteUrl();
+        toast('Veraltete Schreib-URL verworfen — neuer Versuch');
+        continue;
+      }
+      if (!istHttp4 && !transientVersucht){                 // 4xx heilt kein Warten
+        transientVersucht = true; await new Promise(r=>setTimeout(r, 900)); continue;
+      }
       toast('Nicht gespeichert (' + lastErr + ')');
       return null;
     }
