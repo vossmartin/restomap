@@ -1,18 +1,18 @@
 id,name,lat,lon,typ,status,qualitaet,preis,quelle_import,dupe_flag,geaendert_am,gmaps_url,place_id,kueche,tags,quelle,geprueft_am
 r0001,#HASHTAG Coffee Shop,52.5095695,13.3992457,Café,besucht,mittel,normal,fav,,2026-07-27,,,,"fruehstueck, kaffee",,
-r0002,12 Apostel,52.505226,13.32016,Pizza,besucht,mittel,normal,fav,,2026-07-27,,,,"lunch, dinner",,
+r0002,12 Apostel,52.505226,13.32016,Pizza,besucht,mittel,normal,fav,,2026-07-29,,,,"lunch, dinner",,2026-07-29
 r0003,"19grams Alex - Café, Kaffeerösterei & Event Location",52.5227376,13.4074325,Café,besucht,mittel,normal,fav,,2026-07-27,,,,"fruehstueck, brunch",,
-r0004,26 Shibuya,52.5376609,13.4077675,Sushi,besucht,mittel,normal,fav,,2026-07-27,,,,"lunch, dinner",,
+r0004,26 Shibuya,52.5376609,13.4077675,Sushi,besucht,mittel,normal,fav,,2026-07-29,,,,"lunch, dinner",,2026-07-29
 r0006,3 Schwestern,52.5037853,13.4244039,Restaurant,besucht,gut,normal,fav,,2026-07-27,,,,"lunch, dinner",,
-r0007,60 Hz,52.5009564,13.4282298,Club/Livemusik,besucht,gut,normal,fav,,2026-07-23,,,,"drinks, music",,
-r0008,893 Ryōtei Japanese Restaurant,52.5058893,13.3169731,Sushi,besucht,sehr_gut,teuer,fav,,2026-07-20,,,,"lunch, dinner",,
-r0009,://about blank,52.502559,13.4663169,Club/Livemusik,besucht,gut,normal,fav,,2026-07-23,,,,"drinks, music",,
+r0007,60 Hz,52.5009564,13.4282298,Club/Livemusik,besucht,gut,normal,fav,,2026-07-29,,,,"drinks, music",,2026-07-29
+r0008,893 Ryōtei Japanese Restaurant,52.5058893,13.3169731,Sushi,besucht,sehr_gut,teuer,fav,,2026-07-29,,,,"lunch, dinner",,2026-07-29
+r0009,://about blank,52.502559,13.4663169,Club/Livemusik,besucht,gut,normal,fav,,2026-07-29,,,,"drinks, music",,2026-07-29
 r0010,A Never Ever Ending Love Story,52.5063461,13.3198725,Restaurant,besucht,sehr_gut,normal,fav,,2026-07-20,,,,"fruehstueck, brunch",,
-r0011,A-Trane,52.50737,13.3201,Club/Livemusik,besucht,sehr_gut,normal,fav,,2026-07-20,,,,"drinks, music",,
+r0011,A-Trane,52.50737,13.3201,Club/Livemusik,besucht,sehr_gut,normal,fav,,2026-07-29,,,,"drinks, music",,2026-07-29
 r0012,acht&dreissig,52.5254913,13.391468,Restaurant,besucht,gut,normal,fav,,2026-07-27,,,,"lunch, dinner",,
-r0013,Aiko,52.5305299,13.400302,Sushi,besucht,mittel,normal,fav,,2026-07-27,,,,"lunch, dinner",,
+r0013,Aiko,52.5305299,13.400302,Sushi,besucht,mittel,normal,fav,,2026-07-29,,,,"lunch, dinner",,2026-07-29
 r0014,Al Hamra,52.5417705,13.4209741,Restaurant,besucht,unbewertet,normal,fav,,2026-07-20,,,,"lunch, dinner",,
-r0015,Albatross Bakery,52.491416,13.416808,Bäcker,besucht,unbewertet,normal,fav,,2026-07-23,,,,"fruehstueck, kaffee",,
+r0015,Albatross Bakery,52.491416,13.416808,Bäcker,besucht,mittel,normal,fav,,2026-07-29,,,,"fruehstueck, kaffee",,2026-07-29
 r0016,Aleppo Supper Club,52.5089124,13.4609188,Restaurant,besucht,unbewertet,normal,fav,,2026-07-20,,,,"lunch, dinner",,
 r0017,"Alt Wien, Gasthaus",52.531586,13.432402,Restaurant,besucht,sehr_gut,normal,fav,,2026-07-20,,,,"lunch, dinner",,
 r0018,Altes Europa,52.5267028,13.4010694,Kneipe,besucht,unbewertet,normal,fav,,2026-07-20,,,,drinks,,
@@ -27,10 +27,10 @@ r0027,APARTMENT Bar,52.5278532,13.370368,Cocktail-Bar,besucht,unbewertet,normal,
 r0028,ASMAN,52.531489,13.396645,Restaurant,besucht,unbewertet,normal,fav,,2026-07-20,,,,"lunch, dinner",,
 r0029,Atame,52.52355,13.406848,Restaurant,besucht,unbewertet,normal,fav,,2026-07-20,,,,"lunch, dinner",,
 r0030,August Fengler,52.541706,13.415018,Kneipe,besucht,unbewertet,normal,fav,,2026-07-20,,,,drinks,,
-r0031,Badeschiff,52.4978612,13.4537728,Biergarten,besucht,sehr_gut,normal,fav,,2026-07-20,,,,"kaffee, dinner, drinks",,
-r0032,Bagdad,52.500705,13.442213,Imbiss,besucht,unbewertet,normal,fav,,2026-07-20,,,,"lunch, dinner",,
-r0033,Bake and Take,52.5174245,13.4609231,Bäcker,besucht,sehr_gut,normal,fav,,2026-07-23,,,,"fruehstueck, kaffee",,
-r0034,Bakery at Fotografiska Berlin,52.5257798,13.3887826,Bäcker,besucht,unbewertet,ueberteuert,fav,,2026-07-23,,,,"fruehstueck, kaffee",,
+r0031,Badeschiff,52.4978612,13.4537728,Biergarten,besucht,mittel,normal,fav,,2026-07-29,,,,"kaffee, dinner, drinks",,2026-07-29
+r0032,Bagdad,52.500705,13.442213,Imbiss,besucht,mittel,normal,fav,,2026-07-29,,,,"lunch, dinner",,2026-07-29
+r0033,Bake and Take,52.5174245,13.4609231,Bäcker,besucht,sehr_gut,normal,fav,,2026-07-29,,,,fruehstueck,,2026-07-29
+r0034,Bakery at Fotografiska Berlin,52.5257798,13.3887826,Bäcker,besucht,unbewertet,ueberteuert,fav,,2026-07-29,,,,"fruehstueck, kaffee",,2026-07-29
 r0035,Bangkok Bites,52.534845,13.4188471,Asia,besucht,unbewertet,normal,fav,,2026-07-20,,,thai,"lunch, dinner",,
 r0036,Banh Mi Stable,52.5269387,13.4083159,Asia,besucht,sehr_gut,guenstig,fav,,2026-07-20,,,,"lunch, dinner",,
 r0037,Bar 3,52.526917,13.414779,Kneipe,besucht,sehr_gut,normal,fav,,2026-07-20,,,,drinks,,
@@ -47,19 +47,19 @@ r0047,Bekarei - The Good Baking Company,52.5443172,13.4226478,Restaurant,besucht
 r0048,BEN RAHIM,52.5250862,13.4020091,Café,besucht,unbewertet,ueberteuert,fav,,2026-07-20,,,,"fruehstueck, kaffee",,
 r0049,Benedict,52.4969116,13.323843,Restaurant,besucht,unbewertet,ueberteuert,fav,filiale,2026-07-20,,,,"fruehstueck, brunch",,
 r0050,BENEDICT,52.5416676,13.4215108,Restaurant,besucht,unbewertet,ueberteuert,fav,filiale,2026-07-20,,,,"fruehstueck, brunch",,
-r0051,Berghain | Panorama Bar | Säule,52.5110714,13.44293,Club/Livemusik,besucht,sehr_gut,normal,fav,,2026-07-20,,,,"drinks, music",,
-r0052,Berlinburger International,52.4864764,13.4308417,Burger,besucht,sehr_gut,guenstig,fav,,2026-07-20,,,,"lunch, dinner",,
+r0051,Berghain | Panorama Bar | Säule,52.5110714,13.44293,Club/Livemusik,besucht,sehr_gut,normal,fav,,2026-07-29,,,,"drinks, music",,2026-07-29
+r0052,Berlinburger International,52.4864764,13.4308417,Burger,besucht,sehr_gut,guenstig,fav,,2026-07-29,,,,"lunch, dinner",,2026-07-29
 r0053,Berliner Kaffeerösterei Uhlandstraße,52.5014854,13.3252931,Café,besucht,unbewertet,normal,fav,,2026-07-20,,,,"fruehstueck, kaffee",,
 r0054,Berta restaurant,52.50585,13.38018,Restaurant,besucht,unbewertet,ueberteuert,fav,,2026-07-20,,,,"lunch, dinner",,
 r0055,BESTE Bar,52.54403,13.36033,Kneipe,besucht,unbewertet,normal,fav,,2026-07-20,,,,drinks,,
 r0056,Betty'n Caty,52.5349433,13.4182714,Restaurant,besucht,unbewertet,normal,fav,,2026-07-20,,,,"fruehstueck, brunch",,
-r0057,Bierhof Rüdersdorf,52.511363,13.44248,Biergarten,besucht,unbewertet,normal,fav,,2026-07-20,,,,"kaffee, dinner, drinks",,
+r0057,Bierhof Rüdersdorf,52.511363,13.44248,Biergarten,besucht,mittel,normal,fav,,2026-07-29,,,,"kaffee, dinner, drinks",,2026-07-29
 r0058,Birds in the Kitchen,52.5285627,13.4024502,Imbiss,besucht,unbewertet,normal,fav,,2026-07-20,,,,"lunch, dinner",,
-r0059,Birgit & Bier,52.4976929,13.4498057,Club/Livemusik,besucht,sehr_gut,normal,fav,,2026-07-20,,,,"drinks, music",,
+r0059,Birgit & Bier,52.4976929,13.4498057,Club/Livemusik,besucht,sehr_gut,normal,fav,,2026-07-29,,,,"drinks, music",,2026-07-29
 r0060,Black Apron,52.5326749,13.3986089,Café,besucht,unbewertet,normal,fav,,2026-07-20,,,,"fruehstueck, kaffee",,
 r0061,Blackbeards,52.5468824,13.4182762,Restaurant,besucht,unbewertet,normal,fav,,2026-07-20,,,,"lunch, dinner",,
 r0062,Bocca di Bacco,52.515111,13.3889679,Restaurant,besucht,unbewertet,ueberteuert,fav,,2026-07-20,,,,"lunch, dinner",,
-r0063,Bohnengold - Berlin,52.4978363,13.4240518,Club/Livemusik,besucht,unbewertet,normal,fav,,2026-07-20,,,,"drinks, music",,
+r0063,Bohnengold - Berlin,52.4978363,13.4240518,Club/Livemusik,besucht,sehr_gut,normal,fav,,2026-07-29,,,,"drinks, music",,2026-07-29
 r0064,Bonanza Coffee,52.5141026,13.390803,Café,besucht,unbewertet,normal,fav,,2026-07-20,,,,"fruehstueck, kaffee",,
 r0065,BonBon Bar Berlin,52.52972,13.399689,Cocktail-Bar,besucht,unbewertet,ueberteuert,fav,,2026-07-20,,,,drinks,,
 r0066,Bootshaus Stella am Lietzensee,52.50884,13.29268,Restaurant,besucht,unbewertet,normal,fav,,2026-07-20,,,,"lunch, dinner",,
@@ -68,27 +68,27 @@ r0068,Borchardt,52.514999,13.390349,Restaurant,besucht,unbewertet,ueberteuert,fa
 r0069,BOTANICAL AFFAIRS,52.5298242,13.4047703,Cocktail-Bar,besucht,sehr_gut,normal,fav,,2026-07-20,,,,drinks,,
 r0071,Briefmarken Weine,52.517457,13.442612,Restaurant,besucht,unbewertet,normal,fav,,2026-07-20,,,,"lunch, dinner",,
 r0072,BRLO Brwhouse,52.5000503,13.3736449,Kneipe,besucht,unbewertet,normal,fav,,2026-07-20,,,,drinks,,
-r0073,Brooklyn Beef Club,52.511688,13.413668,Steak/Grill,besucht,unbewertet,ueberteuert,fav,,2026-07-20,,,,"lunch, dinner",,
+r0073,Brooklyn Beef Club,52.511688,13.413668,Steak/Grill,besucht,unbewertet,ueberteuert,fav,,2026-07-29,,,,"lunch, dinner",,2026-07-29
 r0074,Brunello,52.507728,13.322444,Restaurant,besucht,unbewertet,normal,fav,,2026-07-20,,,,"lunch, dinner",,
 r0075,BRYK BAR,52.5375945,13.4224222,Cocktail-Bar,besucht,unbewertet,normal,fav,,2026-07-20,,,,drinks,,
 r0076,Bu Kon,52.5431409,13.4210771,Asia,besucht,unbewertet,normal,fav,,2026-07-20,,,vietnamesisch,"lunch, dinner",,
 r0077,Buck and Breck,52.5321302,13.3989457,Cocktail-Bar,besucht,unbewertet,ueberteuert,fav,,2026-07-20,,,,drinks,,
-r0078,BURGERAMT,52.510245,13.459456,Burger,besucht,sehr_gut,guenstig,fav,,2026-07-20,,,,"lunch, dinner",,
-r0079,Burgermeister,52.501099,13.442523,Burger,besucht,sehr_gut,guenstig,fav,,2026-07-20,,,,"lunch, dinner",,
-r0080,Cafe am neuen See,52.5108,13.344623,Biergarten,besucht,unbewertet,normal,fav,,2026-07-23,,,,"fruehstueck, kaffee",,
+r0078,BURGERAMT,52.510245,13.459456,Burger,besucht,sehr_gut,guenstig,fav,,2026-07-29,,,,"lunch, dinner",,2026-07-29
+r0079,Burgermeister,52.501099,13.442523,Burger,besucht,sehr_gut,guenstig,fav,,2026-07-29,,,,"lunch, dinner",,2026-07-29
+r0080,Cafe am neuen See,52.5108,13.344623,Biergarten,besucht,sehr_gut,normal,fav,,2026-07-29,,,,"fruehstueck, kaffee",,2026-07-29
 r0081,Cafe Buondi,52.5302921,13.387681,Restaurant,besucht,unbewertet,normal,fav,,2026-07-20,,,,"fruehstueck, brunch",,
 r0082,Cafe Camaleon,52.5257485,13.4040458,Restaurant,besucht,unbewertet,normal,fav,,2026-07-20,,,,"fruehstueck, brunch",,
 r0083,Cafe Cinema,52.524184,13.402691,Kneipe,besucht,unbewertet,normal,fav,,2026-07-23,,,,"fruehstueck, kaffee",,
-r0084,Cafe Cup Arkona,52.5373172,13.4006891,Eis,besucht,unbewertet,normal,fav,,2026-07-20,,,,kaffee,,
+r0084,Cafe Cup Arkona,52.5373172,13.4006891,Eis,besucht,mittel,normal,fav,,2026-07-29,,,,kaffee,,2026-07-29
 r0085,Cafe Fleury,52.531211,13.402148,Restaurant,besucht,sehr_gut,normal,fav,,2026-07-20,,,,"fruehstueck, brunch",,
 r0086,Cafe MokannTi,52.5437321,13.4185211,Café,besucht,sehr_gut,normal,fav,,2026-07-20,,,,"fruehstueck, kaffee",,
 r0087,Cafe Rosenrot,52.57144,13.40892,Restaurant,besucht,unbewertet,normal,fav,,2026-07-20,,,,"fruehstueck, brunch",,
 r0088,Caffè Monelli Berlin,52.5480312,13.4153581,Café,besucht,unbewertet,normal,fav,,2026-07-20,,,,"fruehstueck, kaffee",,
 r0089,Café am Engelbecken,52.5062365,13.4186097,Café,besucht,unbewertet,normal,fav,,2026-07-20,,,,"fruehstueck, kaffee",,
-r0090,Café am Neuen See,52.5103831,13.3444925,Biergarten,besucht,unbewertet,normal,fav,,2026-07-20,,,,"kaffee, dinner, drinks",,
+r0090,Café am Neuen See,52.5103831,13.3444925,Biergarten,besucht,sehr_gut,normal,fav,,2026-07-29,,,,"kaffee, dinner, drinks, lunch",,2026-07-29
 r0091,Café Anna Blume,52.537966,13.419546,Restaurant,besucht,sehr_gut,normal,fav,,2026-07-20,,,,"fruehstueck, brunch",,
 r0093,Café Bonpland,52.516354,13.4604646,Café,besucht,sehr_gut,normal,fav,,2026-07-20,,,,"fruehstueck, kaffee",,
-r0094,Café Boulangerie,52.5429127,13.4206022,Bäcker,besucht,unbewertet,normal,fav,,2026-07-23,,,,"fruehstueck, kaffee",,
+r0094,Café Boulangerie,52.5429127,13.4206022,Bäcker,besucht,mittel,normal,fav,,2026-07-29,,,,"fruehstueck, kaffee",,2026-07-29
 r0095,Café Bravo,52.526754,13.394972,Restaurant,besucht,unbewertet,normal,fav,,2026-07-20,,,,"fruehstueck, brunch",,
 r0096,Café BUTTER,52.54396,13.41506,Café,besucht,unbewertet,normal,fav,,2026-07-20,,,,"fruehstueck, kaffee",,
 r0097,Café Cinema,52.524261,13.4026214,Kneipe,besucht,unbewertet,normal,fav,,2026-07-20,,,,drinks,,
@@ -101,42 +101,42 @@ r0105,Café Paula,52.5655496,13.4002559,Restaurant,besucht,sehr_gut,normal,fav,,
 r0106,Café Schroeder,52.5303634,13.3922809,Café,besucht,nie_wieder,normal,fav,,2026-07-23,,,,"fruehstueck, kaffee",,
 r0107,Café Schwarzsauer,52.539033,13.409966,Kneipe,besucht,unbewertet,normal,fav,,2026-07-20,,,,drinks,,
 r0109,CaliBocca,52.5039033,13.3168666,Restaurant,besucht,sehr_gut,normal,fav,,2026-07-20,,,,"lunch, dinner",,
-r0110,CANAL Artisanal Ice cream & pastry,52.5242082,13.4020973,Dessert,besucht,gut,normal,fav,filiale,2026-07-28,,,,"fruehstueck, kaffee, drinks",,2026-07-28
+r0110,CANAL Artisanal Ice cream & pastry,52.5242082,13.4020973,Dessert,besucht,gut,normal,fav,filiale,2026-07-28,,,,"fruehstueck, kaffee",,2026-07-28
 r0111,CANAL Artisanal ice cream & Pastry,52.5287841,13.4063433,Dessert,besucht,gut,normal,fav,filiale,2026-07-28,,,,"fruehstueck, kaffee",,2026-07-28
 r0112,Cappuccino Grand Café - Mitte,52.526665,13.393529,Restaurant,besucht,unbewertet,normal,fav,,2026-07-20,,,,"fruehstueck, brunch",,
-r0113,Capvin,52.5246173,13.4028222,Pizza,besucht,unbewertet,ueberteuert,fav,,2026-07-20,,,,"lunch, dinner",,
-r0114,Capvin by Vincenzo Capuano,52.5307411,13.401757,Pizza,besucht,unbewertet,ueberteuert,fav,,2026-07-20,,,,"lunch, dinner",,
+r0113,Capvin,52.5246173,13.4028222,Pizza,besucht,unbewertet,ueberteuert,fav,,2026-07-29,,,,"lunch, dinner",,2026-07-29
+r0114,Capvin by Vincenzo Capuano,52.5307411,13.401757,Pizza,besucht,unbewertet,ueberteuert,fav,,2026-07-29,,,,"lunch, dinner",,2026-07-29
 r0115,Caramel,52.50766,13.39293,Restaurant,besucht,sehr_gut,normal,fav,,2026-07-20,,,,"lunch, dinner",,
-r0116,Cassiopeia,52.5071578,13.4547007,Club/Livemusik,besucht,unbewertet,normal,fav,,2026-07-20,,,,"drinks, music",,
+r0116,Cassiopeia,52.5071578,13.4547007,Club/Livemusik,besucht,mittel,normal,fav,,2026-07-29,,,,"drinks, music",,2026-07-29
 r0118,Cecconi's,52.5275319,13.4154045,Restaurant,besucht,unbewertet,ueberteuert,fav,,2026-07-20,,,,"lunch, dinner",,
 r0119,chanchanchan,52.5412523,13.4229019,Asia,besucht,unbewertet,normal,fav,,2026-07-20,,,koreanisch,"lunch, dinner",,
 r0120,CHAY UMI VEGAN,52.5474499,13.4141792,Asia,besucht,unbewertet,normal,fav,,2026-07-20,,,,"lunch, dinner",,
 r0121,Chay Village,52.5136111,13.4583333,Asia,besucht,unbewertet,normal,fav,,2026-07-20,,,vietnamesisch,"lunch, dinner",,
 r0122,Chez Maurice,52.532533,13.435104,Restaurant,besucht,unbewertet,ueberteuert,fav,,2026-07-20,,,,"lunch, dinner",,
-r0123,ChickenBuzz,52.5291213,13.4020658,Imbiss,besucht,unbewertet,normal,fav,,2026-07-23,,,,"lunch, dinner",,
+r0123,ChickenBuzz,52.5291213,13.4020658,Imbiss,besucht,gut,normal,fav,,2026-07-29,,,,"lunch, dinner",,2026-07-29
 r0124,Chipperfield Kantine,52.5283062,13.4008859,Restaurant,besucht,unbewertet,normal,fav,,2026-07-20,,,,"lunch, dinner",,
-r0125,Chupenga Burritos & Salads,52.5124985,13.3943483,Imbiss,besucht,sehr_gut,guenstig,fav,filiale,2026-07-20,,,,"lunch, dinner",,
-r0126,Chupenga Burritos & Salads,52.506432,13.392965,Imbiss,besucht,sehr_gut,guenstig,fav,filiale,2026-07-20,,,,"lunch, dinner",,
-r0127,Chupenga Burritos & Salads,52.504205,13.443069,Imbiss,besucht,sehr_gut,guenstig,fav,filiale,2026-07-20,,,,"lunch, dinner",,
+r0125,Chupenga Burritos & Salads,52.5124985,13.3943483,Imbiss,besucht,sehr_gut,guenstig,fav,filiale,2026-07-29,,,,"lunch, dinner",,2026-07-29
+r0126,Chupenga Burritos & Salads,52.506432,13.392965,Imbiss,besucht,sehr_gut,guenstig,fav,filiale,2026-07-29,,,,"lunch, dinner",,2026-07-29
+r0127,Chupenga Burritos & Salads,52.504205,13.443069,Imbiss,besucht,sehr_gut,guenstig,fav,filiale,2026-07-29,,,,"lunch, dinner",,2026-07-29
 r0128,Chén Chè,52.52739,13.4023847,Asia,besucht,unbewertet,normal,fav,,2026-07-20,,,vietnamesisch,"lunch, dinner",,
 r0129,Clara Vere,52.5130517,13.3041392,Restaurant,besucht,unbewertet,normal,fav,,2026-07-20,,,,"lunch, dinner",,
 r0130,Clash,52.491894,13.388514,Kneipe,besucht,unbewertet,normal,fav,,2026-07-20,,,,drinks,,
-r0131,Club der Visionäre,52.496777,13.450465,Club/Livemusik,besucht,unbewertet,normal,fav,,2026-07-20,,,,"drinks, music",,
+r0131,Club der Visionäre,52.496777,13.450465,Club/Livemusik,besucht,mittel,normal,fav,,2026-07-29,,,,"drinks, music",,2026-07-29
 r0132,Coccodrillo,52.5323355,13.4017285,Restaurant,besucht,unbewertet,ueberteuert,fav,,2026-07-20,,,,"lunch, dinner",,
 r0133,Cocolo Ramen Mitte,52.5271711,13.3992772,Asia,besucht,sehr_gut,normal,fav,,2026-07-20,,,japanisch,"lunch, dinner",,
 r0134,CODA Dessert Bar,52.489976,13.427357,Restaurant,besucht,unbewertet,ueberteuert,fav,,2026-07-20,,,,"lunch, dinner",,
 r0135,Coffeemamas Shop,52.5241691,13.3492114,Café,besucht,unbewertet,normal,fav,,2026-07-20,,,,"fruehstueck, kaffee",,
-r0136,Crack Bellmer Bar,52.507699,13.454751,Club/Livemusik,besucht,unbewertet,normal,fav,,2026-07-20,,,,"drinks, music",,
+r0136,Crack Bellmer Bar,52.507699,13.454751,Club/Livemusik,besucht,mittel,normal,fav,,2026-07-29,,,,"drinks, music",,2026-07-29
 r0137,Crackers,52.5164823,13.3887471,Restaurant,besucht,sehr_gut,teuer,fav,,2026-07-20,,,,"lunch, dinner",,
 r0138,Creasian Restaurant,52.524181,13.3992844,Asia,besucht,unbewertet,normal,fav,,2026-07-20,,,vietnamesisch,"lunch, dinner",,
-r0139,Cuore Di Vetro,52.5266183,13.4085104,Eis,besucht,sehr_gut,normal,fav,,2026-07-20,,,,kaffee,,
+r0139,Cuore Di Vetro,52.5266183,13.4085104,Eis,besucht,sehr_gut,normal,fav,,2026-07-29,,,,kaffee,,2026-07-29
 r0140,Cupcake,52.51079,13.457807,Café,besucht,sehr_gut,normal,fav,,2026-07-20,,,,"fruehstueck, kaffee",,
-r0141,Curry 36,52.49345,13.387723,Imbiss,besucht,sehr_gut,guenstig,fav,,2026-07-20,,,,"lunch, dinner",,
-r0142,Curry Mitte,52.5294318,13.4010458,Imbiss,besucht,unbewertet,normal,fav,,2026-07-20,,,,"lunch, dinner",,
+r0141,Curry 36,52.49345,13.387723,Imbiss,besucht,sehr_gut,guenstig,fav,,2026-07-29,,,,"lunch, dinner",,2026-07-29
+r0142,Curry Mitte,52.5294318,13.4010458,Imbiss,besucht,mittel,normal,fav,,2026-07-29,,,,"lunch, dinner",,2026-07-29
 r0143,Cô Cô - Bánh mì deli,52.529172,13.401452,Asia,besucht,sehr_gut,guenstig,fav,,2026-07-20,,,vietnamesisch,"lunch, dinner",,
 r0144,Dachkammer,52.511083,13.456957,Kneipe,besucht,unbewertet,normal,fav,,2026-07-20,,,,drinks,,
 r0145,Dada Falafel,52.5264427,13.3881916,Restaurant,besucht,unbewertet,normal,fav,,2026-07-20,,,,"lunch, dinner",,
-r0146,Dade Falafel,52.5436073,13.4168716,Imbiss,besucht,unbewertet,normal,fav,,2026-07-20,,,,"lunch, dinner",,
+r0146,Dade Falafel,52.5436073,13.4168716,Imbiss,besucht,gut,normal,fav,,2026-07-29,,,,"lunch, dinner",,2026-07-29
 r0147,Dal Contadino Wine Bar,52.5276172,13.4048224,Restaurant,besucht,sehr_gut,normal,fav,,2026-07-20,,,,"lunch, dinner",,
 r0148,DAO Thai-Restaurant,52.5060468,13.3150963,Asia,besucht,unbewertet,normal,fav,,2026-07-20,,,thai,"lunch, dinner",,
 r0151,Delizie D'Italia,52.539074,13.421408,Restaurant,besucht,sehr_gut,normal,fav,,2026-07-20,,,,"lunch, dinner",,
@@ -153,33 +153,33 @@ r0161,Diekmann,52.5012838,13.3286508,Restaurant,besucht,unbewertet,normal,fav,,2
 r0162,Diener Tattersall,52.5046906,13.3236735,Cocktail-Bar,besucht,unbewertet,normal,fav,,2026-07-20,,,,drinks,,
 r0163,District Môt - Saigon Street Food,52.5277212,13.403421,Asia,besucht,unbewertet,normal,fav,,2026-07-20,,,vietnamesisch,"lunch, dinner",,
 r0164,Distrikt Coffee,52.531585,13.3940435,Restaurant,besucht,unbewertet,normal,fav,,2026-07-20,,,,"fruehstueck, brunch",,
-r0165,Dolores,52.523833,13.409256,Imbiss,besucht,sehr_gut,guenstig,fav,,2026-07-20,,,,"lunch, dinner",,
+r0165,Dolores,52.523833,13.409256,Imbiss,besucht,sehr_gut,guenstig,fav,,2026-07-29,,,,"lunch, dinner",,2026-07-29
 r0166,Dresden,52.5015611,13.4167099,Cocktail-Bar,besucht,sehr_gut,normal,fav,,2026-07-20,,,,drinks,,
 r0168,Du Bonheur,52.536243,13.397867,Restaurant,besucht,sehr_gut,normal,fav,,2026-07-20,,,,"fruehstueck, brunch",,
 r0169,EasyPeasy,52.5469285,13.4244692,Restaurant,besucht,unbewertet,normal,fav,,2026-07-20,,,,"lunch, dinner",,
 r0170,eins44 - Kantine Neukölln,52.4853771,13.4399593,Restaurant,besucht,sehr_gut,teuer,fav,,2026-07-20,,,,"lunch, dinner",,
-r0171,Eismanufaktur Berlin,52.52727,13.396824,Eis,besucht,sehr_gut,normal,fav,,2026-07-20,,,,kaffee,,
-r0172,Eispatisserie Hokey Pokey,52.546981,13.417506,Eis,besucht,sehr_gut,normal,fav,,2026-07-20,,,,kaffee,,
-r0173,El Amigo Taqueria,52.5332557,13.4009854,Imbiss,besucht,sehr_gut,guenstig,fav,,2026-07-20,,,,"lunch, dinner",,
-r0174,Else OpenAir-Club & Biergarten,52.4949687,13.462286,Club/Livemusik,besucht,unbewertet,normal,fav,,2026-07-20,,,,"drinks, music",,
+r0171,Eismanufaktur Berlin,52.52727,13.396824,Eis,besucht,sehr_gut,normal,fav,,2026-07-29,,,,kaffee,,2026-07-29
+r0172,Eispatisserie Hokey Pokey,52.546981,13.417506,Eis,besucht,sehr_gut,normal,fav,,2026-07-29,,,,kaffee,,2026-07-29
+r0173,El Amigo Taqueria,52.5332557,13.4009854,Imbiss,besucht,sehr_gut,normal,fav,,2026-07-29,,,,"lunch, dinner",,2026-07-29
+r0174,Else OpenAir-Club & Biergarten,52.4949687,13.462286,Club/Livemusik,besucht,sehr_gut,normal,fav,,2026-07-29,,,,"drinks, music",,2026-07-29
 r0175,Enoiteca Il Calice,52.50215,13.31491,Restaurant,besucht,sehr_gut,teuer,fav,,2026-07-20,,,,"lunch, dinner",,
-r0176,Entrecôte,52.508498,13.3912405,Steak/Grill,besucht,unbewertet,normal,fav,,2026-07-20,,,,"lunch, dinner",,
+r0176,Entrecôte,52.508498,13.3912405,Steak/Grill,besucht,mittel,normal,fav,,2026-07-29,,,,"lunch, dinner",,2026-07-29
 r0177,espresso-ambulanz,52.5260286,13.3879951,Café,besucht,sehr_gut,normal,fav,,2026-07-20,,,,"fruehstueck, kaffee",,
 r0178,Ewig Freunde,52.5427945,13.4180771,Restaurant,besucht,unbewertet,normal,fav,,2026-07-20,,,,"fruehstueck, brunch",,
 r0179,Fahimi Bar,52.4994,13.4197999,Cocktail-Bar,besucht,unbewertet,normal,fav,,2026-07-20,,,,drinks,,
 r0180,Fairytale Bar,52.528736,13.428215,Cocktail-Bar,besucht,unbewertet,ueberteuert,fav,,2026-07-20,,,,drinks,,
-r0181,Falafel Aladdin,52.5440184,13.4243957,Imbiss,besucht,sehr_gut,guenstig,fav,,2026-07-20,,,,"lunch, dinner",,
+r0181,Falafel Aladdin,52.5440184,13.4243957,Imbiss,besucht,sehr_gut,guenstig,fav,,2026-07-29,,,,"lunch, dinner",,2026-07-29
 r0182,Fame,52.5121299,13.4248551,Restaurant,besucht,unbewertet,ueberteuert,fav,,2026-07-20,,,,"lunch, dinner",,
 r0183,Father Carpenter Coffee Brewers,52.5243955,13.4065566,Café,besucht,sehr_gut,normal,fav,,2026-07-21,,,,"fruehstueck, kaffee, brunch",,
 r0184,Fatoush,52.5114723,13.4572257,Restaurant,besucht,sehr_gut,normal,fav,,2026-07-20,,,,"lunch, dinner",,
-r0185,FC Magnet Bar,52.533033,13.4001047,Sportsbar,besucht,sehr_gut,normal,fav,,2026-07-20,,,,drinks,,
+r0185,FC Magnet Bar,52.533033,13.4001047,Sportsbar,besucht,sehr_gut,normal,fav,,2026-07-29,,,,drinks,,2026-07-29
 r0187,Fes Turkish BBQ,52.4892671,13.4087677,Restaurant,besucht,sehr_gut,normal,fav,,2026-07-20,,,,"lunch, dinner",,
 r0188,Five Elephant Kreuzberg,52.4934326,13.438335,Café,besucht,unbewertet,normal,fav,,2026-07-20,,,,"fruehstueck, kaffee",,
 r0189,Five Elephant Mitte,52.5267037,13.4076559,Café,besucht,unbewertet,normal,fav,,2026-07-20,,,,"fruehstueck, kaffee",,
-r0190,Fleischerei Berlin,52.529794,13.410439,Steak/Grill,besucht,unbewertet,normal,fav,,2026-07-20,,,,"lunch, dinner",,
-r0191,Frannz-Club,52.5381516,13.4126088,Club/Livemusik,besucht,unbewertet,normal,fav,,2026-07-20,,,,"drinks, music",,
+r0190,Fleischerei Berlin,52.529794,13.410439,Steak/Grill,besucht,gut,normal,fav,,2026-07-29,,,,"lunch, dinner",,2026-07-29
+r0191,Frannz-Club,52.5381516,13.4126088,Club/Livemusik,besucht,mittel,normal,fav,,2026-07-29,,,,"drinks, music",,2026-07-29
 r0192,Frau Mittenmang,52.5502357,13.4194038,Restaurant,besucht,unbewertet,normal,fav,,2026-07-20,,,,"lunch, dinner",,
-r0194,FREA Bakery,52.5302132,13.3919477,Bäcker,besucht,unbewertet,normal,fav,,2026-07-23,,,,"fruehstueck, brunch",,
+r0194,FREA Bakery,52.5302132,13.3919477,Bäcker,besucht,mittel,normal,fav,,2026-07-29,,,,"fruehstueck, brunch, kaffee",,2026-07-29
 r0195,Freischwimmer,52.497592,13.451482,Kneipe,besucht,unbewertet,normal,fav,,2026-07-20,,,,drinks,,
 r0196,Friedel Richter Restaurant,52.5283,13.39148,Restaurant,besucht,sehr_gut,normal,fav,,2026-07-20,,,,"lunch, dinner",,
 r0197,FRIEDL Rösterei & Kekse,52.5462453,13.4182087,Café,besucht,sehr_gut,normal,fav,,2026-07-20,,,,"fruehstueck, kaffee",,
@@ -187,15 +187,15 @@ r0198,Frollein Langner,52.473839,13.425185,Kneipe,besucht,sehr_gut,normal,fav,,2
 r0199,Frühstück 3000,52.4992016,13.3567819,Restaurant,besucht,unbewertet,normal,fav,,2026-07-20,,,,"fruehstueck, brunch",,
 r0200,Galander -Kreuzberg-,52.4918718,13.3831685,Cocktail-Bar,besucht,sehr_gut,normal,fav,,2026-07-20,,,,drinks,,
 r0201,Geist im Glas,52.490117,13.424802,Cocktail-Bar,besucht,unbewertet,normal,fav,,2026-07-20,,,,drinks,,
-r0202,Gingi Sushi,52.5365996,13.4203897,Sushi,besucht,sehr_gut,normal,fav,,2026-07-20,,,,"lunch, dinner",,
+r0202,Gingi Sushi,52.5365996,13.4203897,Sushi,besucht,sehr_gut,normal,fav,,2026-07-29,,,,"lunch, dinner",,2026-07-29
 r0203,Goldfisch,52.511418,13.458259,Cocktail-Bar,besucht,sehr_gut,normal,fav,,2026-07-20,,,,drinks,,
-r0204,goldies,52.4998565,13.4251139,Imbiss,besucht,sehr_gut,normal,fav,,2026-07-20,,,,"lunch, dinner",,
+r0204,goldies,52.4998565,13.4251139,Imbiss,besucht,sehr_gut,normal,fav,,2026-07-29,,,,"lunch, dinner",,2026-07-29
 r0205,Good Friends,52.5062824,13.3179921,Asia,besucht,unbewertet,normal,fav,,2026-07-20,,,chinesisch,"lunch, dinner",,
 r0206,Good Q,52.5271351,13.3929786,Restaurant,besucht,unbewertet,normal,fav,,2026-07-20,,,,"fruehstueck, brunch",,
 r0207,Goodtime Restaurant,52.512715,13.396959,Asia,besucht,sehr_gut,normal,fav,,2026-07-20,,,thai,"lunch, dinner",,
 r0208,Gorgonzola Club,52.501253,13.416583,Restaurant,besucht,unbewertet,normal,fav,,2026-07-20,,,,"lunch, dinner",,
 r0209,Green Door,52.497003,13.352804,Cocktail-Bar,besucht,sehr_gut,normal,fav,,2026-07-20,,,,drinks,,
-r0211,Grill Royal,52.522553,13.3886,Steak/Grill,besucht,unbewertet,ueberteuert,fav,,2026-07-20,,,,"lunch, dinner",,
+r0211,Grill Royal,52.522553,13.3886,Steak/Grill,besucht,unbewertet,ueberteuert,fav,,2026-07-29,,,,"lunch, dinner",,2026-07-29
 r0212,Hackbarth’s,52.5278881,13.4008123,Kneipe,besucht,unbewertet,normal,fav,,2026-07-20,,,,drinks,,
 r0214,Hallesches Haus,52.4972842,13.3904317,Restaurant,besucht,sehr_gut,normal,fav,,2026-07-20,,,,"fruehstueck, brunch",,
 r0215,Hasir Kreuzberg,52.50089,13.419156,Restaurant,besucht,unbewertet,normal,fav,,2026-07-20,,,,"lunch, dinner",,
@@ -204,28 +204,28 @@ r0217,Hefner Bar,52.5055628,13.3232255,Cocktail-Bar,besucht,unbewertet,normal,fa
 r0218,heimlichTreu,52.5352937,13.399299,Restaurant,besucht,unbewertet,ueberteuert,fav,,2026-07-20,,,,"lunch, dinner",,
 r0219,HOME Bar,52.507129,13.4708367,Kneipe,besucht,unbewertet,normal,fav,,2026-07-20,,,,drinks,,
 r0220,Hopfenreich,52.4994743,13.4392578,Kneipe,besucht,unbewertet,normal,fav,,2026-07-20,,,,drinks,,
-r0221,Hops & Barley,52.509011,13.460687,Sportsbar,besucht,gut,normal,fav,,2026-07-23,,,,drinks,,
+r0221,Hops & Barley,52.509011,13.460687,Sportsbar,besucht,gut,normal,fav,,2026-07-29,,,,drinks,,2026-07-29
 r0222,Hostaria del Monte Croce,52.49405,13.39655,Restaurant,besucht,sehr_gut,normal,fav,,2026-07-20,,,,"lunch, dinner",,
 r0223,House of Small Wonder,52.5264072,13.3944188,Restaurant,besucht,unbewertet,ueberteuert,fav,,2026-07-20,,,,"fruehstueck, brunch",,
-r0224,Humboldthain Club,52.5443793,13.3786006,Club/Livemusik,besucht,unbewertet,normal,fav,,2026-07-20,,,,"drinks, music",,
-r0225,I Due Forni,52.530788,13.412534,Pizza,besucht,unbewertet,normal,fav,,2026-07-20,,,,"lunch, dinner",,
-r0226,I-Ke-Su Japanese Restaurant,52.4985395,13.3249591,Sushi,besucht,sehr_gut,normal,fav,,2026-07-20,,,,"lunch, dinner",,
+r0224,Humboldthain Club,52.5443793,13.3786006,Club/Livemusik,besucht,gut,normal,fav,,2026-07-29,,,,"drinks, music",,2026-07-29
+r0225,I Due Forni,52.530788,13.412534,Pizza,besucht,gut,normal,fav,,2026-07-29,,,,"lunch, dinner",,2026-07-29
+r0226,I-Ke-Su Japanese Restaurant,52.4985395,13.3249591,Sushi,besucht,sehr_gut,normal,fav,,2026-07-29,,,,"lunch, dinner",,2026-07-29
 r0227,ichi いち,52.5285396,13.4119852,Asia,besucht,sehr_gut,teuer,fav,,2026-07-20,,,japanisch,"lunch, dinner",,
 r0228,ick koof mir Dave Lombardo wenn ick reich bin,52.5338378,13.4035258,Kneipe,besucht,unbewertet,normal,fav,,2026-07-20,,,,drinks,,
 r0229,Iimori Ramen,52.5273199,13.4056359,Asia,besucht,sehr_gut,normal,fav,,2026-07-20,,,japanisch,"lunch, dinner",,
-r0230,Il Casolare,52.49488,13.415667,Pizza,besucht,unbewertet,normal,fav,,2026-07-20,,,,"lunch, dinner",,
-r0232,Il Pane e le Rose,52.529429,13.434723,Pizza,besucht,sehr_gut,normal,fav,,2026-07-20,,,,"lunch, dinner",,
-r0233,Il Ritrovo-Cucina Casalinga Popolare,52.50953,13.458064,Pizza,besucht,unbewertet,normal,fav,,2026-07-20,,,,"lunch, dinner",,
+r0230,Il Casolare,52.49488,13.415667,Pizza,besucht,gut,normal,fav,,2026-07-29,,,,"lunch, dinner",,2026-07-29
+r0232,Il Pane e le Rose,52.529429,13.434723,Pizza,besucht,sehr_gut,normal,fav,,2026-07-29,,,,"lunch, dinner",,2026-07-29
+r0233,Il Ritrovo-Cucina Casalinga Popolare,52.50953,13.458064,Pizza,besucht,gut,normal,fav,,2026-07-29,,,,"lunch, dinner",,2026-07-29
 r0234,India Club Berlin,52.5151828,13.3797405,Asia,besucht,unbewertet,ueberteuert,fav,,2026-07-20,,,indisch,"lunch, dinner",,
-r0235,IPSE,52.4977354,13.4517798,Club/Livemusik,besucht,sehr_gut,normal,fav,,2026-07-20,,,,"drinks, music",,
-r0236,Ishin,52.5080044,13.3924252,Sushi,besucht,unbewertet,normal,fav,,2026-07-20,,,,"lunch, dinner",,
+r0235,IPSE,52.4977354,13.4517798,Club/Livemusik,besucht,sehr_gut,normal,fav,,2026-07-29,,,,"drinks, music",,2026-07-29
+r0236,Ishin,52.5080044,13.3924252,Sushi,besucht,mittel,normal,fav,,2026-07-29,,,,"lunch, dinner",,2026-07-29
 r0237,ITA Bistro,52.5438787,13.4183748,Restaurant,besucht,sehr_gut,teuer,fav,,2026-07-20,,,,"lunch, dinner",,
 r0238,Ixthys Korean Restaurant,52.4945793,13.3543313,Asia,besucht,sehr_gut,guenstig,fav,,2026-07-20,,,koreanisch,"lunch, dinner",,
 r0239,Jatz Bar,52.5501882,13.3691302,Kneipe,besucht,unbewertet,normal,fav,,2026-07-20,,,,drinks,,
 r0240,Jolesch,52.500693,13.43392,Restaurant,besucht,unbewertet,normal,fav,,2026-07-20,,,,"lunch, dinner",,
-r0241,JONES ice cream,52.490486,13.353453,Eis,besucht,sehr_gut,normal,fav,,2026-07-20,,,,kaffee,,
+r0241,JONES ice cream,52.490486,13.353453,Eis,besucht,sehr_gut,normal,fav,,2026-07-29,,,,kaffee,,2026-07-29
 r0242,JOSEPH,52.52584,13.38769,Restaurant,besucht,unbewertet,normal,fav,,2026-07-20,,,,"lunch, dinner",,
-r0243,Jubel,52.5322864,13.4305233,Dessert,besucht,sehr_gut,normal,fav,,2026-07-23,,,,"fruehstueck, kaffee",,
+r0243,Jubel,52.5322864,13.4305233,Dessert,besucht,sehr_gut,normal,fav,,2026-07-28,,,,"fruehstueck, kaffee",,2026-07-28
 r0244,jules Geisberg,52.4974066,13.3421683,Café,besucht,sehr_gut,normal,fav,,2026-07-20,,,,"fruehstueck, kaffee",,
 r0245,Jägerklause,52.5134677,13.4479224,Kneipe,besucht,unbewertet,normal,fav,,2026-07-20,,,,drinks,,
 r0246,KAFFEE.BAR,52.5446217,13.4229262,Café,besucht,unbewertet,normal,fav,,2026-07-20,,,,"fruehstueck, kaffee",,
@@ -237,32 +237,32 @@ r0251,Kallasch & - Moab Barprojekt,52.5329457,13.3365831,Kneipe,besucht,sehr_gut
 r0252,Kanaan,52.5435988,13.4198475,Restaurant,besucht,unbewertet,normal,fav,,2026-07-20,,,,"lunch, dinner",,
 r0253,Kapital ist ein scheues Reh,52.53817,13.41126,Kneipe,besucht,unbewertet,normal,fav,,2026-07-20,,,,drinks,,
 r0254,Kaschk,52.528326,13.409988,Kneipe,besucht,unbewertet,normal,fav,,2026-07-20,,,,drinks,,
-r0255,Kater Blau,52.5119475,13.4253838,Club/Livemusik,besucht,unbewertet,normal,fav,,2026-07-20,,,,"drinks, music",,
+r0255,Kater Blau,52.5119475,13.4253838,Club/Livemusik,besucht,gut,normal,fav,,2026-07-29,,,,"drinks, music",,2026-07-29
 r0256,Katz Orange,52.5315246,13.3953026,Restaurant,besucht,unbewertet,ueberteuert,fav,filiale,2026-07-20,,,,"lunch, dinner",,
 r0257,Katz Orange,52.5315246,13.3953026,Cocktail-Bar,besucht,sehr_gut,teuer,fav,filiale,2026-07-20,,,,drinks,,
 r0258,Kebab Baba,52.5265051,13.3878453,Imbiss,besucht,unbewertet,normal,fav,,2026-07-20,,,,"lunch, dinner",,
 r0259,Kebab Kitchen,52.5245371,13.4031745,Imbiss,besucht,sehr_gut,guenstig,fav,,2026-07-20,,,,"lunch, dinner",,
 r0260,Khao Taan,52.5086511,13.4638149,Asia,besucht,unbewertet,normal,fav,,2026-07-20,,,thai,"lunch, dinner",,
 r0261,Khushi,52.53404,13.415211,Restaurant,besucht,sehr_gut,normal,fav,,2026-07-20,,,,"lunch, dinner",,
-r0263,Ki Kuriya,52.5320832,13.4312275,Sushi,besucht,unbewertet,normal,fav,,2026-07-20,,,,"lunch, dinner",,
-r0264,Kickerbar Platzwart,52.50295,13.42999,Sportsbar,besucht,gut,normal,fav,,2026-07-23,,,,drinks,,
+r0263,Ki Kuriya,52.5320832,13.4312275,Sushi,besucht,mittel,normal,fav,,2026-07-29,,,,"lunch, dinner",,2026-07-29
+r0264,Kickerbar Platzwart,52.50295,13.42999,Sportsbar,besucht,gut,normal,fav,,2026-07-29,,,,drinks,,2026-07-29
 r0265,Kimchi Princess,52.498557,13.425854,Asia,besucht,unbewertet,normal,fav,,2026-07-20,,,,"lunch, dinner",,
-r0266,King Karaoke Berlin,52.505532,13.313446,Karaoke,besucht,unbewertet,normal,fav,,2026-07-20,,,,"drinks, music",,
+r0266,King Karaoke Berlin,52.505532,13.313446,Karaoke,besucht,mittel,normal,fav,,2026-07-29,,,,"drinks, music",,2026-07-29
 r0267,King King,52.5251252,13.4102803,Asia,besucht,unbewertet,normal,fav,,2026-07-20,,,,"lunch, dinner",,
 r0268,KINK Bar & Restaurant,52.5319504,13.4116301,Restaurant,besucht,unbewertet,ueberteuert,fav,filiale,2026-07-20,,,,"lunch, dinner",,
 r0269,KINK Bar & Restaurant,52.5319735,13.4115959,Cocktail-Bar,besucht,unbewertet,ueberteuert,fav,filiale,2026-07-20,,,,drinks,,
 r0270,Kinnaree Thai,52.488649,13.407387,Asia,besucht,unbewertet,normal,fav,,2026-07-20,,,thai,"lunch, dinner",,
 r0271,Kirk Bar,52.500874,13.440445,Kneipe,besucht,unbewertet,normal,fav,,2026-07-20,,,,drinks,,
-r0272,Kitty Cheng Bar,52.529894,13.404218,Club/Livemusik,besucht,unbewertet,normal,fav,,2026-07-20,,,,"drinks, music",,
+r0272,Kitty Cheng Bar,52.529894,13.404218,Club/Livemusik,besucht,mittel,normal,fav,,2026-07-29,,,,"drinks, music",,2026-07-29
 r0273,Klunkerkranich,52.482081,13.432256,Kneipe,besucht,unbewertet,normal,fav,,2026-07-20,,,,drinks,,
 r0274,Koempul - authentic Indonesian Restaurant,52.5414179,13.4151773,Asia,besucht,unbewertet,normal,fav,,2026-07-20,,,sonstige-asiatisch,"lunch, dinner",,
 r0275,KOHLEN QUELLE,52.549152,13.408012,Kneipe,besucht,unbewertet,normal,fav,,2026-07-20,,,,drinks,,
 r0276,KOKIO,52.540032,13.4161384,Asia,besucht,unbewertet,normal,fav,,2026-07-20,,,koreanisch,"lunch, dinner",,
-r0277,Konditorei Buchwald,52.5212047,13.3476955,Dessert,besucht,unbewertet,normal,fav,,2026-07-23,,,,"fruehstueck, kaffee",,
+r0277,Konditorei Buchwald,52.5212047,13.3476955,Dessert,besucht,mittel,normal,fav,,2026-07-28,,,,"fruehstueck, kaffee",,2026-07-28
 r0278,Kongfu Chili,52.544156,13.4199361,Asia,besucht,sehr_gut,normal,fav,,2026-07-20,,,chinesisch,"lunch, dinner",,
 r0279,Konnopke's Imbiss,52.540511,13.412174,Imbiss,besucht,sehr_gut,guenstig,fav,,2026-07-20,,,,"lunch, dinner",,
 r0280,Krass Böser Wolf,52.49761,13.464537,Cocktail-Bar,besucht,sehr_gut,normal,fav,,2026-07-20,,,,drinks,,
-r0281,Kuchi,52.527236,13.399284,Sushi,besucht,unbewertet,normal,fav,,2026-07-20,,,,"lunch, dinner",,
+r0281,Kuchi,52.527236,13.399284,Sushi,besucht,mittel,normal,fav,,2026-07-29,,,,"lunch, dinner",,2026-07-29
 r0282,Kushinoya,52.5054053,13.3197779,Asia,besucht,unbewertet,normal,fav,,2026-07-20,,,japanisch,"lunch, dinner",,
 r0283,KWA - Kebap with Attitude,52.5272082,13.3990775,Restaurant,besucht,unbewertet,normal,fav,,2026-07-20,,,,"lunch, dinner",,
 r0284,L'Osteria del Parlamento,52.5417385,13.4204488,Restaurant,besucht,unbewertet,normal,fav,,2026-07-20,,,,"lunch, dinner",,
@@ -278,24 +278,24 @@ r0295,Lebensmittel in Mitte,52.524138,13.407495,Restaurant,besucht,unbewertet,no
 r0296,Lecker Song,52.5441305,13.4204094,Asia,besucht,unbewertet,normal,fav,,2026-07-20,,,chinesisch,"lunch, dinner",,
 r0298,Lemongrass,52.53532,13.39919,Asia,besucht,unbewertet,normal,fav,,2026-07-20,,,vietnamesisch,"lunch, dinner",,
 r0299,Lerchen&Eulen,52.50211,13.43087,Kneipe,besucht,sehr_gut,normal,fav,,2026-07-20,,,,drinks,,
-r0300,Lido,52.4992291,13.445205,Club/Livemusik,besucht,unbewertet,normal,fav,,2026-07-20,,,,"drinks, music",,
+r0300,Lido,52.4992291,13.445205,Club/Livemusik,besucht,mittel,normal,fav,,2026-07-29,,,,"drinks, music",,2026-07-29
 r0301,Lois,52.5288502,13.4054007,Café,besucht,unbewertet,normal,fav,,2026-07-20,,,,"fruehstueck, kaffee",,
 r0302,Lokal,52.527918,13.394828,Restaurant,besucht,unbewertet,normal,fav,,2026-07-20,,,,"lunch, dinner",,
-r0303,Lola Pizzaiola,52.5344101,13.4261691,Pizza,besucht,sehr_gut,guenstig,fav,,2026-07-20,,,,"lunch, dinner",,
+r0303,Lola Pizzaiola,52.5344101,13.4261691,Pizza,besucht,sehr_gut,guenstig,fav,,2026-07-29,,,,"lunch, dinner",,2026-07-29
 r0304,Lon-Men's Noodle House,52.506335,13.316612,Asia,besucht,sehr_gut,normal,fav,,2026-07-20,,,chinesisch,"lunch, dinner",,
 r0305,Long March Canteen,52.502973,13.431057,Asia,besucht,unbewertet,normal,fav,,2026-07-20,,,chinesisch,"lunch, dinner",,
 r0306,LOST MY LOVE TO ITALY,52.5291781,13.3958049,Café,besucht,sehr_gut,normal,fav,,2026-07-20,,,,"fruehstueck, kaffee",,
-r0307,Lovebirds - Contemporary Pizza,52.5288711,13.401739,Pizza,besucht,sehr_gut,normal,fav,,2026-07-20,,,,"lunch, dinner",,
+r0307,Lovebirds - Contemporary Pizza,52.5288711,13.401739,Pizza,besucht,sehr_gut,normal,fav,,2026-07-29,,,,"lunch, dinner",,2026-07-29
 r0308,Lubitsch,52.504537,13.320048,Restaurant,besucht,unbewertet,normal,fav,,2026-07-20,,,,"fruehstueck, brunch",,
 r0309,Lucky Leek,52.5348647,13.4167816,Restaurant,besucht,unbewertet,ueberteuert,fav,,2026-07-20,,,,"lunch, dinner",,
 r0310,Luna D'Oro,52.5267016,13.3968996,Restaurant,besucht,sehr_gut,normal,fav,,2026-07-20,,,,"lunch, dinner",,
 r0311,Mabuhay Indonesian Restaurant,52.5042976,13.376049,Asia,besucht,sehr_gut,guenstig,fav,,2026-07-20,,,sonstige-asiatisch,"lunch, dinner",,
 r0312,Macke Prinz,52.5344223,13.4048861,Kneipe,besucht,unbewertet,normal,fav,,2026-07-20,,,,drinks,,
 r0313,Madang,52.492078,13.390092,Asia,besucht,unbewertet,normal,fav,,2026-07-20,,,koreanisch,"lunch, dinner",,
-r0315,Magic John's,52.5261078,13.3889755,Pizza,besucht,sehr_gut,normal,fav,,2026-07-20,,,,"lunch, dinner",,
-r0316,Malafemmena,52.4737663,13.3383341,Pizza,besucht,sehr_gut,normal,fav,,2026-07-20,,,,"lunch, dinner",,
-r0317,Malafemmena Prenzlauer Berg,52.5402745,13.4154011,Pizza,besucht,sehr_gut,normal,fav,,2026-07-20,,,,"lunch, dinner",,
-r0318,Mamida,52.5430291,13.4209438,Pizza,besucht,sehr_gut,normal,fav,,2026-07-20,,,,"lunch, dinner",,
+r0315,Magic John's,52.5261078,13.3889755,Pizza,besucht,mittel,normal,fav,,2026-07-29,,,,"lunch, dinner",,2026-07-29
+r0316,Malafemmena,52.4737663,13.3383341,Pizza,besucht,sehr_gut,normal,fav,,2026-07-29,,,,"lunch, dinner",,2026-07-29
+r0317,Malafemmena Prenzlauer Berg,52.5402745,13.4154011,Pizza,besucht,sehr_gut,normal,fav,,2026-07-29,,,,"lunch, dinner",,2026-07-29
+r0318,Mamida,52.5430291,13.4209438,Pizza,besucht,sehr_gut,normal,fav,,2026-07-29,,,,"lunch, dinner",,2026-07-29
 r0319,Mani Restaurant,52.529396,13.399545,Restaurant,besucht,unbewertet,normal,fav,,2026-07-20,,,,"lunch, dinner",,
 r0320,Maria Bonita Mexican Bistro,52.5404105,13.4181046,Imbiss,besucht,sehr_gut,guenstig,fav,,2026-07-20,,,,"lunch, dinner",,
 r0322,Maselli Ristorante,52.4917307,13.3909221,Restaurant,besucht,sehr_gut,normal,fav,,2026-07-20,,,,"lunch, dinner",,
@@ -305,7 +305,7 @@ r0325,meisterschueler,52.522653,13.3888009,Cocktail-Bar,besucht,unbewertet,norma
 r0327,Metzer Eck,52.53181,13.4163603,Kneipe,besucht,sehr_gut,normal,fav,,2026-07-20,,,,drinks,,
 r0329,Michelberger Hotel,52.504651,13.447904,Restaurant,besucht,unbewertet,ueberteuert,fav,filiale,2026-07-20,,,,"lunch, dinner",,
 r0330,Michelberger Hotel,52.504651,13.447904,Kneipe,besucht,unbewertet,normal,fav,filiale,2026-07-20,,,,drinks,,
-r0331,Midtown Grill,52.5110508,13.3765689,Steak/Grill,besucht,unbewertet,ueberteuert,fav,,2026-07-20,,,,"lunch, dinner",,
+r0331,Midtown Grill,52.5110508,13.3765689,Steak/Grill,besucht,unbewertet,ueberteuert,fav,,2026-07-29,,,,"lunch, dinner",,2026-07-29
 r0332,Mikkeller Berlin,52.5295158,13.4038983,Kneipe,besucht,unbewertet,ueberteuert,fav,,2026-07-20,,,,drinks,,
 r0333,Milch & Zucker,52.51178,13.452642,Café,besucht,sehr_gut,normal,fav,filiale,2026-07-20,,,,"fruehstueck, kaffee",,
 r0334,Milch & Zucker,52.5018777,13.4174929,Café,besucht,unbewertet,normal,fav,filiale,2026-07-20,,,,"fruehstueck, kaffee",,
@@ -315,16 +315,16 @@ r0337,Ming Dynastie,52.513625,13.418422,Asia,besucht,unbewertet,normal,fav,,2026
 r0339,Mizu Ramen,52.5268053,13.3874491,Asia,besucht,unbewertet,normal,fav,,2026-07-20,,,,"lunch, dinner",,
 r0340,moa - café & bar,52.5244381,13.3493007,Café,besucht,sehr_gut,normal,fav,,2026-07-20,,,,"fruehstueck, kaffee",,
 r0341,momiji,52.5066369,13.32042,Asia,besucht,sehr_gut,normal,fav,,2026-07-20,,,japanisch,"lunch, dinner",,
-r0342,Monarch,52.499268,13.419378,Club/Livemusik,besucht,unbewertet,normal,fav,,2026-07-20,,,,"drinks, music",,
+r0342,Monarch,52.499268,13.419378,Club/Livemusik,besucht,mittel,normal,fav,,2026-07-29,,,,"drinks, music",,2026-07-29
 r0343,Monkey Bar,52.505671,13.337896,Cocktail-Bar,besucht,unbewertet,ueberteuert,fav,,2026-07-20,,,,drinks,,
 r0344,Monsieur Vuong,52.526597,13.40786,Asia,besucht,sehr_gut,normal,fav,,2026-07-20,,,vietnamesisch,"lunch, dinner",,
-r0345,Monster Ronson's Ichiban Karaoke,52.505199,13.448463,Karaoke,besucht,sehr_gut,normal,fav,,2026-07-20,,,,"drinks, music",,
+r0345,Monster Ronson's Ichiban Karaoke,52.505199,13.448463,Karaoke,besucht,sehr_gut,normal,fav,,2026-07-29,,,,"drinks, music",,2026-07-29
 r0347,Morimori Ramen,52.499793,13.4241807,Asia,besucht,unbewertet,normal,fav,,2026-07-20,,,japanisch,"lunch, dinner",,
 r0348,Mozzarella Bar & Bottega - Al Contadino sotto le Stelle,52.5276577,13.4009114,Restaurant,besucht,unbewertet,normal,fav,,2026-07-20,,,,"lunch, dinner",,
 r0349,Mo’s Coffee,52.5435332,13.4255722,Café,besucht,unbewertet,normal,fav,,2026-07-20,,,,"fruehstueck, kaffee",,
 r0350,Mr. Susan,52.5244194,13.3957051,Cocktail-Bar,besucht,sehr_gut,normal,fav,,2026-07-20,,,,drinks,,
 r0351,Muret la Barba,52.527492,13.403442,Restaurant,besucht,unbewertet,normal,fav,,2026-07-20,,,,"lunch, dinner",,
-r0352,Musashi,52.49517,13.42109,Sushi,besucht,sehr_gut,guenstig,fav,,2026-07-20,,,,"lunch, dinner",,
+r0352,Musashi,52.49517,13.42109,Sushi,besucht,sehr_gut,guenstig,fav,,2026-07-29,,,,"lunch, dinner",,2026-07-29
 r0353,Mustafa's Gemüse Kebap,52.493814,13.388034,Imbiss,besucht,sehr_gut,guenstig,fav,,2026-07-20,,,,"lunch, dinner",,
 r0354,Mustafas Gemüse Döner,52.510066,13.451154,Imbiss,besucht,sehr_gut,guenstig,fav,,2026-07-20,,,,"lunch, dinner",,
 r0355,Mutzenbacher Restaurant,52.508547,13.452776,Restaurant,besucht,unbewertet,normal,fav,,2026-07-20,,,,"lunch, dinner",,
@@ -333,7 +333,7 @@ r0357,Mysliwska,52.4995533,13.4452655,Kneipe,besucht,sehr_gut,normal,fav,,2026-0
 r0358,Myxa Berlin,52.490273,13.426709,Café,besucht,sehr_gut,normal,fav,,2026-07-20,,,,"fruehstueck, kaffee",,
 r0359,Mädchenitaliener,52.526921,13.407812,Restaurant,besucht,unbewertet,normal,fav,,2026-07-20,,,,"lunch, dinner",,
 r0360,Möbel Olfe,52.500045,13.417503,Cocktail-Bar,besucht,unbewertet,normal,fav,,2026-07-20,,,,drinks,,
-r0361,NAUTA Berlín,52.5341574,13.4050309,Fisch,besucht,unbewertet,normal,fav,,2026-07-20,,,,"lunch, dinner",,
+r0361,NAUTA Berlín,52.5341574,13.4050309,Fisch,besucht,mittel,normal,fav,,2026-07-29,,,,"lunch, dinner",,2026-07-29
 r0362,NENI Berlin,52.50572,13.33776,Restaurant,besucht,unbewertet,normal,fav,,2026-07-20,,,,"lunch, dinner",,
 r0363,NEO1,52.5428103,13.4206186,Restaurant,besucht,unbewertet,normal,fav,,2026-07-20,,,,"lunch, dinner",,
 r0364,Neue Odessa Bar,52.529619,13.40579,Cocktail-Bar,besucht,unbewertet,ueberteuert,fav,,2026-07-20,,,,drinks,,
@@ -342,9 +342,9 @@ r0366,Newton Bar,52.51287,13.390939,Cocktail-Bar,besucht,unbewertet,ueberteuert,
 r0367,Night Kitchen,52.5256149,13.3939892,Restaurant,besucht,unbewertet,ueberteuert,fav,,2026-07-20,,,,"lunch, dinner",,
 r0368,Ni’s Restaurant 倪记,52.5228386,13.4004031,Asia,besucht,unbewertet,normal,fav,,2026-07-20,,,chinesisch,"lunch, dinner",,
 r0369,Nomad - Breakfast & Dinner,52.5294207,13.3895639,Restaurant,besucht,unbewertet,normal,fav,,2026-07-20,,,,"fruehstueck, brunch",,
-r0370,NOVEMBER Brasserie,52.53804,13.4172401,Sushi,besucht,unbewertet,ueberteuert,fav,,2026-07-20,,,,"lunch, dinner",,
-r0372,OHM,52.5104862,13.4202742,Club/Livemusik,besucht,unbewertet,normal,fav,,2026-07-20,,,,"drinks, music",,
-r0373,Omoni,52.549173,13.408967,Sushi,besucht,sehr_gut,normal,fav,,2026-07-20,,,,"lunch, dinner",,
+r0370,NOVEMBER Brasserie,52.53804,13.4172401,Sushi,besucht,unbewertet,ueberteuert,fav,,2026-07-29,,,,"lunch, dinner",,2026-07-29
+r0372,OHM,52.5104862,13.4202742,Club/Livemusik,besucht,mittel,normal,fav,,2026-07-29,,,,"drinks, music",,2026-07-29
+r0373,Omoni,52.549173,13.408967,Sushi,besucht,sehr_gut,normal,fav,,2026-07-29,,,,"lunch, dinner",,2026-07-29
 r0375,ORA,52.5013856,13.4159187,Restaurant,besucht,unbewertet,normal,fav,,2026-07-20,,,,"lunch, dinner",,
 r0376,Orania.Restaurant & Orania.Bar,52.5022169,13.4168669,Restaurant,besucht,unbewertet,ueberteuert,fav,,2026-07-20,,,,"lunch, dinner",,
 r0377,Osmans Töchter,52.5430228,13.4147207,Restaurant,besucht,sehr_gut,normal,fav,,2026-07-20,,,,"lunch, dinner",,
@@ -359,27 +359,27 @@ r0387,Pasta & Vino,52.5468798,13.4177834,Restaurant,besucht,unbewertet,normal,fa
 r0388,Pastelaria A Galão,52.531083,13.402662,Café,besucht,sehr_gut,normal,fav,,2026-07-20,,,,"fruehstueck, kaffee",,
 r0390,Paules Metal Eck,52.510718,13.456827,Kneipe,besucht,unbewertet,normal,fav,,2026-07-20,,,,drinks,,
 r0391,Pawn Dot Com Bar,52.528944,13.3961644,Cocktail-Bar,besucht,mittel,normal,fav,,2026-07-27,,,,drinks,,
-r0392,Pepe Nero Trattoria-Pizzeria,52.53172,13.434405,Pizza,besucht,unbewertet,normal,fav,,2026-07-20,,,,"lunch, dinner",,
+r0392,Pepe Nero Trattoria-Pizzeria,52.53172,13.434405,Pizza,besucht,mittel,normal,fav,,2026-07-29,,,,"lunch, dinner",,2026-07-29
 r0393,PeterPaul,52.5299474,13.4042323,Restaurant,besucht,unbewertet,normal,fav,,2026-07-20,,,,"lunch, dinner",,
-r0394,petit bijou,52.5227372,13.3938699,Dessert,besucht,unbewertet,normal,fav,,2026-07-23,,,,"fruehstueck, brunch",,
-r0395,Petrarca,52.5291672,13.3884163,Weinbar,besucht,sehr_gut,normal,fav,,2026-07-20,,,,drinks,,
+r0394,petit bijou,52.5227372,13.3938699,Dessert,besucht,mittel,normal,fav,,2026-07-28,,,,"fruehstueck, brunch, kaffee",,2026-07-28
+r0395,Petrarca,52.5291672,13.3884163,Restaurant,besucht,sehr_gut,normal,fav,,2026-07-29,,,,drinks,,
 r0396,PHO - Noodlebar (Mitte),52.5264349,13.387848,Asia,besucht,unbewertet,normal,fav,,2026-07-20,,,vietnamesisch,"lunch, dinner",,
 r0397,Pho Co Restaurant,52.52517,13.41074,Asia,besucht,sehr_gut,normal,fav,,2026-07-20,,,vietnamesisch,"lunch, dinner",,
 r0398,Pik As,52.529583,13.4025829,Kneipe,besucht,sehr_gut,guenstig,fav,,2026-07-20,,,,drinks,,
-r0399,Pizza Meister Berlin,52.4923021,13.3944603,Pizza,besucht,sehr_gut,guenstig,fav,,2026-07-20,,,,"lunch, dinner",,
-r0400,Pizzeria Ristorante Papa Pane di Sorrento,52.532069,13.396356,Pizza,besucht,sehr_gut,normal,fav,,2026-07-20,,,,"lunch, dinner",,
-r0401,Platzhirsch,52.4840047,13.3437421,Biergarten,besucht,unbewertet,normal,fav,,2026-07-20,,,,"kaffee, dinner, drinks",,
-r0403,Prater,52.539768,13.410575,Biergarten,besucht,unbewertet,normal,fav,,2026-07-20,,,,"kaffee, dinner, drinks",,
+r0399,Pizza Meister Berlin,52.4923021,13.3944603,Pizza,besucht,sehr_gut,guenstig,fav,,2026-07-29,,,,"lunch, dinner",,2026-07-29
+r0400,Pizzeria Ristorante Papa Pane di Sorrento,52.532069,13.396356,Pizza,besucht,sehr_gut,normal,fav,,2026-07-29,,,,"lunch, dinner",,2026-07-29
+r0401,Platzhirsch,52.4840047,13.3437421,Biergarten,besucht,gut,normal,fav,,2026-07-29,,,,"kaffee, dinner, drinks",,2026-07-29
+r0403,Prater,52.539768,13.410575,Biergarten,besucht,gut,normal,fav,,2026-07-29,,,,"kaffee, dinner, drinks",,2026-07-29
 r0404,Preeda,52.5314613,13.433536,Asia,besucht,unbewertet,normal,fav,,2026-07-20,,,thai,"lunch, dinner",,
-r0405,Prince Charles,52.503273,13.408719,Club/Livemusik,besucht,unbewertet,normal,fav,,2026-07-20,,,,"drinks, music",,
-r0406,Princess Cheesecake,52.526761,13.393029,Dessert,besucht,sehr_gut,normal,fav,filiale,2026-07-23,,,,"fruehstueck, kaffee",,
+r0405,Prince Charles,52.503273,13.408719,Club/Livemusik,besucht,mittel,normal,fav,,2026-07-29,,,,"drinks, music",,2026-07-29
+r0406,Princess Cheesecake,52.526761,13.393029,Dessert,besucht,sehr_gut,normal,fav,filiale,2026-07-28,,,,"fruehstueck, kaffee",,2026-07-28
 r0407,Prinzipal Kreuzberg,52.50093,13.41964,Cocktail-Bar,besucht,sehr_gut,normal,fav,,2026-07-20,,,,drinks,,
 r0408,Pursuit of Coffee,52.5466749,13.4186475,Café,besucht,unbewertet,normal,fav,,2026-07-20,,,,"fruehstueck, kaffee",,
 r0410,Refinery High End Coffee,52.5213117,13.3849173,Café,besucht,sehr_gut,normal,fav,,2026-07-20,,,,"fruehstueck, kaffee",,
 r0411,Reingold,52.528657,13.388364,Cocktail-Bar,besucht,unbewertet,ueberteuert,fav,,2026-07-20,,,,drinks,,
-r0412,rembrandt-burger,52.5200075,13.4478194,Burger,besucht,sehr_gut,normal,fav,,2026-07-20,,,,"lunch, dinner",,
+r0412,rembrandt-burger,52.5200075,13.4478194,Burger,besucht,sehr_gut,normal,fav,,2026-07-29,,,,"lunch, dinner",,2026-07-29
 r0413,Remi,52.5283718,13.4105324,Restaurant,besucht,unbewertet,normal,fav,,2026-07-20,,,,"lunch, dinner",,
-r0414,Restaurant Aposto,52.522677,13.400039,Pizza,besucht,unbewertet,normal,fav,,2026-07-20,,,,"lunch, dinner",,
+r0414,Restaurant Aposto,52.522677,13.400039,Pizza,besucht,mittel,normal,fav,,2026-07-29,,,,"lunch, dinner",,2026-07-29
 r0415,Restaurant Bricole,52.541102,13.422249,Restaurant,besucht,sehr_gut,teuer,fav,,2026-07-20,,,,"lunch, dinner",,
 r0416,Restaurant Dae Mon,52.5227699,13.399358,Asia,besucht,unbewertet,ueberteuert,fav,,2026-07-20,,,sonstige-asiatisch,"lunch, dinner",,
 r0417,Restaurant Herr Rossi,52.5328228,13.4246048,Restaurant,besucht,sehr_gut,normal,fav,,2026-07-20,,,,"lunch, dinner",,
@@ -388,7 +388,7 @@ r0419,Restaurant Masel Topf,52.5337929,13.4204741,Restaurant,besucht,unbewertet,
 r0420,Restaurant Papaya,52.510781,13.45802,Asia,besucht,sehr_gut,normal,fav,,2026-07-20,,,thai,"lunch, dinner",,
 r0421,Restaurant Pasternak,52.534798,13.4187,Restaurant,besucht,unbewertet,normal,fav,,2026-07-20,,,,"fruehstueck, brunch",,
 r0422,Restaurant Richard,52.504219,13.435281,Restaurant,besucht,gut,ueberteuert,fav,,2026-07-20,,,,"lunch, dinner",,
-r0423,Restaurant Schoenbrunn,52.52869,13.434621,Biergarten,besucht,unbewertet,normal,fav,filiale,2026-07-20,,,,"kaffee, dinner, drinks",,
+r0423,Restaurant Schoenbrunn,52.52869,13.434621,Biergarten,besucht,gut,normal,fav,filiale,2026-07-29,,,,"kaffee, dinner, drinks, fruehstueck, brunch, lunch",,2026-07-29
 r0424,Restaurant Schoenbrunn,52.528069,13.433982,Restaurant,besucht,unbewertet,normal,fav,filiale,2026-07-20,,,,"fruehstueck, brunch",,
 r0426,Restaurant und Bar Keyser soze,52.52625,13.39329,Kneipe,besucht,unbewertet,normal,fav,filiale,2026-07-20,,,,drinks,,
 r0427,Restaurant und Bar Keyser soze,52.52625,13.39329,Restaurant,besucht,unbewertet,normal,fav,filiale,2026-07-20,,,,"fruehstueck, brunch",,
@@ -401,7 +401,7 @@ r0433,Ristorante L'angolo,52.486241,13.332617,Restaurant,besucht,sehr_gut,normal
 r0434,Ristorante Pizzeria Garda,52.5258685,13.3942209,Restaurant,besucht,sehr_gut,normal,fav,,2026-07-20,,,,"lunch, dinner",,
 r0435,Ristorante Roma,52.4782403,13.3281001,Restaurant,besucht,unbewertet,normal,fav,,2026-07-20,,,,"lunch, dinner",,
 r0436,Ristorante Sale e Tabacchi,52.506662,13.391415,Restaurant,besucht,unbewertet,normal,fav,,2026-07-20,,,,"lunch, dinner",,
-r0437,Ritter Butzke,52.5028662,13.4082552,Club/Livemusik,besucht,sehr_gut,normal,fav,,2026-07-20,,,,"drinks, music",,
+r0437,Ritter Butzke,52.5028662,13.4082552,Club/Livemusik,besucht,sehr_gut,normal,fav,,2026-07-29,,,,"drinks, music",,2026-07-29
 r0438,rocket + basil,52.5030596,13.3666316,Restaurant,besucht,sehr_gut,guenstig,fav,,2026-07-20,,,,"lunch, dinner",,
 r0440,Roses,52.500494,13.421684,Cocktail-Bar,besucht,unbewertet,normal,fav,,2026-07-20,,,,drinks,,
 r0441,Roter Rabe,52.496584,13.419306,Cocktail-Bar,besucht,sehr_gut,normal,fav,,2026-07-20,,,,drinks,,
@@ -417,19 +417,19 @@ r0451,Sadhu Prenzlauer Berg,52.5453541,13.4214104,Asia,besucht,sehr_gut,normal,f
 r0452,Sage Restaurant,52.5056562,13.4326079,Restaurant,besucht,unbewertet,ueberteuert,fav,,2026-07-20,,,,"lunch, dinner",,
 r0453,Saigon Green,52.50605,13.320837,Asia,besucht,sehr_gut,normal,fav,,2026-07-20,,,vietnamesisch,"lunch, dinner",,
 r0455,Salamat,52.5287003,13.3938062,Restaurant,besucht,sehr_gut,guenstig,fav,,2026-07-20,,,,"lunch, dinner",,
-r0456,Salami Social Club,52.5150822,13.4633505,Pizza,besucht,sehr_gut,guenstig,fav,,2026-07-20,,,,"lunch, dinner",,
-r0457,Salon zur wilden Renate,52.4975709,13.4655289,Club/Livemusik,besucht,unbewertet,normal,fav,,2026-07-20,,,,"drinks, music",,
+r0456,Salami Social Club,52.5150822,13.4633505,Pizza,besucht,sehr_gut,guenstig,fav,,2026-07-29,,,,"lunch, dinner",,2026-07-29
+r0457,Salon zur wilden Renate,52.4975709,13.4655289,Club/Livemusik,besucht,gut,normal,fav,,2026-07-29,,,,"drinks, music",,2026-07-29
 r0458,Salsabil,52.5121505,13.4538144,Imbiss,besucht,unbewertet,normal,fav,,2026-07-20,,,,"lunch, dinner",,
-r0459,SammyS Berliner Donuts,52.5262981,13.3992822,Dessert,besucht,gut,normal,fav,,2026-07-23,,,,"fruehstueck, kaffee",,
-r0460,SAN,52.5269769,13.4146945,Sushi,besucht,sehr_gut,teuer,fav,,2026-07-20,,,,"lunch, dinner",,
+r0459,SammyS Berliner Donuts,52.5262981,13.3992822,Dessert,besucht,gut,normal,fav,,2026-07-28,,,,"fruehstueck, kaffee",,2026-07-28
+r0460,SAN,52.5269769,13.4146945,Sushi,besucht,sehr_gut,teuer,fav,,2026-07-29,,,,"lunch, dinner",,2026-07-29
 r0461,Sanku Maots'ai 三顾冒菜,52.5264478,13.3869873,Asia,besucht,unbewertet,normal,fav,,2026-07-20,,,chinesisch,"lunch, dinner",,
 r0462,Sant Buena,52.5294637,13.3970636,Restaurant,besucht,unbewertet,ueberteuert,fav,,2026-07-27,,,,"fruehstueck, brunch, kaffee",,
 r0464,Saphire Bar,52.531868,13.43401,Cocktail-Bar,besucht,unbewertet,ueberteuert,fav,,2026-07-20,,,,drinks,,
 r0465,Saravanaa Bhavan,52.5102496,13.3761846,Asia,besucht,unbewertet,normal,fav,,2026-07-20,,,indisch,"lunch, dinner",,
-r0466,Sasaya,52.5443009,13.4185897,Sushi,besucht,sehr_gut,normal,fav,,2026-07-20,,,,"lunch, dinner",,
+r0466,Sasaya,52.5443009,13.4185897,Sushi,besucht,sehr_gut,normal,fav,,2026-07-29,,,,"lunch, dinner",,2026-07-29
 r0467,Sathutu,52.5367593,13.4211053,Restaurant,besucht,unbewertet,normal,fav,,2026-07-20,,,,"lunch, dinner",,
-r0468,Schland Hütte (Pizzahütte),52.549132,13.407624,Pizza,besucht,unbewertet,normal,fav,,2026-07-20,,,,"lunch, dinner",,
-r0469,Schleusenkrug,52.511258,13.335815,Biergarten,besucht,unbewertet,normal,fav,,2026-07-20,,,,"kaffee, dinner, drinks",,
+r0468,Schland Hütte (Pizzahütte),52.549132,13.407624,Pizza,besucht,sehr_gut,guenstig,fav,,2026-07-29,,,,"lunch, dinner",,2026-07-29
+r0469,Schleusenkrug,52.511258,13.335815,Biergarten,besucht,mittel,normal,fav,,2026-07-29,,,,"kaffee, dinner, drinks, lunch",,2026-07-29
 r0470,Schmittz,52.5293112,13.4052558,Kneipe,besucht,unbewertet,normal,fav,,2026-07-20,,,,drinks,,
 r0471,Schneeweiss,52.508697,13.458154,Restaurant,besucht,sehr_gut,normal,fav,,2026-07-20,,,,"lunch, dinner",,
 r0472,Schnitzelei Mitte,52.5285831,13.3878853,Restaurant,besucht,unbewertet,normal,fav,,2026-07-20,,,,"lunch, dinner",,
@@ -441,14 +441,14 @@ r0477,Schwarzwaldstuben,52.527658,13.392967,Restaurant,besucht,unbewertet,normal
 r0478,Seoulkitchen,52.503682,13.447171,Asia,besucht,unbewertet,normal,fav,,2026-07-20,,,koreanisch,"lunch, dinner",,
 r0479,Shakespeare and Sons,52.5127049,13.4531269,Café,besucht,unbewertet,normal,fav,,2026-07-20,,,,"fruehstueck, kaffee",,
 r0480,Shiori,52.5255437,13.4079551,Asia,besucht,unbewertet,ueberteuert,fav,,2026-07-20,,,japanisch,"lunch, dinner",,
-r0481,Shiso Burger Alte Schönhauser,52.5269025,13.4076359,Burger,besucht,unbewertet,normal,fav,,2026-07-20,,,,"lunch, dinner",,
-r0482,Shiso Burger Auguststrasse,52.5272762,13.3987744,Burger,besucht,unbewertet,normal,fav,,2026-07-20,,,,"lunch, dinner",,
-r0483,Shiso Burger Kantstr,52.5067234,13.3095662,Burger,besucht,unbewertet,normal,fav,,2026-07-20,,,,"lunch, dinner",,
+r0481,Shiso Burger Alte Schönhauser,52.5269025,13.4076359,Burger,besucht,mittel,normal,fav,,2026-07-29,,,,"lunch, dinner",,2026-07-29
+r0482,Shiso Burger Auguststrasse,52.5272762,13.3987744,Burger,besucht,mittel,normal,fav,,2026-07-29,,,,"lunch, dinner",,2026-07-29
+r0483,Shiso Burger Kantstr,52.5067234,13.3095662,Burger,besucht,mittel,normal,fav,,2026-07-29,,,,"lunch, dinner",,2026-07-29
 r0484,Silo Coffee,52.510044,13.458342,Café,besucht,unbewertet,normal,fav,,2026-07-20,,,,"fruehstueck, kaffee",,
 r0485,Sisaket,52.5235706,13.4048617,Asia,besucht,unbewertet,normal,fav,,2026-07-20,,,thai,"lunch, dinner",,
-r0486,Sisyphos,52.4930619,13.4912974,Club/Livemusik,besucht,sehr_gut,normal,fav,,2026-07-20,,,,"drinks, music",,
+r0486,Sisyphos,52.4930619,13.4912974,Club/Livemusik,besucht,sehr_gut,normal,fav,,2026-07-29,,,,"drinks, music",,2026-07-29
 r0487,Smartdeli Sushi & More,52.5280421,13.3890738,Asia,besucht,sehr_gut,normal,fav,,2026-07-20,,,japanisch,"lunch, dinner",,
-r0488,SOFI,52.5262061,13.4008837,Bäcker,besucht,unbewertet,ueberteuert,fav,,2026-07-23,,,,"fruehstueck, kaffee",,
+r0488,SOFI,52.5262061,13.4008837,Bäcker,besucht,unbewertet,ueberteuert,fav,,2026-07-29,,,,"fruehstueck, kaffee",,2026-07-29
 r0489,Sohnemann Bar,52.5142688,13.4596043,Cocktail-Bar,besucht,sehr_gut,normal,fav,,2026-07-20,,,,drinks,,
 r0490,soopoollim,52.5315761,13.3961477,Asia,besucht,unbewertet,normal,fav,,2026-07-20,,,koreanisch,"lunch, dinner",,
 r0491,Sophien 11,52.525,13.4027778,Restaurant,besucht,unbewertet,normal,fav,,2026-07-20,,,,"lunch, dinner",,
@@ -461,13 +461,13 @@ r0497,Spreegold Store Ros 02,52.522932,13.4091387,Restaurant,besucht,unbewertet,
 r0498,Spätzle Club,52.5106213,13.4023286,Restaurant,besucht,sehr_gut,guenstig,fav,,2026-07-20,,,,"lunch, dinner",,
 r0499,St. Oberholz,52.529507,13.401894,Café,besucht,unbewertet,normal,fav,,2026-07-20,,,,"fruehstueck, kaffee",,
 r0500,Stagger Lee,52.4975589,13.3516181,Cocktail-Bar,besucht,sehr_gut,normal,fav,,2026-07-20,,,,drinks,,
-r0502,Standard - Serious Pizza,52.5329046,13.4085775,Pizza,besucht,sehr_gut,normal,fav,,2026-07-20,,,,"lunch, dinner",,
-r0503,Sticks'n'Sushi,52.5019764,13.3651086,Sushi,besucht,unbewertet,ueberteuert,fav,,2026-07-20,,,,"lunch, dinner",,
+r0502,Standard - Serious Pizza,52.5329046,13.4085775,Pizza,besucht,sehr_gut,normal,fav,,2026-07-29,,,,"lunch, dinner",,2026-07-29
+r0503,Sticks'n'Sushi,52.5019764,13.3651086,Sushi,besucht,unbewertet,ueberteuert,fav,,2026-07-29,,,,"lunch, dinner",,2026-07-29
 r0504,Strandbad Mitte,52.527351,13.3967289,Restaurant,besucht,sehr_gut,normal,fav,,2026-07-20,,,,"fruehstueck, brunch",,
-r0505,Stranero,52.5522179,13.3640581,Pizza,besucht,sehr_gut,guenstig,fav,,2026-07-20,,,,"lunch, dinner",,
+r0505,Stranero,52.5522179,13.3640581,Pizza,besucht,sehr_gut,guenstig,fav,,2026-07-29,,,,"lunch, dinner",,2026-07-29
 r0506,Ständige Vertretung,52.521138,13.385326,Kneipe,besucht,unbewertet,normal,fav,,2026-07-20,,,,drinks,,
-r0507,Suicide Circus,52.507272,13.450853,Club/Livemusik,besucht,unbewertet,normal,fav,,2026-07-20,,,,"drinks, music",,
-r0508,Süß War Gestern,52.508588,13.460999,Club/Livemusik,besucht,sehr_gut,normal,fav,,2026-07-20,,,,"drinks, music",,
+r0507,Suicide Circus,52.507272,13.450853,Club/Livemusik,besucht,mittel,normal,fav,,2026-07-29,,,,"drinks, music",,2026-07-29
+r0508,Süß War Gestern,52.508588,13.460999,Club/Livemusik,besucht,sehr_gut,normal,fav,,2026-07-29,,,,"drinks, music",,2026-07-29
 r0509,Takumi NINE,52.5438067,13.4156551,Asia,besucht,sehr_gut,normal,fav,,2026-07-20,,,japanisch,"lunch, dinner",,
 r0510,Takumi NINE Sapporo,52.5290557,13.3847621,Asia,besucht,sehr_gut,normal,fav,,2026-07-20,,,japanisch,"lunch, dinner",,
 r0511,Taleh Thai,52.530488,13.4315041,Asia,besucht,sehr_gut,normal,fav,,2026-07-20,,,thai,"lunch, dinner",,
@@ -476,12 +476,12 @@ r0513,Tausend,52.521021,13.384465,Cocktail-Bar,besucht,unbewertet,ueberteuert,fa
 r0514,Thai Aroma,52.5435357,13.4219225,Asia,besucht,unbewertet,normal,fav,,2026-07-20,,,thai,"lunch, dinner",,
 r0515,THE BARN,52.527403,13.398084,Café,besucht,unbewertet,normal,fav,,2026-07-20,,,,"fruehstueck, kaffee",,
 r0516,The Barn Café Potsdamer Platz,52.5084739,13.374776,Café,besucht,unbewertet,normal,fav,,2026-07-20,,,,"fruehstueck, kaffee",,
-r0517,The Bird,52.546674,13.405829,Burger,besucht,unbewertet,normal,fav,,2026-07-20,,,,"lunch, dinner",,
+r0517,The Bird,52.546674,13.405829,Burger,besucht,gut,normal,fav,,2026-07-29,,,,"lunch, dinner",,2026-07-29
 r0518,The Castle Berlin Mitte,52.5315,13.3885,Kneipe,besucht,unbewertet,normal,fav,,2026-07-20,,,,drinks,,
-r0519,The Catch,52.503071,13.3198672,Sushi,besucht,unbewertet,normal,fav,,2026-07-20,,,,"lunch, dinner",,
+r0519,The Catch,52.503071,13.3198672,Sushi,besucht,unbewertet,ueberteuert,fav,,2026-07-29,,,,"lunch, dinner",,2026-07-29
 r0520,The Forsberg,52.544442,13.3719412,Cocktail-Bar,besucht,sehr_gut,normal,fav,,2026-07-20,,,,drinks,,
 r0521,The Grand,52.5255425,13.4125934,Cocktail-Bar,besucht,unbewertet,normal,fav,,2026-07-20,,,,drinks,,
-r0522,The Grand Berlin,52.525525,13.412382,Steak/Grill,besucht,unbewertet,ueberteuert,fav,,2026-07-20,,,,"lunch, dinner",,
+r0522,The Grand Berlin,52.525525,13.412382,Steak/Grill,besucht,unbewertet,ueberteuert,fav,,2026-07-29,,,,"lunch, dinner",,2026-07-29
 r0523,The Klub Kitchen,52.52488,13.40894,Restaurant,besucht,unbewertet,normal,fav,filiale,2026-07-20,,,,"lunch, dinner",,
 r0524,The Klub Kitchen,52.5329933,13.3996866,Restaurant,besucht,unbewertet,normal,fav,filiale,2026-07-20,,,,"lunch, dinner",,
 r0525,The Klub Kitchen West,52.5016053,13.3255733,Restaurant,besucht,sehr_gut,normal,fav,,2026-07-20,,,,"lunch, dinner",,
@@ -491,23 +491,23 @@ r0528,TiER,52.4848514,13.4375875,Cocktail-Bar,besucht,sehr_gut,normal,fav,,2026-
 r0529,Tilda - coffee eat sleep,52.5429536,13.4177874,Restaurant,besucht,sehr_gut,normal,fav,filiale,2026-07-20,,,,"lunch, dinner",,
 r0530,Tilda - coffee eat sleep,52.5429536,13.4177874,Café,besucht,sehr_gut,normal,fav,filiale,2026-07-20,,,,"fruehstueck, kaffee",,
 r0531,Tim Raue,52.50698,13.39138,Restaurant,besucht,unbewertet,ueberteuert,fav,,2026-07-20,,,,"lunch, dinner",,
-r0532,To The Bone,52.5294155,13.4045047,Steak/Grill,besucht,unbewertet,normal,fav,,2026-07-20,,,,"lunch, dinner",,
+r0532,To The Bone,52.5294155,13.4045047,Steak/Grill,besucht,mittel,normal,fav,,2026-07-29,,,,"lunch, dinner",,2026-07-29
 r0533,Toca Rouge,52.528265,13.391905,Asia,besucht,sehr_gut,normal,fav,,2026-07-20,,,,"lunch, dinner",,
 r0534,Tomasa Villa Kreuzberg,52.4894688,13.3802681,Restaurant,besucht,unbewertet,normal,fav,,2026-07-23,,,,"fruehstueck, kaffee",,
-r0535,Tommis Burger Joint,52.5323743,13.3976067,Burger,besucht,unbewertet,normal,fav,,2026-07-20,,,,"lunch, dinner",,
+r0535,Tommis Burger Joint,52.5323743,13.3976067,Burger,besucht,mittel,normal,fav,,2026-07-29,,,,"lunch, dinner",,2026-07-29
 r0536,Torbar,52.5286256,13.393479,Cocktail-Bar,besucht,unbewertet,ueberteuert,fav,,2026-07-20,,,,drinks,,
 r0537,Tossakan Berlin,52.5437294,13.4200028,Asia,besucht,sehr_gut,normal,fav,,2026-07-20,,,thai,"lunch, dinner",,
 r0538,Trancina,52.5430513,13.4258042,Restaurant,besucht,unbewertet,normal,fav,,2026-07-20,,,,"lunch, dinner",,
 r0539,Transit,52.505987,13.465711,Asia,besucht,unbewertet,normal,fav,,2026-07-20,,,thai,"lunch, dinner",,
 r0540,"TRANSIT, Berlin-Mitte",52.52865,13.402259,Asia,besucht,unbewertet,normal,fav,,2026-07-20,,,thai,"lunch, dinner",,
-r0541,Trattoria Acquolina,52.4819409,13.3209041,Pizza,besucht,unbewertet,normal,fav,,2026-07-20,,,,"lunch, dinner",,
+r0541,Trattoria Acquolina,52.4819409,13.3209041,Pizza,besucht,mittel,normal,fav,,2026-07-29,,,,"lunch, dinner",,2026-07-29
 r0542,Trattoria Da Gianni,52.50499,13.299,Restaurant,besucht,sehr_gut,normal,fav,,2026-07-20,,,,"lunch, dinner",,
 r0544,Trattoria Firuze,52.5435509,13.4163799,Restaurant,besucht,unbewertet,normal,fav,,2026-07-20,,,,"lunch, dinner",,
 r0545,Tussylounge,52.507007,13.464527,Kneipe,besucht,unbewertet,normal,fav,,2026-07-20,,,,drinks,,
 r0546,Van Hoa,52.5476757,13.4146911,Asia,besucht,unbewertet,normal,fav,,2026-07-20,,,vietnamesisch,"lunch, dinner",,
 r0547,Venue,52.4841944,13.4395417,Restaurant,besucht,sehr_gut,normal,fav,,2026-07-20,,,,"fruehstueck, brunch",,
 r0548,Vereinszimmer,52.4900063,13.3825711,Restaurant,besucht,sehr_gut,guenstig,fav,,2026-07-20,,,,"lunch, dinner",,
-r0549,Verōnika Berlin,52.5257108,13.3892885,Steak/Grill,besucht,unbewertet,ueberteuert,fav,,2026-07-23,,,,"lunch, dinner",,
+r0549,Verōnika Berlin,52.5257108,13.3892885,Steak/Grill,besucht,sehr_gut,teuer,fav,,2026-07-29,,,,"lunch, dinner",,2026-07-29
 r0550,Victoria Bar,52.5013896,13.3638541,Cocktail-Bar,besucht,sehr_gut,normal,fav,,2026-07-20,,,,drinks,,
 r0551,Viet Village,52.5253086,13.4036262,Asia,besucht,unbewertet,normal,fav,,2026-07-20,,,vietnamesisch,"lunch, dinner",,
 r0552,Vietnam Village,52.538544,13.410217,Asia,besucht,unbewertet,normal,fav,,2026-07-20,,,vietnamesisch,"lunch, dinner",,
@@ -515,12 +515,12 @@ r0553,Vino & Basilico,52.5251793,13.3931924,Restaurant,besucht,sehr_gut,normal,f
 r0554,Vinpearl,52.5420986,13.4198681,Asia,besucht,unbewertet,normal,fav,,2026-07-20,,,vietnamesisch,"lunch, dinner",,
 r0555,VOLK,52.5315804,13.3995092,Restaurant,besucht,unbewertet,ueberteuert,fav,,2026-07-20,,,,"lunch, dinner",,
 r0556,W - Der Imbiss,52.5342948,13.405064,Asia,besucht,unbewertet,normal,fav,,2026-07-20,,,,"lunch, dinner",,
-r0557,Weinverein Rote Insel,52.4812452,13.3610653,Weinbar,besucht,sehr_gut,normal,fav,,2026-07-20,,,,drinks,,
+r0557,Weinverein Rote Insel,52.4812452,13.3610653,Weinbar,besucht,sehr_gut,normal,fav,,2026-07-29,,,,"drinks, dinner",,2026-07-29
 r0558,Wen Cheng,52.5307212,13.4117515,Asia,besucht,sehr_gut,normal,fav,,2026-07-20,,,chinesisch,"lunch, dinner",,
 r0559,Wen Cheng 3,52.508541,13.4552754,Asia,besucht,sehr_gut,normal,fav,,2026-07-20,,,chinesisch,"lunch, dinner",,
 r0560,Wen Cheng 4,52.4986546,13.4315636,Asia,besucht,sehr_gut,normal,fav,,2026-07-20,,,chinesisch,"lunch, dinner",,
 r0561,Wen Cheng Handpulled Noodles,52.5462791,13.4135482,Asia,besucht,sehr_gut,normal,fav,,2026-07-20,,,chinesisch,"lunch, dinner",,
-r0562,Werkstatt der Süße,52.5391185,13.4176004,Dessert,besucht,sehr_gut,normal,fav,,2026-07-23,,,,"fruehstueck, kaffee",,
+r0562,Werkstatt der Süße,52.5391185,13.4176004,Dessert,besucht,sehr_gut,normal,fav,,2026-07-28,,,,"fruehstueck, kaffee",,2026-07-28
 r0563,What do you fancy love?,52.5283123,13.4096598,Restaurant,besucht,unbewertet,normal,fav,filiale,2026-07-20,,,,"fruehstueck, brunch",,
 r0565,Wilma,52.5532638,13.3786216,Kneipe,besucht,sehr_gut,normal,fav,,2026-07-20,,,,drinks,,
 r0566,WIM Kaffee,52.5481639,13.407854,Café,besucht,sehr_gut,normal,fav,,2026-07-20,,,,"fruehstueck, kaffee",,
@@ -536,12 +536,12 @@ r0575,Yumcha Heroes,52.531192,13.402727,Asia,besucht,unbewertet,normal,fav,,2026
 r0576,Z-Bar,52.529517,13.395655,Kneipe,besucht,mittel,normal,fav,,2026-07-27,,,,drinks,,
 r0577,Zaika,52.5480805,13.4227334,Restaurant,besucht,unbewertet,normal,fav,,2026-07-20,,,,"lunch, dinner",,
 r0578,Zaitoun restaurant,52.5140434,13.4544301,Restaurant,besucht,sehr_gut,guenstig,fav,,2026-07-20,,,,"lunch, dinner",,
-r0579,Zeit für Brot,52.527998,13.408662,Bäcker,besucht,sehr_gut,normal,fav,filiale,2026-07-23,,,,"fruehstueck, kaffee",,
-r0580,Zeit für Brot,52.530412,13.4020423,Bäcker,besucht,sehr_gut,normal,fav,filiale,2026-07-23,,,,"fruehstueck, kaffee",,
-r0581,Zenner Biergarten und Weingarten,52.487488,13.4778311,Biergarten,besucht,sehr_gut,normal,fav,,2026-07-20,,,,"kaffee, dinner, drinks",,
-r0582,Zia Maria,52.5458621,13.4178782,Pizza,besucht,sehr_gut,guenstig,fav,,2026-07-20,,,,"lunch, dinner",,
+r0579,Zeit für Brot,52.527998,13.408662,Bäcker,besucht,sehr_gut,normal,fav,filiale,2026-07-29,,,,"fruehstueck, kaffee, brunch",,2026-07-29
+r0580,Zeit für Brot,52.530412,13.4020423,Bäcker,besucht,sehr_gut,normal,fav,filiale,2026-07-29,,,,"fruehstueck, kaffee, brunch",,2026-07-29
+r0581,Zenner Biergarten und Weingarten,52.487488,13.4778311,Biergarten,besucht,sehr_gut,normal,fav,,2026-07-29,,,,"kaffee, dinner, drinks, lunch",,2026-07-29
+r0582,Zia Maria,52.5458621,13.4178782,Pizza,besucht,sehr_gut,guenstig,fav,,2026-07-29,,,,"lunch, dinner",,2026-07-29
 r0583,Zimt & Zucker,52.5206109,13.3842849,Restaurant,besucht,sehr_gut,normal,fav,,2026-07-20,,,,"fruehstueck, brunch",,
-r0584,ZOLA,52.496228,13.422372,Pizza,besucht,unbewertet,normal,fav,,2026-07-20,,,,"lunch, dinner",,
+r0584,ZOLA,52.496228,13.422372,Pizza,besucht,gut,normal,fav,,2026-07-29,,,,"lunch, dinner",,2026-07-29
 r0585,Zu Mir oder Zu Dir,52.541965,13.415395,Kneipe,besucht,unbewertet,normal,fav,,2026-07-20,,,,drinks,,
 r0586,Zuckerstück,52.550962,13.411714,Restaurant,besucht,sehr_gut,normal,fav,,2026-07-20,,,,"fruehstueck, brunch",,
 r0587,Zwiebelfisch,52.506577,13.321597,Cocktail-Bar,besucht,unbewertet,normal,fav,,2026-07-20,,,,drinks,,
@@ -815,7 +815,7 @@ r0885,Konditorei Rabien,52.45181,13.3305,Café,wunschliste,sehr_gut,normal,tovis
 r0886,KONG,52.5144686,13.4591475,Asia,wunschliste,unbewertet,normal,tovisit,,2026-07-20,,,chinesisch,"lunch, dinner",,
 r0887,Kreuzberger Himmel,52.4928703,13.3864031,Restaurant,wunschliste,unbewertet,normal,tovisit,,2026-07-20,,,,"lunch, dinner",,
 r0888,KROM,52.5321387,13.4240699,Cocktail-Bar,wunschliste,sehr_gut,normal,tovisit,,2026-07-20,,,,drinks,,
-r0889,KTV Karaoke Bar,52.5063097,13.3099406,Karaoke,wunschliste,unbewertet,normal,tovisit,,2026-07-20,,,,"drinks, music",,
+r0889,KTV Karaoke Bar,52.5063097,13.3099406,Karaoke,wunschliste,gut,normal,tovisit,,2026-07-29,,,,"drinks, music",,2026-07-29
 r0890,Kuchi Kant,52.5061941,13.3182456,Sushi,wunschliste,unbewertet,normal,tovisit,,2026-07-20,,,,"lunch, dinner",,
 r0891,Kumpel & Keule GmbH,52.5022699,13.4317393,Restaurant,wunschliste,sehr_gut,normal,tovisit,,2026-07-20,,,,"lunch, dinner",,
 r0892,Kumpelnest 3000,52.503049,13.366432,Kneipe,wunschliste,unbewertet,normal,tovisit,,2026-07-20,,,,drinks,,
@@ -924,7 +924,7 @@ r1003,PHC BAR,52.4802398,13.2744185,Cocktail-Bar,wunschliste,sehr_gut,normal,tov
 r1004,Piccola Taormina,52.5012886,13.3248506,Pizza,wunschliste,sehr_gut,guenstig,tovisit,,2026-07-20,,,,"lunch, dinner",,
 r1005,Pizza Mario x Gambino,52.5096356,13.4312734,Pizza,wunschliste,unbewertet,normal,tovisit,,2026-07-20,,,,"lunch, dinner",,
 r1006,Pizza Nostra,52.5410141,13.4149338,Pizza,wunschliste,sehr_gut,guenstig,tovisit,,2026-07-20,,,,"lunch, dinner",,
-r1007,PIZZERIA - Napoletanische Pizza Berlin,52.5363534,13.376119,Pizza,besucht,sehr_gut,normal,tovisit,,2026-07-23,,,,"lunch, dinner",,
+r1007,PIZZERIA - Napoletanische Pizza Berlin,52.5363534,13.376119,Pizza,besucht,gut,normal,tovisit,,2026-07-29,,,,"lunch, dinner",,2026-07-29
 r1008,Ponte - Ristorante Italiano,52.49607,13.33854,Restaurant,wunschliste,unbewertet,normal,tovisit,,2026-07-20,,,,"lunch, dinner",,
 r1010,Princess Cheesecake,52.5032713,13.3216579,Dessert,wunschliste,sehr_gut,normal,tovisit,filiale,2026-07-23,,,,"fruehstueck, kaffee",,
 r1012,Prometeo Authentic Pizza,52.4939055,13.3622646,Pizza,wunschliste,sehr_gut,normal,tovisit,,2026-07-20,,,,"lunch, dinner",,
@@ -971,7 +971,7 @@ r1056,Schnelle Quelle,52.5238889,13.4072222,Kneipe,wunschliste,unbewertet,normal
 r1057,Schönwetter,52.540938,13.402747,Kneipe,wunschliste,sehr_gut,normal,tovisit,,2026-07-20,,,,drinks,,
 r1058,Schüsseldienst,52.4867644,13.3555944,Restaurant,wunschliste,sehr_gut,guenstig,tovisit,,2026-07-20,,,,"lunch, dinner",,
 r1060,Secret Garden | Vegan Sushi,52.5077682,13.4500313,Sushi,wunschliste,unbewertet,normal,tovisit,,2026-07-20,,,,"lunch, dinner",,
-r1061,Selecta Modern Pizza,52.53413,13.4217131,Pizza,besucht,sehr_gut,normal,tovisit,,2026-07-23,,,,"lunch, dinner",,
+r1061,Selecta Modern Pizza,52.53413,13.4217131,Pizza,besucht,sehr_gut,normal,tovisit,,2026-07-29,,,,"lunch, dinner",,2026-07-29
 r1062,Seoul-Kwan Restaurant,52.47068,13.33059,Asia,wunschliste,sehr_gut,normal,tovisit,,2026-07-20,,,koreanisch,"lunch, dinner",,
 r1063,Sfera,52.4739148,13.450397,Restaurant,wunschliste,sehr_gut,normal,tovisit,,2026-07-20,,,,"fruehstueck, brunch",,
 r1064,Shaniu's House of Noodles,52.496173,13.3279995,Asia,wunschliste,sehr_gut,normal,tovisit,,2026-07-20,,,chinesisch,"lunch, dinner",,
@@ -982,7 +982,7 @@ r1068,simsim levantine eatery,52.536912,13.4170543,Restaurant,wunschliste,unbewe
 r1069,Sironi – Pizza di Milano,52.4937462,13.3535133,Pizza,wunschliste,unbewertet,normal,tovisit,,2026-07-20,,,,"lunch, dinner",,
 r1070,Sky Bar,52.5140774,13.4684846,Cocktail-Bar,wunschliste,unbewertet,normal,tovisit,,2026-07-20,,,,drinks,,
 r1071,SKYKITCHEN Restaurant & Bar,52.52844,13.45707,Restaurant,wunschliste,sehr_gut,teuer,tovisit,,2026-07-20,,,,"lunch, dinner",,
-r1072,Slice Society,52.5289504,13.3949077,Pizza,besucht,mittel,normal,tovisit,,2026-07-27,,,,"lunch, dinner",,
+r1072,Slice Society,52.5289504,13.3949077,Pizza,besucht,mittel,normal,tovisit,,2026-07-29,,,,"lunch, dinner",,2026-07-29
 r1073,Smack Burger,52.5502926,13.3847369,Burger,wunschliste,sehr_gut,normal,tovisit,,2026-07-20,,,,"lunch, dinner",,
 r1074,Smooches Sandwich Laden,52.495535,13.4296144,Restaurant,wunschliste,sehr_gut,normal,tovisit,,2026-07-20,,,,"lunch, dinner",,
 r1075,Sole d`Oro CUCINA ITALIANA,52.514882,13.304953,Restaurant,wunschliste,sehr_gut,normal,tovisit,,2026-07-20,,,,"lunch, dinner",,
@@ -1014,7 +1014,7 @@ r1105,The Curtain Club,52.51032,13.375282,Cocktail-Bar,wunschliste,sehr_gut,norm
 r1106,The Gibson Bar Berlin,52.5057254,13.380306,Cocktail-Bar,wunschliste,unbewertet,ueberteuert,tovisit,,2026-07-20,,,,drinks,,
 r1107,The Hat Bar Berlin,52.505122,13.329289,Cocktail-Bar,wunschliste,sehr_gut,normal,tovisit,,2026-07-20,,,,drinks,,
 r1108,THE MEAT,52.5003376,13.2994962,Steak/Grill,wunschliste,sehr_gut,normal,tovisit,,2026-07-20,,,,"lunch, dinner",,
-r1110,The Sanctuary Berlin,52.5289539,13.3945684,Bäcker,besucht,unbewertet,normal,tovisit,,2026-07-21,,,,"fruehstueck, brunch",,
+r1110,The Sanctuary Berlin,52.5289539,13.3945684,Bäcker,besucht,mittel,normal,tovisit,,2026-07-29,,,,"fruehstueck, brunch, kaffee",,2026-07-29
 r1111,The small garden,52.5080064,13.3918671,Restaurant,wunschliste,sehr_gut,normal,tovisit,,2026-07-20,,,,"lunch, dinner",,
 r1112,The Store Kitchen,52.5275076,13.4154483,Restaurant,wunschliste,unbewertet,normal,tovisit,,2026-07-20,,,,"lunch, dinner",,
 r1113,The Tree,52.5337744,13.3980739,Asia,besucht,sehr_gut,normal,tovisit,,2026-07-23,,,chinesisch,"lunch, dinner",,
@@ -1044,7 +1044,7 @@ r1140,Vesper Bar,52.499379,13.305274,Cocktail-Bar,wunschliste,unbewertet,normal,
 r1141,Vincent Piano Bar,52.5215549,13.3859509,Biergarten,wunschliste,unbewertet,normal,tovisit,,2026-07-20,,,,"kaffee, dinner, drinks",,
 r1142,Vox Restaurant,52.508263,13.372837,Restaurant,wunschliste,unbewertet,ueberteuert,tovisit,,2026-07-20,,,,"lunch, dinner",,
 r1143,W Pizza,52.4868623,13.4395553,Pizza,wunschliste,unbewertet,normal,tovisit,,2026-07-20,,,,"lunch, dinner",,
-r1144,W Pizza Mitte,52.5304844,13.3834317,Pizza,besucht,sehr_gut,normal,tovisit,,2026-07-23,,,,"lunch, dinner",,
+r1144,W Pizza Mitte,52.5304844,13.3834317,Pizza,besucht,sehr_gut,normal,tovisit,,2026-07-29,,,,"lunch, dinner",,2026-07-29
 r1146,Wax On Bar,52.4881756,13.4298614,Cocktail-Bar,wunschliste,sehr_gut,normal,tovisit,,2026-07-20,,,,drinks,,
 r1147,weinverein,52.4812574,13.3611131,Weinbar,wunschliste,sehr_gut,normal,tovisit,,2026-07-20,,,,drinks,,
 r1148,Weyers Restaurant,52.4974637,13.323019,Restaurant,wunschliste,unbewertet,normal,tovisit,,2026-07-20,,,,"lunch, dinner",,
@@ -1055,7 +1055,7 @@ r1152,Wirtshaus Wuppke,52.506534,13.3173041,Kneipe,wunschliste,unbewertet,normal
 r1153,Yasmin Alsham,52.4848586,13.4330931,Imbiss,wunschliste,unbewertet,normal,tovisit,,2026-07-20,,,,"lunch, dinner",,
 r1154,Yume- Japanese Cafe & Diner,52.5097788,13.4581611,Asia,wunschliste,sehr_gut,normal,tovisit,,2026-07-20,,,japanisch,"lunch, dinner",,
 r1155,Zacharias . kaffeebar,52.5341272,13.4159156,Café,besucht,unbewertet,normal,tovisit,,2026-07-23,,,,"fruehstueck, kaffee",,
-r1156,Zollhaus Pankow,52.5558722,13.4150153,Pizza,besucht,unbewertet,normal,tovisit,,2026-07-23,,,,"lunch, dinner",,
+r1156,Zollhaus Pankow,52.5558722,13.4150153,Pizza,besucht,mittel,normal,tovisit,,2026-07-29,,,,"lunch, dinner",,2026-07-29
 r1158,ZUKA Dessertkultur,52.4972417,13.3204219,Dessert,wunschliste,sehr_gut,normal,tovisit,,2026-07-23,,,,"fruehstueck, kaffee",,
 r1159,Zula Hummus Café,52.5375334,13.4178043,Restaurant,wunschliste,unbewertet,normal,tovisit,,2026-07-20,,,,"lunch, dinner",,
 r1160,Zum Heiligen Teufel - Cucina Italiana,52.4991204,13.4368175,Restaurant,wunschliste,unbewertet,normal,tovisit,,2026-07-20,,,,"lunch, dinner",,
@@ -1066,8 +1066,8 @@ r1164,Cara Restaurant & Bar,52.52822,13.3941,Restaurant,besucht,unbewertet,ueber
 r1166,Le Coronarie,52.5276096,13.3993318,Restaurant,besucht,sehr_gut,normal,,,2026-07-23,https://www.google.com/maps/place/?q=place_id:ChIJZ9MHHABRqEcRfzHfJ4WNWSQ,ChIJZ9MHHABRqEcRfzHfJ4WNWSQ,,"lunch, dinner",,
 r1167,Poveracci,52.5289539,13.3945684,Restaurant,besucht,mittel,normal,,,2026-07-27,https://www.google.com/maps/place/?q=place_id:ChIJMQ3ZUO9RqEcRaANrt2LssoU,ChIJMQ3ZUO9RqEcRaANrt2LssoU,,"lunch, dinner",,
 r1168,Coffee Circle Oranienburger Tor,52.5265228,13.3887761,Café,besucht,unbewertet,normal,,,2026-07-23,https://www.google.com/maps/place/?q=place_id:ChIJWQQ8X9BRqEcRM85Gph6dUR4,ChIJWQQ8X9BRqEcRM85Gph6dUR4,,"fruehstueck, kaffee",,
-r1169,Eispatisserie Hokey Pokey Mitte,52.5297033,13.3987939,Eis,besucht,sehr_gut,normal,,,2026-07-23,https://www.google.com/maps/place/?q=place_id:ChIJ-bOuEcVRqEcRv1a3C1ax4Xo,ChIJ-bOuEcVRqEcRv1a3C1ax4Xo,,kaffee,,
-r1170,Café Tillmann Koppenplatz - Bio Konditorei,52.527297,13.3978781,Bäcker,besucht,sehr_gut,normal,,,2026-07-23,https://www.google.com/maps/place/?q=place_id:ChIJmZwEE_NRqEcR0j-lCBJE81k,ChIJmZwEE_NRqEcR0j-lCBJE81k,,"fruehstueck, kaffee",,
-r1171,Bäcker Taudien,52.5322808,13.3966781,Bäcker,besucht,sehr_gut,normal,,,2026-07-23,https://www.google.com/maps/place/?q=place_id:ChIJrfqg9-9RqEcRo7j6hWsvNKE,ChIJrfqg9-9RqEcRo7j6hWsvNKE,,"fruehstueck, kaffee",,
+r1169,Eispatisserie Hokey Pokey Mitte,52.5297033,13.3987939,Eis,besucht,sehr_gut,normal,,,2026-07-29,https://www.google.com/maps/place/?q=place_id:ChIJ-bOuEcVRqEcRv1a3C1ax4Xo,ChIJ-bOuEcVRqEcRv1a3C1ax4Xo,,kaffee,,2026-07-29
+r1170,Café Tillmann Koppenplatz - Bio Konditorei,52.527297,13.3978781,Bäcker,besucht,sehr_gut,normal,,,2026-07-29,https://www.google.com/maps/place/?q=place_id:ChIJmZwEE_NRqEcR0j-lCBJE81k,ChIJmZwEE_NRqEcR0j-lCBJE81k,,fruehstueck,,2026-07-29
+r1171,Bäcker Taudien,52.5322808,13.3966781,Bäcker,besucht,sehr_gut,normal,,,2026-07-29,https://www.google.com/maps/place/?q=place_id:ChIJrfqg9-9RqEcRo7j6hWsvNKE,ChIJrfqg9-9RqEcRo7j6hWsvNKE,,fruehstueck,,2026-07-29
 r1172,Croissant Couture Breakfast & Brunch,52.5265223,13.3898775,Restaurant,besucht,unbewertet,normal,,,2026-07-27,https://www.google.com/maps/place/?q=place_id:ChIJhfYxx_lRqEcREPhCBHnFXLM,ChIJhfYxx_lRqEcREPhCBHnFXLM,,"lunch, dinner",Spontanfund,
 r1173,Rram,52.5289118,13.3947772,Asia,besucht,sehr_gut,normal,,,2026-07-27,https://www.google.com/maps/place/?q=place_id:ChIJp8LetORRqEcRQ3fsICB65mo,ChIJp8LetORRqEcRQ3fsICB65mo,,"lunch, dinner",Spontanfund,
