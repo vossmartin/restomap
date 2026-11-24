@@ -1,0 +1,23 @@
+# restomap — Suchmaschinen ausschließen (Martins Entscheidung 07.08.2026, G2)
+#
+# Gehört in den WURZELORDNER des Repos, neben index.html.
+# Erreichbar unter https://vossmartin.github.io/restomap/robots.txt
+#
+# ACHTUNG, die Falle: "Disallow: /" wäre hier FALSCH. Es verbietet dem Crawler den
+# Abruf — und dann liest er das noindex-Meta-Tag in der Seite nie. Eine Seite, auf
+# die von irgendwo verlinkt wird, landet dann trotzdem im Index, nur ohne Textauszug.
+# Genau das Gegenteil des Ziels.
+#
+# Richtig ist deshalb: Abruf ERLAUBEN, damit das Meta-Tag gelesen werden kann.
+# Der eigentliche Ausschluss passiert über
+#     <meta name="robots" content="noindex, nofollow">
+# in index.html und review.html. Diese Datei sperrt nur das, was ohnehin niemand
+# indexieren soll, und dokumentiert die Absicht.
+#
+# Was das leistet: Die Seite taucht nicht in Suchergebnissen auf.
+# Was das NICHT leistet: Zugriffsschutz. Wer die URL hat, kommt rein — so gewollt.
+
+User-agent: *
+Allow: /
+Disallow: /data/
+Disallow: /review.html
